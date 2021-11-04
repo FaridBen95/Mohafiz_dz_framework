@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Empty project</string>
+    <string name="accept_permission">Please accept the permission to start the application</string>
+    <string name="action_settings">Settings</string>
+    <string name="phone_required">Phone is Required.</string>
+    <string name="phone_code_required">Phone code is required.</string>
+    <string name="no_activity_found_to_handle_this_file">No application found to handle this file</string>
+    <string name="toast_permission_download_storage">Authorize the storage permission</string>
+    <string name="error_occurred">"An error occurred "</string>
+    <string name="cancel">Cancel</string>
+    <string name="you_need_internet_connection">You need an internet connection</string>
+    <string name="try_again">Please try again</string>
+    <string name="phone_number">Phone</string>
+    <string name="reset_code_sent">Reset password code sent to your email</string>
+    <string name="error_confirming_phone_code">An error while confirming phone code</string>
+    <string name="home">Home</string>
+    <string name="about">About</string>
+    <string name="an_authentication_code_has_sent_to">An authentication code has sent to</string>
+    <string name="image_saved">Image is saved</string>
+    <string name="upload_title">Upload :</string>
+    <string name="uploading_attachments">Uploading attachment</string>
+    <string name="preparing_data">Preparing data</string>
+    <string name="sync_failed">Sync failed something went wrong</string>
+    <string name="fetching_data">Fetching data</string>
+    <string name="enter_valid_code">Please enter a valid code</string>
+    <string name="phone_verification_successful">Phone verification completed successfully</string>
+    <string name="log_out">Log out</string>
+    <string name="link_with_phone_title">Link your account with a phone number</string>
+    <string name="logout_message">Are you sure you want to log out</string>
+
+    <string name="language_changed">Language has been changed</string>
+    <string name="theme_changed">Theme has been changed</string>
+    <string name="login_with_phone">Login with Phone</string>
+    <string name="result_empty">Result empty</string>
+    <string name="try_searching_for_something">Try searching for something else</string>
+    <string name="incorrect_date">Possible incorrect date</string>
+    <string name="incorrect_date_msg" translatable="false"><![CDATA[\"Make sure you\'re online and that the automatic date & time is activated in your phone settings \"]]></string>
+    <string name="day"> day </string>
+    <string name="days"> days </string>
+    <string name="hour"> hour </string>
+    <string name="hours"> hours </string>
+    <string name="minute"> minute </string>
+    <string name="minutes"> minutes </string>
+    <string name="seconds"> seconds</string>
+    <string name="now">Now</string>
+    <string name="continue_with_facebook">Continue with Facebook</string>
+    <string name="continue_with_gmail">Continue with Gmail</string>
+    <string name="continue_with_phone">Continue with Phone</string>
+    <string name="loading_dialog_text">Loading ...</string>
+    <string name="next">Next</string>
+    <string name="phone_authentication">Phone Authentication</string>
+    <string name="i_don_t_recieve_code">I didn\'t receive the code </string>
+    <string name="resend_code">Resend the code</string>
+    <string name="fill_your_informations_in_order_to_continue">Fill out your informations in order to continue</string>
+    <string name="low_storage_error_message">"The application won't work properly because of the insufficient storage space "</string>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="font_normal" translatable="false">sans-serif</string>
+
+    <!-- Text colors -->
+    <color name="body_text_1_inverse">#deffffff</color>
+
+<!--    <string name="font_fontFamily_light">@string/font_fontFamily_light</string>-->
+
+
+</resources>

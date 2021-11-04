@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="default_4dp">4dp</dimen>
+    <dimen name="default_8dp">8dp</dimen>
+    <dimen name="default_16dp">16dp</dimen>
+    <dimen name="app_bar_top_padding">0dp</dimen>
+
+
+    <!-- Text Sizes -->
+    <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_medium">14sp</dimen>
+    <dimen name="text_size_xmedium">16sp</dimen>
+    <dimen name="text_size_xxlarge">25sp</dimen>
+
+
+    <!-- Eshop colors -->
+    <dimen name="eshop_tiny_font">10dp</dimen>
+
+</resources>

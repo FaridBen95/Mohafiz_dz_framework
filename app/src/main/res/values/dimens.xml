@@ -1,0 +1,35 @@
+<resources>
+
+
+    //user profile
+
+
+    //ecomerce x dimensions
+
+    <!--general spacing-->
+    <dimen name="spacing_small">3dp</dimen>
+    <dimen name="spacing_medium">5dp</dimen>
+    <dimen name="spacing_middle">10dp</dimen>
+    <dimen name="spacing_large">15dp</dimen>
+    <dimen name="spacing_smlarge">18dp</dimen>
+    <dimen name="spacing_mlarge">20dp</dimen>
+    <dimen name="spacing_xlarge">35dp</dimen>
+    <dimen name="spacing_xmlarge">40dp</dimen>
+
+    <!-- Material Vision -->
+
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+
+
+    <dimen name="activity_horizontal_margin2">8dp</dimen>
+    <dimen name="activity_horizontal_margin3">32dp</dimen>
+
+    <dimen name="backdrop_height1">132dp</dimen>
+    <dimen name="spacing_xxlarge">50dp</dimen>
+
+
+    <!--
+Refer to App Widget Documentation for margin information
+http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
+    -->
+</resources>

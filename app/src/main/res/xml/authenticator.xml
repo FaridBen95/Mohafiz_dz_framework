@@ -1,0 +1,7 @@
+<account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accountType="com.mohafizDZ.empty_project.auth"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_title"
+    android:smallIcon="@mipmap/ic_launcher">
+
+</account-authenticator>

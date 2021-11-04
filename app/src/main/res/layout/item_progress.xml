@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="160dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingVertical="@dimen/activity_horizontal_margin3"
+        android:id="@+id/lyt_progress"
+        android:background="@color/white"
+        >
+        <com.wang.avi.AVLoadingIndicatorView
+            android:layout_gravity="center"
+            android:id="@+id/progressDots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:indicatorColor="@color/main_theme_primary_"
+            app:indicatorName="BallPulseIndicator"
+            />
+    </FrameLayout>
+</FrameLayout>

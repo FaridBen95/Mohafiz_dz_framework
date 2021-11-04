@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Empty project</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="phone_required">Le téléphone est obligatoire.</string>
+    <string name="phone_code_required">Le code est requis.</string>
+    <string name="accept_permission">Veuillez accepter l\'autorisation pour démarrer l\'application</string>
+    <string name="no_activity_found_to_handle_this_file">Aucune application trouvée pour gérer ce fichier</string>
+    <string name="toast_permission_download_storage">Autoriser la  permission de stockage</string>
+    <string name="error_occurred">Une erreur s\'est produite</string>
+    <string name="cancel">Annuler</string>
+    <string name="you_need_internet_connection">Vous avez besoin d\'une connexion Internet</string>
+    <string name="try_again">Veuillez réessayer</string>
+    <string name="phone_number">Téléphone</string>
+    <string name="reset_code_sent">Reset password code sent to your email</string>
+    <string name="error_confirming_phone_code">Une erreur lors de la confirmation du code téléphonique</string>
+    <string name="home">L\'accueil</string>
+    <string name="about">À propos</string>
+    <string name="an_authentication_code_has_sent_to">Un code d\'authentification a été envoyé à</string>
+    <string name="image_saved">L\'image est enregistrée</string>
+    <string name="upload_title">Télécharger :</string>
+    <string name="uploading_attachments">Téléchargement de la pièce jointe</string>
+    <string name="preparing_data">Préparation des données</string>
+    <string name="sync_failed">La synchronisation a échoué quelque chose s\'est mal passé</string>
+    <string name="fetching_data">Récupération des données</string>
+    <string name="enter_valid_code">Veuillez saisir un code valide</string>
+    <string name="phone_verification_successful">Vérification du téléphone terminée avec succès</string>
+    <string name="log_out">"Déconnecter "</string>
+    <string name="now">Maintenant</string>
+    <string name="seconds"> Seconds</string>
+    <string name="minutes"> Minutes</string>
+    <string name="minute"> Minute</string>
+    <string name="hours"> Heures</string>
+    <string name="hour"> Heure</string>
+    <string name="days"> Jours</string>
+    <string name="day"> Jour</string>
+    <string name="incorrect_date">Date incorrecte possible</string>
+    <string name="language_changed">La langue a été changée</string>
+    <string name="theme_changed">Le theme a été changée</string>
+    <string name="login_with_phone">Connectez avec le téléphone</string>
+    <string name="link_with_phone_title">Associez votre compte à un numéro de téléphone</string>
+    <string name="logout_message">Êtes-vous sûr de vouloir vous déconnecter</string>
+    <string name="result_empty">Résultat est vide</string>
+    <string name="try_searching_for_something">Veuilez rechercher pous un autre chôse</string>
+    <string name="incorrect_date_msg"><![CDATA[\"Assurez-vous que vous êtes en ligne et que la date et l\'heure automatiques sont activées dans les paramètres de votre téléphone \"]]></string>
+    <string name="continue_with_facebook">Continuer avec Facebook</string>
+    <string name="continue_with_gmail">Continuer avec Gmail</string>
+    <string name="continue_with_phone">Continuer avec Téléphone</string>
+    <string name="loading_dialog_text">Chargement ...</string>
+    <string name="next">Suivant</string>
+    <string name="phone_authentication">Authentification par téléphone</string>
+    <string name="i_don_t_recieve_code">je n\'ai pas reçu le code </string>
+    <string name="resend_code">Renvoyer le code</string>
+    <string name="fill_your_informations_in_order_to_continue">Remplissez vos informations pour continuer</string>
+    <string name="low_storage_error_message">L\'application ne fonctionnera pas correctement à cause de l\'espace de stockage insuffisant</string>
+
+</resources>

@@ -1,0 +1,560 @@
+package com.MohafizDZ.framework_repository;
+
+import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.widget.Toast;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.framework_repository.Utils.FileManager;
+import com.MohafizDZ.framework_repository.Utils.IntentUtils;
+import com.MohafizDZ.framework_repository.Utils.MySharedPreferences;
+import com.MohafizDZ.framework_repository.Utils.MyUtil;
+import com.MohafizDZ.framework_repository.controls.MMenuAdapter;
+import com.MohafizDZ.framework_repository.core.DataRow;
+import com.MohafizDZ.framework_repository.core.Model;
+import com.MohafizDZ.framework_repository.core.MyAppCompatActivity;
+import com.MohafizDZ.framework_repository.service.MSyncStatusObserverListener;
+import com.MohafizDZ.framework_repository.service.SyncUtils;
+import com.MohafizDZ.framework_repository.service.SyncingReport;
+import com.MohafizDZ.project.StartClassHelper;
+import com.MohafizDZ.project.models.ConfigurationModel;
+import com.MohafizDZ.project.models.UserModel;
+import com.google.firebase.messaging.FirebaseMessaging;
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
+import nl.psdcompany.duonavigationdrawer.views.DuoDrawerLayout;
+import nl.psdcompany.duonavigationdrawer.views.DuoMenuView;
+import nl.psdcompany.duonavigationdrawer.widgets.DuoDrawerToggle;
+
+public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuView.OnMenuClickListener, MSyncStatusObserverListener {
+    public static final String TAG = MohafizMainActivity.class.getSimpleName();
+    private static final int PERMISSIONS_REQUEST_REQUIRED_PERMS = 13;
+    public static final int FACEBOOK_REQUEST_CODE = 64206;
+    public static final String DEFAULT_LANGUAGE = "not_provided";
+    public static final String LANGUAGE_KEY = "language_key";
+    //if a bundle contains this then open the corresponding fragment
+    public static final String FRAGMENT_NAME = "fragment_name";
+    private static final String FIRST_RUN = "first_run";
+    public static final String FIRST_RUN_DATE = "first_run_date";
+    private static final int KEEP_SERVICE_RUNNING = 5017;
+    private String toOpenFragment = null;
+    private Bundle data;
+    private DuoDrawerLayout drawerLayout;
+    private ArrayList<String> menuOptions;
+    private MMenuAdapter menuAdapter;
+    private DuoMenuView duoMenuView;
+    private List<String> syncedModels = new ArrayList<>();
+    private List<String> signUpProcessSyncedModels = new ArrayList<>();
+    public AlertDialog progressDialog;
+    private boolean opened;
+    private boolean waitForFirstSync;
+    private View imageView;
+    private Animation animation;
+    private View waitingFrameLayout;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+//        FacebookSdk.sdkInitialize(getApplicationContext());
+        setContentView(R.layout.activity_start);
+        sethasSyncListener(this);
+        imageView = findViewById(R.id.logo_up);
+        waitingFrameLayout = findViewById(R.id.waitingFrameLayout);
+        initAnimation();
+        if(app().forceAutomaticDate() && !app().dateIsCorrect()){
+            SweetAlertDialog dateDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
+            dateDialog.setTitleText(getString(R.string.incorrect_date))
+                    .setContentText(getString(R.string.incorrect_date_msg)).setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    finish();
+                }
+            });
+            dateDialog.show();
+            return;
+        }
+        initConfig();
+        init();
+        initArgs();
+        initDrawerMenu();
+        data = null;
+        if(toOpenFragment != null) {
+            data = new Bundle();
+            data.putString(FRAGMENT_NAME, toOpenFragment);
+        }
+        startProjectCode();
+    }
+
+    private void initAnimation() {
+        animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.animation_down_to_center);
+        animation.setInterpolator(new AnticipateOvershootInterpolator());
+        animation.setDuration(2000);
+        imageView.startAnimation(animation);
+        new Handler().postDelayed(() -> {
+            waitingFrameLayout.setVisibility(View.VISIBLE);
+        }, 2000);
+    }
+
+    private void startProjectCode() {
+        verifyUserConnection();
+    }
+
+    private void verifyUserConnection() {
+        DataRow currentUserRow = app().getCurrentUser();
+        if(app().isConnected()) {
+            boolean userSynced = new UserModel(this).syncWithSuccess(15);
+            if (currentUserRow != null && ( !app().inNetwork() || userSynced)) {
+                openNextPage();
+            }else{
+                syncUsers();
+            }
+        }
+    }
+
+    public void syncUsers(){
+        showProgressDialog();
+        Bundle bundle = new Bundle();
+        bundle.putString("from", TAG);
+        SyncUtils.requestSync(this, UserModel.AUTHORITY, bundle);
+    }
+
+    private static final Intent[] POWERMANAGER_INTENTS = {
+            new Intent().setComponent(new ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")),
+            new Intent().setComponent(new ComponentName("com.letv.android.letvsafe", "com.letv.android.letvsafe.AutobootManageActivity")),
+            new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity")),
+            new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")),
+            new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.appcontrol.activity.StartupAppControlActivity")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.privacypermissionsentry.PermissionTopActivity")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.FakeActivity")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.privacypermissionsentry.PermissionTopActivity")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.privacypermissionsentry.PermissionTopActivity.Startupmanager")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.startupapp.startupmanager")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startupmanager.startupActivity")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startupapp.startupmanager")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startsettings")),
+            new Intent().setComponent(new ComponentName("com.coloros.safe", "com.coloros.safe.permission.startupmanager.StartupAppListActivity")),
+            new Intent().setComponent(new ComponentName("com.coloros.safe", "com.coloros.safe.permission.startupapp.StartupAppListActivity")),
+            new Intent().setComponent(new ComponentName("com.coloros.safe", "com.coloros.safe.permission.startup.StartupAppListActivity")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startupmanager.StartupAppListActivity")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startupapp.StartupAppListActivity")),
+            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.FakeActivity")),
+            new Intent().setComponent(new ComponentName("com.oppo.safe", "com.oppo.safe.permission.startup.StartupAppListActivity")),
+            new Intent().setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity")),
+            new Intent().setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager")),
+            new Intent().setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity")),
+            new Intent().setComponent(new ComponentName("com.samsung.android.lool", "com.samsung.android.sm.battery.ui.BatteryActivity")),
+            new Intent().setComponent(new ComponentName("com.samsung.android.lool", "com.samsung.android.sm.ui.battery.BatteryActivity")),
+            new Intent().setComponent(new ComponentName("com.htc.pitroad", "com.htc.pitroad.landingpage.activity.LandingPageActivity")),
+            new Intent().setComponent(new ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity")),
+            new Intent().setComponent(new ComponentName("com.transsion.phonemanager", "com.itel.autobootmanager.activity.AutoBootMgrActivity"))
+    };
+
+    private void keepServicesInChineseDevices() {
+        if(new MySharedPreferences(this).getBoolean(MySharedPreferences.KEEP_SERVICE_RUNNING_KEY, false)){
+            return;
+        }
+//        Intent intent = new Intent();
+//
+//        String manufacturer = android.os.Build.MANUFACTURER;
+//        boolean startIntent = true;
+//        Toast.makeText(this, manufacturer, Toast.LENGTH_SHORT).show();
+//
+//        switch (manufacturer.toLowerCase()) {
+//
+//            case "xiaomi":
+//                intent.setComponent(new ComponentName("com.miui.securitycenter",
+//                        "com.miui.permcenter.autostart.AutoStartManagementActivity"));
+//                break;
+//            case "oppo":
+//                intent.setComponent(new ComponentName("com.coloros.safecenter",
+//                        "com.coloros.safecenter.permission.startup.StartupAppListActivity"));
+//
+//                break;
+//            case "vivo":
+//                intent.setComponent(new ComponentName("com.vivo.permissionmanager",
+//                        "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"));
+//                break;
+//            default:
+//                startIntent = false;
+//                new MySharedPreferences(this).setBoolean(MySharedPreferences.KEEP_SERVICE_RUNNING_KEY, true);
+//                break;
+//        }
+//        if(startIntent) {
+//            try {
+//                startActivityForResult(intent, KEEP_SERVICE_RUNNING);
+//            }catch (Exception ignored){}
+//        }
+        for (Intent intent : POWERMANAGER_INTENTS) {
+            boolean success;
+            if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
+                try {
+                    success = true;
+                    startActivityForResult(intent, KEEP_SERVICE_RUNNING);
+                } catch (Exception e) {
+                    success = false;
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+                if(success) break;
+            }
+        }
+    }
+
+//    private void initOPPO() {
+//        try {
+//
+//            Intent i = new Intent(Intent.ACTION_MAIN);
+//            i.setComponent(new ComponentName("com.oppo.safe", "com.oppo.safe.permission.floatwindow.FloatWindowListActivity"));
+//            startActivity(i);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            try {
+//
+//                Intent intent = new Intent("action.coloros.safecenter.FloatWindowListActivity");
+//                intent.setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.floatwindow.FloatWindowListActivity"));
+//                startActivity(intent);
+//            } catch (Exception ee) {
+//
+//                ee.printStackTrace();
+//                try{
+//
+//                    Intent i = new Intent("com.coloros.safecenter");
+//                    i.setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.sysfloatwindow.FloatWindowListActivity"));
+//                    startActivity(i);
+//                }catch (Exception e1){
+//
+//                    e1.printStackTrace();
+//                }
+//            }
+//
+//        }
+//
+//        if (Build.MANUFACTURER.equalsIgnoreCase("oppo")) {
+//            try {
+//                Intent intent = new Intent();
+//                intent.setClassName("com.coloros.safecenter",
+//                        "com.coloros.safecenter.permission.startup.StartupAppListActivity");
+//                startActivity(intent);
+//            } catch (Exception e) {
+//                try {
+//                    Intent intent = new Intent();
+//                    intent.setClassName("com.oppo.safe",
+//                            "com.oppo.safe.permission.startup.StartupAppListActivity");
+//                    startActivity(intent);
+//
+//                } catch (Exception ex) {
+//                    try {
+//                        Intent intent = new Intent();
+//                        intent.setClassName("com.coloros.safecenter",
+//                                "com.coloros.safecenter.startupapp.StartupAppListActivity");
+//                        startActivity(intent);
+//                    } catch (Exception exx) {
+//
+//                    }
+//                }
+//            }
+//        }
+//
+//        try
+//        {
+//            //Open the specific App Info page:
+//            Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+//            intent.setData(Uri.parse("package:" + getPackageName()));
+//            startActivity(intent);
+//        }
+//        catch ( ActivityNotFoundException e )
+//        {
+//            //Open the generic Apps page:
+//            Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
+//            startActivity(intent);
+//        }
+//
+//        AutoStartHelper.getInstance().getAutoStartPermission(this);
+//    }
+
+    private void initDrawerMenu() {
+        drawerLayout = (DuoDrawerLayout) findViewById(R.id.drawer_layout);
+        DuoDrawerToggle drawerToggle = new DuoDrawerToggle(this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
+        ArrayList<String> menuOptions = new ArrayList<>();
+        menuOptions.add(getResources().getString(R.string.home));
+//        menuOptions.add(getResources().getString(R.string.my_profile));
+//        menuOptions.add(getResources().getString(R.string.my_orders));
+        menuOptions.add(getResources().getString(R.string.action_settings));
+        menuOptions.add(getResources().getString(R.string.about));
+        duoMenuView = findViewById(R.id.menu);
+        menuAdapter = new MMenuAdapter(menuOptions);
+        menuOptions = new ArrayList<>();
+        menuOptions.add(getResources().getString(R.string.home));
+        menuAdapter.setViewSelected(0, true);
+        menuAdapter = new MMenuAdapter(menuOptions);
+        menuAdapter.setViewSelected(0, true);
+        drawerLayout.setDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+        duoMenuView.setOnMenuClickListener(this);
+    }
+
+    public MMenuAdapter getMenuAdapter() {
+        return menuAdapter;
+    }
+
+    public void setMenuAdapter(MMenuAdapter menuAdapter) {
+        this.menuAdapter = menuAdapter;
+    }
+
+    public void applyMenuAdapter(){
+        DuoMenuView duoMenuView = (DuoMenuView) findViewById(R.id.menu);
+        duoMenuView.setAdapter(getMenuAdapter());
+    }
+
+    private void syncModels() {
+        //todo sync necessary models
+    }
+
+    @Override
+    public void setTitleBar(androidx.appcompat.app.ActionBar actionBar) {
+        if (actionBar != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle("");
+        }
+    }
+
+    private void initConfig() {
+        keepServicesInChineseDevices();
+        AutoStartHelper.getInstance().getAutoStartPermission(this);
+//        initOPPO();
+        MySharedPreferences mySharedPreferences = new MySharedPreferences(this);
+        if(mySharedPreferences.getBoolean(FIRST_RUN, true)){
+            mySharedPreferences.setBoolean(FIRST_RUN, false);
+            mySharedPreferences.putString(FIRST_RUN_DATE, MyUtil.getCurrentDate());
+            onFirstRun();
+        }
+        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+        int WRITE_EXTERNAL_STORAGE_Check = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int CALL_PHONE_Check = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CALL_PHONE);
+        int ACCESS_FINE_LOCATION_Check = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION);
+        int ACCESS_COARSE_LOCATION_Check = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION);
+        if(CALL_PHONE_Check != PackageManager.PERMISSION_GRANTED ||
+                ACCESS_FINE_LOCATION_Check != PackageManager.PERMISSION_GRANTED ||
+                ACCESS_COARSE_LOCATION_Check != PackageManager.PERMISSION_GRANTED ||
+                WRITE_EXTERNAL_STORAGE_Check != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{
+                            android.Manifest.permission.CALL_PHONE,
+                            android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSIONS_REQUEST_REQUIRED_PERMS );
+        }else{
+            app().createApplicationFolder();
+        }
+        onChangeView = new OnChangeView() {
+            @Override
+            public void openedClass(Class opened) {
+                if(opened == null){
+                    findViewById(R.id.waitingFrameLayout).setVisibility(View.VISIBLE);
+                }else{
+                    findViewById(R.id.waitingFrameLayout).setVisibility(View.GONE);
+                }
+            }
+        };
+    }
+
+    private void onFirstRun() {
+        new SyncingReport(this).getWritableDatabase();
+        if(new MySharedPreferences(this).getBoolean(MySharedPreferences.KEEP_SERVICE_RUNNING_KEY, true)) {
+            Bundle data = new Bundle();
+            data.putString("from", TAG);
+            SyncUtils.requestSync(this, UserModel.AUTHORITY, data);
+            SyncUtils.requestSync(this, ConfigurationModel.AUTHORITY, data);
+            waitForFirstSync = true;
+        }
+    }
+
+    private void initControls() {
+    }
+
+    private void initArgs() {
+        Bundle data = getIntent().getExtras();
+        if(data != null){
+            toOpenFragment = data.containsKey(FRAGMENT_NAME)? data.getString(FRAGMENT_NAME) : null;
+        }
+    }
+
+    private void initAdapter() {
+
+    }
+
+    private void init(){
+        progressDialog = MyUtil.getProgressDialog(this);
+    }
+
+    @Override
+    public androidx.appcompat.widget.Toolbar setToolBar() {
+        return (androidx.appcompat.widget.Toolbar) findViewById(R.id.toolbar);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.start_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            if(drawerLayout.isDrawerOpen()){
+                drawerLayout.closeDrawer();
+            } else{
+                drawerLayout.openDrawer();
+            }
+            return false;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_REQUIRED_PERMS: {
+                app().createApplicationFolder();
+                for (int i = 0; i < grantResults.length ; i++) {
+                    if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                        Toast.makeText(this, getString(R.string.accept_permission), Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                }
+                return;
+            }
+
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == FACEBOOK_REQUEST_CODE || requestCode == FileManager.REQUEST_CAMERA ||
+                requestCode == FileManager.REQUEST_IMAGE ){
+            getSupportFragmentManager().findFragmentById(R.id.fragment_container).
+                    onActivityResult(requestCode, resultCode, data);
+        }else if(requestCode == KEEP_SERVICE_RUNNING){
+            Bundle bundle = new Bundle();
+            bundle.putString("from", TAG);
+            SyncUtils.requestSync(this, ConfigurationModel.AUTHORITY, bundle);
+            waitForFirstSync = true;
+            verifyUserConnection();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    public DuoDrawerLayout getDrawerLayout() {
+        return drawerLayout;
+    }
+
+    public DuoMenuView getDuoMenuView() {
+        return duoMenuView;
+    }
+
+    @Override
+    public void onFooterClicked() {
+        //todo logout here
+    }
+
+    @Override
+    public void onHeaderClicked() {
+        //nothing
+    }
+
+    @Override
+    public void onOptionClicked(int position, Object objectClicked) {
+//        switch (position){
+//        }
+        drawerLayout.closeDrawer();
+    }
+
+    @Override
+    public void onSyncStart(Bundle data, Model model) {
+
+    }
+
+    @Override
+    public void onSyncFinish(Bundle data, Model model) {
+        String from = data.containsKey("from") ? data.getString("from") : "";
+        if (from != null) {
+            if (from.equals(MohafizMainActivity.TAG) && !opened) {
+                if(model.getModelName().equals("user") || model.getModelName().equals("tag") || model.getModelName().equals("shareable_user")
+                        || model.getModelName().equals("global_configuration")){
+                    if (!syncedModels.contains(model.getModelName())) {
+                        syncedModels.add(model.getModelName());
+                    }
+                }
+                if((waitForFirstSync && syncedModels.size() == 4) || (!waitForFirstSync && syncedModels.size() >= 1 && syncedModels.contains("user"))) {
+                    syncedModels.clear();
+                    if(waitForFirstSync){
+                        SyncUtils.setSyncPeriodic(this, ConfigurationModel.AUTHORITY, SyncUtils.SYNC_PERIOD_LOW_PRIORITY, null);
+                        waitForFirstSync = false;
+                    }
+                    openNextPage();
+                }
+            }
+        }
+    }
+
+    private void openNextPage() {
+        boolean userSynced = new UserModel(MohafizMainActivity.this).syncWithSuccess(15);
+        if(!app().inNetwork() || userSynced) {
+            DataRow currentUserRow = app().getCurrentUser();
+            if (currentUserRow == null || !currentUserRow.getBoolean("_is_active")) {
+                StartClassHelper.openSignUpActivity(this);
+            }else{
+                StartClassHelper.openProjectMainActivity(this);
+            }
+        }else{
+            finish();
+        }
+    }
+
+    public void showProgressDialog() {
+//        if(findViewById(R.id.waitingFrameLayout).getVisibility() != View.VISIBLE){
+//            progressDialog.show();
+//        }
+    }
+
+    private void startSyncing() {
+        Bundle bundle = new Bundle();
+        bundle.putString("from", MohafizMainActivity.TAG);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        animation.cancel();
+    }
+}

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Empty project</string>
+    <string name="accept_permission">الرجاء قبول الإذن لبدء التطبيق</string>
+    <string name="action_settings">الاعدادات</string>
+    <string name="phone_required">الهاتف مطلوب.</string>
+    <string name="phone_code_required">رمز الهاتف مطلوب.</string>
+    <string name="no_activity_found_to_handle_this_file">لم يتم العثور على تطبيق للتعامل مع هذا الملف</string>
+    <string name="toast_permission_download_storage">السماح بإذن التخزين</string>
+    <string name="error_occurred">حدث خطأ</string>
+    <string name="cancel">إلغاء</string>
+    <string name="you_need_internet_connection">أنت بحاجة إلى اتصال بالإنترنت</string>
+    <string name="try_again">حاول مرة اخرى</string>
+    <string name="phone_number">هاتف</string>
+    <string name="reset_code_sent">إعادة تعيين رمز كلمة المرور ارسل إلى بريدك الإلكتروني</string>
+    <string name="error_confirming_phone_code">خطأ أثناء تأكيد رمز الهاتف</string>
+    <string name="home">الصفحة الرئيسية</string>
+    <string name="about">حول</string>
+    <string name="an_authentication_code_has_sent_to">تم إرسال الرمز إلى</string>
+    <string name="image_saved">تم حفظ الصورة</string>
+    <string name="upload_title">تحميل :</string>
+    <string name="uploading_attachments">تحميل المرفق</string>
+    <string name="preparing_data">تجهيز البيانات</string>
+    <string name="sync_failed">فشلت المزامنة حدث خطأ ما</string>
+    <string name="fetching_data">جلب البيانات</string>
+    <string name="enter_valid_code">الرجاء ادخال الكود الصحيح</string>
+    <string name="phone_verification_successful">اكتمل التحقق من الهاتف بنجاح</string>
+    <string name="log_out">تسجيل الخروج</string>
+    <string name="language_changed">تم تغيير اللغة</string>
+    <string name="theme_changed">تم تغيير ال Theme</string>
+    <string name="login_with_phone">تسجيل الدخول بالهاتف</string>
+    <string name="link_with_phone_title">ربط الحساب برقم الهاتف</string>
+    <string name="logout_message">هل انت متأكد من تسجيل الخروج</string>
+    <string name="result_empty">نتيجة فارغة</string>
+    <string name="try_searching_for_something">حرب البحث عن شيئ اخر</string>
+    <string name="now">الان</string>
+    <string name="seconds">" ثواني"</string>
+    <string name="minutes">" دقائق"</string>
+    <string name="minute">" دقيقة"</string>
+    <string name="hours">" ساعات"</string>
+    <string name="hour">" ساعة"</string>
+    <string name="days">" الايام"</string>
+    <string name="day">" يوم"</string>
+    <string name="incorrect_date">يمكن ان يكون التاريخ خاطئا</string>
+    <string name="incorrect_date_msg" translatable="false"><![CDATA[\ "تأكد من أنك متصل بالإنترنت ومن تنشيط التاريخ والوقت التلقائي في إعدادات هاتفك \"]]></string>
+    <string name="continue_with_facebook">استمر ب Facebook</string>
+    <string name="continue_with_gmail">استمر ب Gmail</string>
+    <string name="continue_with_phone">استمر بالهاتف</string>
+    <string name="loading_dialog_text">جار التحميل...</string>
+    <string name="next">التالي</string>
+    <string name="phone_authentication">التأكد من الهاتف</string>
+    <string name="i_don_t_recieve_code">لم أستلم الرمز </string>
+    <string name="resend_code">اعد ارسال الرمز</string>
+    <string name="fill_your_informations_in_order_to_continue">أملئ معلوماتك للاستمرار</string>
+    <string name="low_storage_error_message">لن يعمل التطبيق بشكل صحيح بسبب مساحة التخزين غير الكافية</string>
+
+</resources>
