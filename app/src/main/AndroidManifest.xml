@@ -64,6 +64,14 @@
         </activity>
         <activity
             android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.framework_repository.core.Account.PhoneLogInActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
             android:name="com.MohafizDZ.framework_repository.core.Account.PhoneVerificationActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:resizeableActivity="false"
