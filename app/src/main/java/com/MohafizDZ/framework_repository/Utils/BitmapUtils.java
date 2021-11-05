@@ -190,6 +190,11 @@ public class BitmapUtils {
             if(destFolderPath != null){
                 compressor = compressor.setDestinationDirectoryPath(destFolderPath);
             }
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             File compressedImage = compressor.compressToFile(file);
             if(compressedImage.renameTo(outputFile)){
                 return outputFile;

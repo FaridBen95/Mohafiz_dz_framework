@@ -513,6 +513,11 @@ public class MyUtil {
         }
         if (success) {
             File imageFile = new File(storageDir, fileName);
+            try {
+                imageFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             savedImagePath = imageFile.getAbsolutePath();
             try {
                 OutputStream fOut = new FileOutputStream(imageFile);

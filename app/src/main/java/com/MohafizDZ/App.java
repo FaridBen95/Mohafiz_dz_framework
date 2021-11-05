@@ -329,8 +329,30 @@ public class App extends MultiDexApplication {
         return new File(path).exists();
     }
 
+    public boolean checkAppImagesFolderExist() {
+        String folder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
+            folder= getExternalFilesDir
+                    (Environment.DIRECTORY_DCIM)  +"/MohafizDZ/"+ App.getApplicationName(this);
+        }
+        else
+        {
+            folder = Environment.getExternalStorageDirectory().getPath() + "/MohafizDZ/"+ App.getApplicationName(this) + "/";
+        }
+        return new File(folder).exists();
+    }
+
     public void createApplicationFolder() {
         MConstants.applicationFolder = Environment.getExternalStorageDirectory().getPath() + "/MohafizDZ/"+ App.getApplicationName(this) + "/";
+        MConstants.applicationImagesFolder = Environment.getExternalStorageDirectory().getPath() + "/MohafizDZ/"+ App.getApplicationName(this) + "/";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
+            MConstants.applicationImagesFolder= getExternalFilesDir
+                    (Environment.DIRECTORY_DCIM)+"/MohafizDZ/"+ App.getApplicationName(this);
+        }
+        else
+        {
+            MConstants.applicationImagesFolder = Environment.getExternalStorageDirectory().getPath() + "/MohafizDZ/"+ App.getApplicationName(this) + "/";
+        }
         File directory = new File(Environment.getExternalStorageDirectory().getPath()+  "/MohafizDZ");
         if(!directory.exists()){
             directory.mkdir();
