@@ -149,7 +149,7 @@ public abstract class RecordHandler {
                         }
                     } else {
                         if (val != null && !val.equals("false") && !val.equals("")) {
-                            List<String> relIds = (List<String>) val;
+                            HashSet<String> relIds = (HashSet<String>) val;
                             List<String> manyToOneIds = manyToOneIdsMap.get(col.getName());
                             manyToOneIds = manyToOneIds != null ? manyToOneIds : new ArrayList<String>();
                             manyToOneIds.addAll(relIds);

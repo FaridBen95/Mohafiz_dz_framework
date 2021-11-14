@@ -506,7 +506,7 @@ public class MyUtil {
 
     public static String saveImage(Context mContext, Bitmap image, String fileName) {
         String savedImagePath = null;
-        File storageDir = new File(MConstants.applicationFolder);
+        File storageDir = new File(MConstants.applicationImagesFolder);
         boolean success = true;
         if (!storageDir.exists()) {
             success = storageDir.mkdirs();

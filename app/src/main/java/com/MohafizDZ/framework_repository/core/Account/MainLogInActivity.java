@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,6 +31,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 
@@ -42,6 +50,10 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
     private AlertDialog progressDialog;
     private boolean newAccount;
     private LogInWith logInWith;
+    private TextView languageTextView;
+    private LinearLayout languageLinearLayout;
+    private String selectedLanguage;
+
     private enum LogInType {phone, email}
     private LogInType logInType = LogInType.email;
 
@@ -52,6 +64,7 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         initConfig();
         initAuthentication();
+        prepareView();
     }
 
     private void initActivity() {
@@ -65,6 +78,8 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
         facebookLinearLayout = findViewById(R.id.facebookLinearLayout);
         gmailLinearLayout = findViewById(R.id.gmailLinearLayout);
         phoneLinearLayout = findViewById(R.id.phoneLinearLayout);
+        languageLinearLayout = findViewById(R.id.languageLinearLayout);
+        languageTextView = findViewById(R.id.languageTextView);
     }
 
     private void initLogInWith() {
@@ -94,6 +109,7 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
             @Override
             public void onErrorOccurred(String message) {
                 Log.d(LogInWith.TAG, message);
+                makeText(MainLogInActivity.this, message, Toast.LENGTH_LONG).show();
                 makeText(MainLogInActivity.this, getResources().getString(R.string.try_again), LENGTH_SHORT).show();
             }
 
@@ -107,11 +123,21 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
         };
     }
 
+    private void prepareView() {
+        try {
+            MyUtil.Language language = MyUtil.getCurrentLanguage(this);
+            String languageStr = language == MyUtil.Language.english ? "English" :
+                    (language == MyUtil.Language.french ? "Français" : "العربية");
+            languageTextView.setText(languageStr);
+        }catch (Exception ignored){}
+    }
+
     private void setControls() {
         facebookLinearLayout.setOnClickListener(this);
         gmailLinearLayout.setOnClickListener(this);
         phoneLinearLayout.setOnClickListener(this);
         findViewById(R.id.parentView).setOnClickListener(this);
+        languageLinearLayout.setOnClickListener(this);
     }
 
     private void initConfig() {
@@ -203,6 +229,7 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSIONS_REQUEST_REQUIRED_PERMS) {
             for (int grantResult : grantResults) {
                 if (grantResult != PackageManager.PERMISSION_GRANTED) {
@@ -250,7 +277,45 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
                     makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
                 }
                 break;
+            case R.id.languageLinearLayout:
+            	languagesDialog();
+                break;
         }
+    }
+
+    private void languagesDialog() {
+        MyUtil.Language language = MyUtil.getCurrentLanguage(this);
+        selectedLanguage = language == MyUtil.Language.english? "English" :
+                (language == MyUtil.Language.french? "Français" : "العربية");
+        String[] availableLocales = Resources.getSystem().getAssets().getLocales();
+        List<String> supportedLocales = Arrays.asList(availableLocales);
+        final Map<String, String> locales = new HashMap<>();
+        List<String> supportedLanguages = new ArrayList<>();
+        if(supportedLocales.contains("en")){
+            locales.put("English", "en");
+            supportedLanguages.add("English");
+        }
+        if(supportedLocales.contains("fr")){
+            locales.put("Français", "fr");
+            supportedLanguages.add("Français");
+        }
+        if(supportedLocales.contains("ar")){
+            locales.put("العربية", "ar");
+            supportedLanguages.add("العربية");
+        }
+        final String[] languages = supportedLanguages.toArray(new String[0]);
+        int checkedItem = Arrays.asList(languages).indexOf(selectedLanguage);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.language));
+        builder.setSingleChoiceItems(languages, checkedItem, (dialogInterface, i) -> selectedLanguage = languages[i]);
+        builder.setPositiveButton(R.string.dialog_ok, (dialogInterface, i) -> {
+            String language1 = locales.get(selectedLanguage);
+            new MySharedPreferences(MainLogInActivity.this).putString(MohafizMainActivity.LANGUAGE_KEY, language1);
+            app().refreshLanguage(MainLogInActivity.this, language1);
+            prepareView();
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
     }
 
     @Override

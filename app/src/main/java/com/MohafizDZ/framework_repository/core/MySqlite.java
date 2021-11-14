@@ -74,6 +74,7 @@ public class MySqlite extends SQLiteOpenHelper{
                 model.onModelUpgrade(db, oldVersion, newVersion);
             }
         }
+        ((App)mContext.getApplicationContext()).onVersionUpgraded(oldVersion, newVersion);
     }
 
 

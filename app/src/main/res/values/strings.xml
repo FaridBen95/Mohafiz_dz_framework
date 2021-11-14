@@ -60,5 +60,8 @@
     <string name="fill_your_informations_in_order_to_continue">Fill your informations in order to continue</string>
     <string name="low_storage_error_message">The application won\'t work properly because of the insufficient storage space</string>
     <string name="default_web_client_id" translatable="false">842393264925-9plq81dsb79v6srhjdpkj25gomgkvb9t.apps.googleusercontent.com</string>
+    <string name="language">Language</string>
+    <string name="app_syncing_try_again_text">The application is syncing the data please try again in a few seconds</string>
+    <string name="app_syncing_try_again_title">Modification is temporarily blocked</string>
 
 </resources>

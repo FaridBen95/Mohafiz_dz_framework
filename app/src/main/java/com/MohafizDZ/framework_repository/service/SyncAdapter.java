@@ -400,6 +400,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                     }
                     relRecordsHandler.updateInLocal();
                     relModel.onSyncFinishedFromRel(model);
+                    relModel.setSyncing(false);
                 }
             }
         }
@@ -443,6 +444,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                     }
                     relRecordsHandler.updateInLocal();
                     relModel.onSyncFinishedFromRel(model);
+                    relModel.setSyncing(false);
                 }
             }
         }

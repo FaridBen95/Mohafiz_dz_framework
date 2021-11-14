@@ -4,9 +4,12 @@ import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StatFs;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +22,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.MohafizDZ.empty_project.R;
 import com.MohafizDZ.framework_repository.Utils.FileManager;
-import com.MohafizDZ.framework_repository.Utils.IntentUtils;
 import com.MohafizDZ.framework_repository.Utils.MySharedPreferences;
 import com.MohafizDZ.framework_repository.Utils.MyUtil;
 import com.MohafizDZ.framework_repository.controls.MMenuAdapter;
@@ -27,7 +29,7 @@ import com.MohafizDZ.framework_repository.core.DataRow;
 import com.MohafizDZ.framework_repository.core.Model;
 import com.MohafizDZ.framework_repository.core.MyAppCompatActivity;
 import com.MohafizDZ.framework_repository.service.MSyncStatusObserverListener;
-import com.MohafizDZ.framework_repository.service.SyncUtils;
+import com.MohafizDZ.framework_repository.service.SyncUtilsWithSyncAdapter;
 import com.MohafizDZ.framework_repository.service.SyncingReport;
 import com.MohafizDZ.project.StartClassHelper;
 import com.MohafizDZ.project.models.ConfigurationModel;
@@ -130,7 +132,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         showProgressDialog();
         Bundle bundle = new Bundle();
         bundle.putString("from", TAG);
-        SyncUtils.requestSync(this, UserModel.AUTHORITY, bundle);
+        SyncUtilsWithSyncAdapter.requestSync(this, UserModel.AUTHORITY, bundle);
     }
 
     private static final Intent[] POWERMANAGER_INTENTS = {
@@ -378,13 +380,80 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         };
     }
 
+
+
+    private void showPermissionInfoDialog() {
+//        SweetAlertDialog dialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
+//        dialog.setTitleText("Permissions");
+//        dialog.setContentText("In this app we will need to access theses permissions to let you call in the market place or add ph");
+//        dialog.setConfirmText(getResources().getString(R.string.dialog_ok));
+//        dialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//            @Override
+//            public void onClick(SweetAlertDialog sweetAlertDialog) {
+//                disconnect(activity);
+//            }
+//        });
+//        dialog.setCancelText(getResources().getString(R.string.cancel));
+//        dialog.setCancelClickListener(null);
+//        dialog.setCancelable(true);
+//        dialog.show();
+    }
+
+    private void checkForLowStorage() {
+//        File cacheDir = getCacheDir();
+
+        long mFreeMem = getDeviceCurrentStorage();
+        long deviceLowStorageThreshold = getDeviceLowStorageThreshold();
+//        Toast.makeText(this, (deviceLowStorageThreshold  ) + "", Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, (mFreeMem  ) + "", Toast.LENGTH_LONG).show();
+        if (mFreeMem <= deviceLowStorageThreshold) {
+            Toast.makeText(this, R.string.low_storage_error_message, Toast.LENGTH_LONG).show();
+            // Handle storage low state
+        }/* else {
+            // Handle storage ok state
+        }*/
+    }
+
+    private long getDeviceCurrentStorage() {
+
+        long mFreeMem = 0;
+        try {
+            StatFs mDataFileStats = new StatFs("/data");
+            mDataFileStats.restat("/data");
+            mFreeMem = (long) mDataFileStats.getAvailableBlocksLong() *
+                    mDataFileStats.getBlockSizeLong();
+        } catch (IllegalArgumentException e) {
+            // use the old value of mFreeMem
+        }
+        return mFreeMem;
+    }
+
+    private long getDeviceLowStorageThreshold() {
+
+        long value = Settings.Secure.getInt(
+                getContentResolver(),
+                "sys_storage_threshold_percentage",
+                10);
+        StatFs mDataFileStats = new StatFs("/data");
+        long mTotalMemory = ((long) mDataFileStats.getBlockCountLong() *
+                mDataFileStats.getBlockSizeLong()) / 100L;
+        value *= mTotalMemory;
+//        Toast.makeText(this, value + "", Toast.LENGTH_SHORT).show();
+        long maxValue = Settings.Secure.getInt(
+                getContentResolver(),
+                "sys_storage_threshold_max_bytes",
+                500*1024*1024);
+//        Toast.makeText(this, maxValue + "", Toast.LENGTH_SHORT).show();
+        return Math.min(value, maxValue);
+    }
+
     private void onFirstRun() {
         new SyncingReport(this).getWritableDatabase();
         if(new MySharedPreferences(this).getBoolean(MySharedPreferences.KEEP_SERVICE_RUNNING_KEY, true)) {
             Bundle data = new Bundle();
             data.putString("from", TAG);
-            SyncUtils.requestSync(this, UserModel.AUTHORITY, data);
-            SyncUtils.requestSync(this, ConfigurationModel.AUTHORITY, data);
+            SyncUtilsWithSyncAdapter.requestSync(this, UserModel.AUTHORITY, data);
+            SyncUtilsWithSyncAdapter.requestSync(this, ConfigurationModel.AUTHORITY, data);
             waitForFirstSync = true;
         }
     }
@@ -434,11 +503,12 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case PERMISSIONS_REQUEST_REQUIRED_PERMS: {
                 app().createApplicationFolder();
-                for (int i = 0; i < grantResults.length ; i++) {
-                    if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                for (int i = 0; i < grantResults.length; i++) {
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(this, getString(R.string.accept_permission), Toast.LENGTH_LONG).show();
                         finish();
                     }
@@ -463,7 +533,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         }else if(requestCode == KEEP_SERVICE_RUNNING){
             Bundle bundle = new Bundle();
             bundle.putString("from", TAG);
-            SyncUtils.requestSync(this, ConfigurationModel.AUTHORITY, bundle);
+            SyncUtilsWithSyncAdapter.requestSync(this, ConfigurationModel.AUTHORITY, bundle);
             waitForFirstSync = true;
             verifyUserConnection();
         }
@@ -518,7 +588,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
                 if((waitForFirstSync && syncedModels.size() == 4) || (!waitForFirstSync && syncedModels.size() >= 1 && syncedModels.contains("user"))) {
                     syncedModels.clear();
                     if(waitForFirstSync){
-                        SyncUtils.setSyncPeriodic(this, ConfigurationModel.AUTHORITY, SyncUtils.SYNC_PERIOD_LOW_PRIORITY, null);
+                        SyncUtilsWithSyncAdapter.setSyncPeriodic(this, ConfigurationModel.AUTHORITY, SyncUtilsWithSyncAdapter.SYNC_PERIOD_LOW_PRIORITY, null);
                         waitForFirstSync = false;
                     }
                     openNextPage();

@@ -11,12 +11,15 @@ import com.MohafizDZ.framework_repository.core.Account.MUser;
 import com.MohafizDZ.framework_repository.core.Model;
 import com.MohafizDZ.framework_repository.datas.MConstants;
 
-public class SyncUtils {
+//note that some devices disable services so it should be set in the phone settings and there's no way
+//to fix that programmatically, the solution either use this class and show a tutorial how to enable services
+//in these devices otherwise use SyncUtilsInTheAppRun
+public class SyncUtilsWithSyncAdapter {
     public static final Integer SYNC_PERIOD_VERY_HIGH_PRIORITY = 300;
     public static final Integer SYNC_PERIOD_HIGH_PRIORITY = 900;
     public static final Integer SYNC_PERIOD_LOW_PRIORITY = 43200;
     public static final Integer SYNC_PERIOD_NORMAL_PRIORITY = 3600;
-    private static final String TAG = SyncUtils.class.getSimpleName();
+    private static final String TAG = SyncUtilsWithSyncAdapter.class.getSimpleName();
 
     public static boolean requestSync(Context context){
         return requestSync(context, Model.BASE_AUTHORITY);

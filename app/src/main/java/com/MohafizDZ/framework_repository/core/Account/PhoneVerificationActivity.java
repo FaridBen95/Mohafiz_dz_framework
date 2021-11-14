@@ -48,6 +48,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
     private EditText et6;
     private ImageView btnBack;
     private String lastFrom;
+    private boolean waitForCode = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -119,6 +120,8 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
             new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                 @Override
                 public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
+                    waitForCode = false;
+                    makeText(PhoneVerificationActivity.this, R.string.code_sent, LENGTH_SHORT).show();
                     if(progressDialog != null && progressDialog.isShowing()){
                         progressDialog.dismiss();
                     }
@@ -149,6 +152,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
 
                 @Override
                 public void onVerificationFailed(FirebaseException e) {
+                    waitForCode = false;
                     if(progressDialog != null && progressDialog.isShowing()){
                         progressDialog.dismiss();
                     }
@@ -157,6 +161,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
 
                 @Override
                 public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+                    waitForCode = false;
                     super.onCodeSent(s, forceResendingToken);
                     if(progressDialog != null && progressDialog.isShowing()){
                         progressDialog.dismiss();
@@ -350,6 +355,10 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
     }
 
     private void verifyPhone() {
+        if(waitForCode){
+            makeText(this, R.string.please_wait_for_code, LENGTH_SHORT).show();
+            return;
+        }
         char[] codeChar = new char[6];
         try {
             codeChar[0] = et1.getText().charAt(0);

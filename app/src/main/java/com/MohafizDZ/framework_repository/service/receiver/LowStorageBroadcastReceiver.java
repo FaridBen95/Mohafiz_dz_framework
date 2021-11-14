@@ -9,6 +9,7 @@ import com.MohafizDZ.empty_project.R;
 
 public class LowStorageBroadcastReceiver extends BroadcastReceiver {
     public static final String TAG = LowStorageBroadcastReceiver.class.getSimpleName();
+    public static final String INTENT_FILTER = "android.intent.action.DEVICE_STORAGE_LOW";
 
     @Override
     public void onReceive(Context context, Intent intent) {

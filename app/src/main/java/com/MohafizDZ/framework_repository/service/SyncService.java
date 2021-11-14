@@ -62,18 +62,18 @@ public abstract class SyncService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String input = "syncing started from foreground service";
-        createNotificationChannel();
-        Intent notificationIntent = new Intent(this, MohafizMainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, 0);
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Foreground Service")
-                .setContentText(input)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentIntent(pendingIntent)
-                .build();
-        startForeground(1, notification);
+//        String input = "syncing started from foreground service";
+//        createNotificationChannel();
+//        Intent notificationIntent = new Intent(this, MohafizMainActivity.class);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+//                0, notificationIntent, 0);
+//        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+//                .setContentTitle("Foreground Service")
+//                .setContentText(input)
+//                .setSmallIcon(R.mipmap.ic_launcher)
+//                .setContentIntent(pendingIntent)
+//                .build();
+//        startForeground(1, notification);
         return START_REDELIVER_INTENT ;
     }
 

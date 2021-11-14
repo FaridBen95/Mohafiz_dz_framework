@@ -9,12 +9,16 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
+import android.util.Base64;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -40,6 +44,8 @@ import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.appcheck.FirebaseAppCheck;
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
@@ -50,12 +56,14 @@ import com.google.firebase.storage.StorageReference;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class App extends MultiDexApplication {
-    public static final boolean TEST_MODE = true;
+    public static final boolean TEST_MODE = false;
     private static final String TAG = App.class.getSimpleName();
     public static final String CATEGORY_1 = "HIGH_CATEGORY";
     public static final String CATEGORY_2 = "LOW_CATEGORY";
@@ -111,6 +119,11 @@ public class App extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         FirebaseApp.initializeApp(this);
+        if(TEST_MODE){
+            FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
+            firebaseAppCheck.installAppCheckProviderFactory(
+                    DebugAppCheckProviderFactory.getInstance());
+        }
         TypefaceProvider.registerDefaultIconSets();
         storageReference = FirebaseStorage.getInstance().getReference("images");
         firebaseAuth = FirebaseAuth.getInstance();
@@ -386,5 +399,38 @@ public class App extends MultiDexApplication {
     }
 
     public void onAuthentified(FirebaseUser currentUser) {
+    }
+
+    public static void printHashKey(Context pContext) {
+        try {
+            PackageInfo info = pContext.getPackageManager().getPackageInfo(pContext.getPackageName(), PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                String hashKey = new String(Base64.encode(md.digest(), 0));
+                Log.i(TAG, "printHashKey() Hash Key: " + hashKey);
+            }
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(TAG, "printHashKey()", e);
+        } catch (Exception e) {
+            Log.e(TAG, "printHashKey()", e);
+        }
+    }
+
+    public void onVersionUpgraded(int oldVersion, int newVersion) {
+        new MySharedPreferences(this).clearAll();
+    }
+
+    public boolean canModifyModel(Context context, Model model){
+        boolean isSyncing = model.isSyncing();
+        if(isSyncing){
+            SweetAlertDialog dialog = new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE);
+            dialog.setTitleText(getString(R.string.app_syncing_try_again_title));
+            dialog.setContentText(getString(R.string.app_syncing_try_again_text));
+            dialog.setConfirmText(getResources().getString(R.string.dialog_ok));
+            dialog.setCancelable(true);
+            dialog.show();
+        }
+        return !isSyncing;
     }
 }
