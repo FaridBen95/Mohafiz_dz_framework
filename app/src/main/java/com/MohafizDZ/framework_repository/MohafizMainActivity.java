@@ -5,7 +5,9 @@ import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
@@ -20,6 +22,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.MohafizDZ.App;
 import com.MohafizDZ.empty_project.R;
 import com.MohafizDZ.framework_repository.Utils.FileManager;
 import com.MohafizDZ.framework_repository.Utils.MySharedPreferences;
@@ -29,6 +33,7 @@ import com.MohafizDZ.framework_repository.core.DataRow;
 import com.MohafizDZ.framework_repository.core.Model;
 import com.MohafizDZ.framework_repository.core.MyAppCompatActivity;
 import com.MohafizDZ.framework_repository.service.MSyncStatusObserverListener;
+import com.MohafizDZ.framework_repository.service.SyncUtilsInTheAppRun;
 import com.MohafizDZ.framework_repository.service.SyncUtilsWithSyncAdapter;
 import com.MohafizDZ.framework_repository.service.SyncingReport;
 import com.MohafizDZ.project.StartClassHelper;
@@ -68,6 +73,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
     private View imageView;
     private Animation animation;
     private View waitingFrameLayout;
+    private boolean allowStartProjectCode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +83,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         sethasSyncListener(this);
         imageView = findViewById(R.id.logo_up);
         waitingFrameLayout = findViewById(R.id.waitingFrameLayout);
+        waitingFrameLayout.setVisibility(View.GONE);
         initAnimation();
         if(app().forceAutomaticDate() && !app().dateIsCorrect()){
             SweetAlertDialog dateDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
@@ -90,6 +97,22 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
             dateDialog.show();
             return;
         }
+        if(appVersionIsLow()){
+            SweetAlertDialog lowVersionDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
+            lowVersionDialog.setTitleText(getResources().getString(R.string.low_version_title))
+                    .setContentText(getResources().getString(R.string.low_version_message))
+                    .setOnDismissListener(dialog -> finish());
+            lowVersionDialog.setConfirmClickListener(dialog -> {
+                final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                }
+            }).setConfirmText(getResources().getString(R.string.update));
+            lowVersionDialog.show();
+            return;
+        }
         initConfig();
         init();
         initArgs();
@@ -99,7 +122,26 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
             data = new Bundle();
             data.putString(FRAGMENT_NAME, toOpenFragment);
         }
-        startProjectCode();
+        if(allowStartProjectCode) {
+            startProjectCode();
+        }
+    }
+
+    private boolean appVersionIsLow() {
+        DataRow minVersionRow = new ConfigurationModel(this).
+                getValue(ConfigurationModel.MIN_VERSION_TO_ALLOW);
+        if(minVersionRow != null){
+            try {
+                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                int versionCode = pInfo.versionCode;
+                if(versionCode < minVersionRow.getInteger("value")){
+                    return true;
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
     }
 
     private void initAnimation() {
@@ -132,7 +174,11 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         showProgressDialog();
         Bundle bundle = new Bundle();
         bundle.putString("from", TAG);
-        SyncUtilsWithSyncAdapter.requestSync(this, UserModel.AUTHORITY, bundle);
+        if(App.syncUsingBackgroundServices){
+            SyncUtilsWithSyncAdapter.requestSync(this, UserModel.AUTHORITY, bundle);
+        }else {
+            SyncUtilsInTheAppRun.requestSync(this, UserModel.AUTHORITY, UserModel.class, bundle);
+        }
     }
 
     private static final Intent[] POWERMANAGER_INTENTS = {
@@ -340,8 +386,10 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
     }
 
     private void initConfig() {
-        keepServicesInChineseDevices();
-        AutoStartHelper.getInstance().getAutoStartPermission(this);
+        if(App.syncUsingBackgroundServices) {
+            keepServicesInChineseDevices();
+            AutoStartHelper.getInstance().getAutoStartPermission(this);
+        }
 //        initOPPO();
         MySharedPreferences mySharedPreferences = new MySharedPreferences(this);
         if(mySharedPreferences.getBoolean(FIRST_RUN, true)){
@@ -366,6 +414,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
                             android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSIONS_REQUEST_REQUIRED_PERMS );
         }else{
+            allowStartProjectCode = true;
             app().createApplicationFolder();
         }
         onChangeView = new OnChangeView() {
@@ -452,9 +501,14 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         if(new MySharedPreferences(this).getBoolean(MySharedPreferences.KEEP_SERVICE_RUNNING_KEY, true)) {
             Bundle data = new Bundle();
             data.putString("from", TAG);
-            SyncUtilsWithSyncAdapter.requestSync(this, UserModel.AUTHORITY, data);
-            SyncUtilsWithSyncAdapter.requestSync(this, ConfigurationModel.AUTHORITY, data);
-            waitForFirstSync = true;
+            if(App.syncUsingBackgroundServices) {
+                SyncUtilsWithSyncAdapter.requestSync(this, UserModel.AUTHORITY, data);
+                SyncUtilsWithSyncAdapter.requestSync(this, ConfigurationModel.AUTHORITY, data);
+                waitForFirstSync = true;
+            }else{
+                SyncUtilsInTheAppRun.requestSync(this, UserModel.AUTHORITY, UserModel.class, data);
+                SyncUtilsInTheAppRun.requestSync(this, ConfigurationModel.AUTHORITY, ConfigurationModel.class, data);
+            }
         }
     }
 
@@ -507,12 +561,15 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         switch (requestCode) {
             case PERMISSIONS_REQUEST_REQUIRED_PERMS: {
                 app().createApplicationFolder();
+                allowStartProjectCode = true;
                 for (int i = 0; i < grantResults.length; i++) {
                     if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                        allowStartProjectCode = false;
                         Toast.makeText(this, getString(R.string.accept_permission), Toast.LENGTH_LONG).show();
                         finish();
                     }
                 }
+                startProjectCode();
                 return;
             }
 
@@ -533,8 +590,12 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         }else if(requestCode == KEEP_SERVICE_RUNNING){
             Bundle bundle = new Bundle();
             bundle.putString("from", TAG);
-            SyncUtilsWithSyncAdapter.requestSync(this, ConfigurationModel.AUTHORITY, bundle);
-            waitForFirstSync = true;
+            if(App.syncUsingBackgroundServices) {
+                SyncUtilsWithSyncAdapter.requestSync(this, ConfigurationModel.AUTHORITY, bundle);
+                waitForFirstSync = true;
+            }else{
+                SyncUtilsInTheAppRun.requestSync(this, ConfigurationModel.AUTHORITY, ConfigurationModel.class, bundle);
+            }
             verifyUserConnection();
         }
     }
@@ -587,9 +648,11 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
                 }
                 if((waitForFirstSync && syncedModels.size() == 4) || (!waitForFirstSync && syncedModels.size() >= 1 && syncedModels.contains("user"))) {
                     syncedModels.clear();
-                    if(waitForFirstSync){
-                        SyncUtilsWithSyncAdapter.setSyncPeriodic(this, ConfigurationModel.AUTHORITY, SyncUtilsWithSyncAdapter.SYNC_PERIOD_LOW_PRIORITY, null);
-                        waitForFirstSync = false;
+                    if(App.syncUsingBackgroundServices) {
+                        if (waitForFirstSync) {
+                            SyncUtilsWithSyncAdapter.setSyncPeriodic(this, ConfigurationModel.AUTHORITY, SyncUtilsWithSyncAdapter.SYNC_PERIOD_LOW_PRIORITY, null);
+                            waitForFirstSync = false;
+                        }
                     }
                     openNextPage();
                 }

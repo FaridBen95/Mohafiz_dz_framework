@@ -1,0 +1,4 @@
+App.TEST_MODE should be used in just test mode otherwise don't forget to change it to flase in production
+
+App.syncUsingBackgroundServices use this always when trying to sync and don't forget to specify which methode you want to use before start coding
+keep in mind background services won't work properly in some devices so it's better to prevent using it

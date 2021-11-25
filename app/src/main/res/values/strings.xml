@@ -63,5 +63,7 @@
     <string name="language">Language</string>
     <string name="app_syncing_try_again_text">The application is syncing the data please try again in a few seconds</string>
     <string name="app_syncing_try_again_title">Modification is temporarily blocked</string>
-
+    <string name="low_version_title">Version is low</string>
+    <string name="low_version_message">You need to update the application inorder to continue</string>
+    <string name="update">Update</string>
 </resources>

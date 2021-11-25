@@ -15,6 +15,7 @@ public class ConfigurationModel extends Model {
     public static final String MARKET_PLACE_MIN_PRICE_RANGE_FILTER = "min_price_key";
     public static final String MARKET_PLACE_MAX_PRICE_RANGE_FILTER = "max_price_key";
     public static final String PROFILE_SHOW_SALES_FOR_ALL = "profile_show_sales_for_all";
+    public static final String MIN_VERSION_TO_ALLOW = "min_version_to_allow";
 
     public Col key = new Col(Col.ColumnType.varchar);
     public Col value = new Col(Col.ColumnType.varchar);

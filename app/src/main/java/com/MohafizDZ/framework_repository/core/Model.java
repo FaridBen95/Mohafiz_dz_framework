@@ -1184,7 +1184,7 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
     private String getColumnType(Col col) {
         try {
             StringBuilder colStatement = new StringBuilder();
-            if (col.getColumnType() != Col.ColumnType.many2one &&
+            if (col.getColumnType() != Col.ColumnType.one2many &&
                     col.getColumnType() != Col.ColumnType.array) {
                 String type = col.getType();
                 colStatement.append(type);
@@ -1266,7 +1266,9 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
                 try {
                     String[] sqlArray = column_statement.toString().split(";");
                     for(String sql : sqlArray) {
-                        db.execSQL(sql);
+                        if(!sql.trim().equals("")) {
+                            db.execSQL(sql);
+                        }
                     }
                     Log.i(TAG, "NEW FIELDS CREATED : " + column_statement.toString());
                 } catch (Exception e){

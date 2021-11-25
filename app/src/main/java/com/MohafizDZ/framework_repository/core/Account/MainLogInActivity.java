@@ -62,6 +62,7 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_start);
         initConfig();
         initAuthentication();
         prepareView();

@@ -75,6 +75,7 @@ public class App extends MultiDexApplication {
     public StorageReference storageReference;
     public FirebaseAuth firebaseAuth;
     private static App enableMultiDex;
+    public static final boolean syncUsingBackgroundServices = false;
 
     public static App getEnableMultiDexApp() {
         return enableMultiDex;

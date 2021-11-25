@@ -1,11 +1,19 @@
 # Empty project
 
-1 first create a firebase project
+- first create a firebase project and link it with your app
 
-2 replace all empty_project by your project id (preferable to be the same as the firebase project id) by using ctrl + shift + r 
+- replace PROJECT_ID in MConstants with firebase project id
 
-3 replace your icon with ic_launcher
+- uncomment apply plugin: 'com.google.gms.google-services' in gradle
 
-4 create a facebook project to link with your project 
+- replace all empty_project by your project id (preferable to be the same as the firebase project id) by using ctrl + shift + r 
 
-5 activate firebase authentication, firestore, storage and notification
+- replace empty project with your app name
+
+- replace your icon with ic_launcher
+
+- create a facebook project to link with your project
+
+- activate firebase authentication, firestore, storage and notification
+
+- open StartClassHelper and add the sign up activity intent (after authentication) and add your main activity
