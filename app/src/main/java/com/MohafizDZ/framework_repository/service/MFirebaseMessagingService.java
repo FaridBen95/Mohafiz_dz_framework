@@ -1,51 +1,29 @@
 package com.MohafizDZ.framework_repository.service;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
 
 import com.MohafizDZ.App;
-import com.MohafizDZ.empty_project.R;
-import com.MohafizDZ.framework_repository.Utils.BitmapUtils;
 import com.MohafizDZ.framework_repository.Utils.CustomNotificationBuilder;
-import com.MohafizDZ.framework_repository.core.Account.MainLogInActivity;
-import com.MohafizDZ.framework_repository.core.Col;
-import com.MohafizDZ.framework_repository.core.DataRow;
-import com.MohafizDZ.framework_repository.core.Values;
 import com.MohafizDZ.framework_repository.datas.MConstants;
-import com.MohafizDZ.project.models.NotificationDataModel;
-import com.bumptech.glide.request.FutureTarget;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
 
-import static com.MohafizDZ.App.CATEGORY_1;
-
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
-    public static final String TAG = MyFirebaseMessagingService.class.getSimpleName();
+public class MFirebaseMessagingService extends FirebaseMessagingService {
+    public static final String TAG = MFirebaseMessagingService.class.getSimpleName();
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     public Context context;

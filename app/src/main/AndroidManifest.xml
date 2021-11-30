@@ -148,7 +148,7 @@
             android:label="Users table"
             android:multiprocess="true" />
 
-        <service android:name="com.MohafizDZ.framework_repository.service.MyFirebaseMessagingService"
+        <service android:name="com.MohafizDZ.framework_repository.service.MFirebaseMessagingService"
             android:exported="true"
             android:enabled="true"
             >

@@ -20,7 +20,7 @@ public class FirebaseBackgroundService extends BroadcastReceiver {
                 Log.e("FirebaseDataReceiver", "Key: " + key + " Value: " + value);
                 if(key.equalsIgnoreCase("gcm.notification.body") && value != null) {
                     Bundle bundle = new Bundle();
-                    Intent backgroundIntent = new Intent(context, MyFirebaseMessagingService.class);
+                    Intent backgroundIntent = new Intent(context, MFirebaseMessagingService.class);
                     bundle.putString("push_message", value + "");
                     backgroundIntent.putExtras(bundle);
                     context.startService(backgroundIntent);

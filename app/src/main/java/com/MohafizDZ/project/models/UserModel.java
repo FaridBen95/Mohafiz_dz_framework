@@ -1,40 +1,13 @@
 package com.MohafizDZ.project.models;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
-
-import androidx.annotation.NonNull;
 
 import com.MohafizDZ.App;
 import com.MohafizDZ.empty_project.BuildConfig;
-import com.MohafizDZ.framework_repository.Utils.BitmapUtils;
-import com.MohafizDZ.framework_repository.Utils.MyUtil;
 import com.MohafizDZ.framework_repository.core.Col;
-import com.MohafizDZ.framework_repository.core.DataRow;
 import com.MohafizDZ.framework_repository.core.Model;
-import com.MohafizDZ.framework_repository.core.Values;
-import com.MohafizDZ.framework_repository.service.MyFirebaseMessagingService;
 import com.MohafizDZ.framework_repository.service.SyncingDomain;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
-import com.google.firebase.firestore.WriteBatch;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class UserModel extends Model {
     public static final String TAG = UserModel.class.getSimpleName();
