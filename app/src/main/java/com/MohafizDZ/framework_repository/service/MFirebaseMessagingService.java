@@ -22,7 +22,7 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class MFirebaseMessagingService extends FirebaseMessagingService {
+public class MFirebaseMessagingService extends FirebaseMessagingService implements SyncUtilsInTheAppRun.SyncUtilsListener{
     public static final String TAG = MFirebaseMessagingService.class.getSimpleName();
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
