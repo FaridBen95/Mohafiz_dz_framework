@@ -40,7 +40,7 @@ public class QueryClause {
         this.arg = arg;
     }
 
-    public enum Operator{equalTo, lessThan, lessOrEqualThan, greaterThan,
+    public enum Operator{equalTo, not_equalTo, lessThan, lessOrEqualThan, greaterThan,
         greaterOrEqualThan, whereIn, arrayContains, arrayContainsAny, likeStartWith,
         startAt, endAt, orderAsc, orderDesc
     }

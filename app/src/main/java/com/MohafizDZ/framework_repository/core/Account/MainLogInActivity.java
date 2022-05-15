@@ -6,6 +6,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -16,8 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.legacy.app.ActivityCompat;
 
 import com.MohafizDZ.empty_project.R;
 import com.MohafizDZ.framework_repository.MohafizMainActivity;
@@ -31,6 +35,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -53,6 +60,7 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
     private TextView languageTextView;
     private LinearLayout languageLinearLayout;
     private String selectedLanguage;
+    private TextView termsOfUseTextView;
 
     private enum LogInType {phone, email}
     private LogInType logInType = LogInType.email;
@@ -81,6 +89,7 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
         phoneLinearLayout = findViewById(R.id.phoneLinearLayout);
         languageLinearLayout = findViewById(R.id.languageLinearLayout);
         languageTextView = findViewById(R.id.languageTextView);
+        termsOfUseTextView = findViewById(R.id.termsOfUseTextView);
     }
 
     private void initLogInWith() {
@@ -130,6 +139,12 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
             String languageStr = language == MyUtil.Language.english ? "English" :
                     (language == MyUtil.Language.french ? "Français" : "العربية");
             languageTextView.setText(languageStr);
+            String termsOfUseText = getResources().getString(R.string.terms_of_use_text) ;
+            String termsOfUseToShow = termsOfUseText.replace("@", " ");
+            Spannable spannable = new SpannableString(termsOfUseToShow);
+            int index = termsOfUseText.indexOf("@");
+            spannable.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.blue_900_)), index, termsOfUseText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            termsOfUseTextView.setText(spannable, TextView.BufferType.SPANNABLE);
         }catch (Exception ignored){}
     }
 
@@ -139,6 +154,7 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
         phoneLinearLayout.setOnClickListener(this);
         findViewById(R.id.parentView).setOnClickListener(this);
         languageLinearLayout.setOnClickListener(this);
+        termsOfUseTextView.setOnClickListener(this);
     }
 
     private void initConfig() {
@@ -175,7 +191,7 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
         }
     }*/
 
-//    @ServerTimestamp
+    //    @ServerTimestamp
 //    private Date TIME_STAMP;
     private void initAuthentication() {
         authenticationHelper = new AuthenticationHelper(this) {
@@ -253,35 +269,59 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.gmailLinearLayout:
-                if(app().inNetwork()) {
-                    logInWith.setLoginType(LogInWith.LoginType.gmail);
-                    logInWith.signIn();
-                }else{
-                    makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
-                }
-                break;
-            case R.id.facebookLinearLayout:
-                if(app().inNetwork()) {
-                    logInWith.setLoginType(LogInWith.LoginType.facebook);
-                    logInWith.signIn();
-                }else{
-                    makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
-                }
-                break;
-            case R.id.phoneLinearLayout:
-                if(app().inNetwork()) {
-                    Intent intent = new Intent(this, PhoneLogInActivity.class);
-                    startActivityForResult(intent, LogInWith.PHONE_VERIFICATION_KEY);
-                }else{
-                    makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
-                }
-                break;
-            case R.id.languageLinearLayout:
-            	languagesDialog();
-                break;
+        int id = v.getId();
+        if (id == R.id.gmailLinearLayout) {
+            if (app().inNetwork()) {
+                logInWith.setLoginType(LogInWith.LoginType.gmail);
+                logInWith.signIn();
+            } else {
+                makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
+            }
+        } else if (id == R.id.facebookLinearLayout) {
+            if (app().inNetwork()) {
+                logInWith.setLoginType(LogInWith.LoginType.facebook);
+                logInWith.signIn();
+            } else {
+                makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
+            }
+        } else if (id == R.id.phoneLinearLayout) {
+            if (app().inNetwork()) {
+                Intent intent = new Intent(this, PhoneLogInActivity.class);
+                startActivityForResult(intent, LogInWith.PHONE_VERIFICATION_KEY);
+            } else {
+                makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
+            }
+        } else if (id == R.id.languageLinearLayout) {
+            languagesDialog();
+        } else if (id == R.id.termsOfUseTextView) {
+            showTermsOfUseDialog();
         }
+    }
+
+    private void showTermsOfUseDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String termsOfUseMessage = getTermsOfUseMessage();
+        builder.setMessage(Html.fromHtml(termsOfUseMessage));
+        builder.setPositiveButton(getResources().getString(R.string.dialog_ok), null);
+        builder.show();
+    }
+
+    private String getTermsOfUseMessage() {
+        String text = "";
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(getAssets().open(getResources().getString(R.string.terms_of_use_file_name)), "UTF-8"))) {
+
+            // do reading, usually loop until end of file reading
+            String mLine;
+            while ((mLine = reader.readLine()) != null) {
+                //process line
+                text = text.concat(mLine);
+            }
+        } catch (IOException e) {
+            //log the exception
+        }
+        //log the exception
+        return text;
     }
 
     private void languagesDialog() {

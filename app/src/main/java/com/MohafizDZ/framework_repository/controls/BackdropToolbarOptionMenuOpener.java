@@ -29,6 +29,7 @@ public class BackdropToolbarOptionMenuOpener {
     private Drawable openIcon;
     private Drawable closeIcon;
     private int h;
+    private OnBackDropMenuChangeListener onBackDropMenuChangeListener;
 
 
     //When you want to use full screen backdrop, use this , because the header will be seen at the bottom even when the backdrop contents are scrolled.
@@ -93,22 +94,30 @@ public class BackdropToolbarOptionMenuOpener {
         }
         animatorSet.play(animator);
         animator.start();
-
-    }
-
-    private void updateIcon() {
-        if (openIcon != null && closeIcon != null) {
-            if (backdropShown) {
-                menuItem.setIcon(closeIcon);
-//                ((ImageView) view).setImageDrawable(closeIcon);
-            } else {
-                menuItem.setIcon(openIcon);
-//                ((ImageView) view).setImageDrawable(openIcon);
-            }
+        if(onBackDropMenuChangeListener != null){
+            onBackDropMenuChangeListener.onBackDropMenuChange(isOpened());
         }
     }
 
+    private void updateIcon() {
+        if (backdropShown) {
+            menuItem.setIcon(closeIcon);
+//                ((ImageView) view).setImageDrawable(closeIcon);
+        } else {
+            menuItem.setIcon(openIcon);
+//                ((ImageView) view).setImageDrawable(openIcon);
+            }
+        }
+
     public boolean isOpened(){
         return backdropShown;
+    }
+
+    public interface OnBackDropMenuChangeListener{
+        void onBackDropMenuChange(boolean opened);
+    }
+
+    public void setOnBackDropMenuChangeListener(OnBackDropMenuChangeListener onBackDropMenuChangeListener) {
+        this.onBackDropMenuChangeListener = onBackDropMenuChangeListener;
     }
 }

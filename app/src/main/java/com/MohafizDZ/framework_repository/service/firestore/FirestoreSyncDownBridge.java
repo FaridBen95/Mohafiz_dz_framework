@@ -113,7 +113,12 @@ public class FirestoreSyncDownBridge implements FirestoreSyncDownAdapter.Firesto
             for (Col col : columns) {
                 String colName = col.getName();
                 try {
-                    Object value = recordLineMap.get(colName);
+                    Object value;
+                    if(col.getColumnType() != Col.ColumnType.one2many){
+                        value = recordLineMap.get(colName);
+                    }else{
+                        value = recordLineMap.get(Col.SERVER_ID);
+                    }
                     if(value == null){
                         value = col.getDefaultValue();
                     }
@@ -181,8 +186,21 @@ public class FirestoreSyncDownBridge implements FirestoreSyncDownAdapter.Firesto
             for (DataRow row : records) {
                 String colName = col.getName();
                 try {
-                    DataRow relRow = resultMap.get(colName).get(row.getString(colName));
-                    row.putRel(colName, relRow);
+                    if(col.getColumnType() == Col.ColumnType.one2many) {
+                        DataRow relRow = resultMap.get(colName).get(row.getString(Col.SERVER_ID));
+                        List<DataRow> o2mRows = null;
+                        try{
+                            o2mRows = row.getRelRowList(colName);
+                        }catch (Exception ignored){}
+                        o2mRows = o2mRows == null? new ArrayList<>() : o2mRows;
+                        if(relRow != null) {
+                            o2mRows.add(relRow);
+                        }
+                        row.putRel(colName, o2mRows);
+                    }else{
+                        DataRow relRow = resultMap.get(colName).get(row.getString(colName));
+                        row.putRel(colName, relRow);
+                    }
                 }catch (Exception ignored){ }
             }
         }
@@ -198,13 +216,22 @@ public class FirestoreSyncDownBridge implements FirestoreSyncDownAdapter.Firesto
             Col col = colModelPair.first;
             Model model = colModelPair.second;
             Map<String, DataRow> rowMap = resultMap.containsKey(col.getName()) ?
-                    resultMap.get(col.getName()) : new HashMap<>();
+            resultMap.get(col.getName()) : new HashMap<>();
             rowMap = rowMap == null? new HashMap<>() : rowMap;
             for(Map<String, Object> recordLine : record.second) {
                 DataRow row = model.mapToRow(recordLine);
-                rowMap.put(row.getString(Col.SERVER_ID), row);
+                if(col.getColumnType() == Col.ColumnType.one2many){
+                    rowMap.put(row.getString(col.getRelatedColumn()), row);
+                }else {
+                    rowMap.put(row.getString(Col.SERVER_ID), row);
+                }
             }
-            resultMap.put(col.getName(), rowMap);
+            if(col.getColumnType() == Col.ColumnType.one2many) {
+                //todo fix sync o2m records
+                resultMap.put(col.getName(), rowMap);
+            }else{
+                resultMap.put(col.getName(), rowMap);
+            }
         }
         onRelResult(resultMap);
     }

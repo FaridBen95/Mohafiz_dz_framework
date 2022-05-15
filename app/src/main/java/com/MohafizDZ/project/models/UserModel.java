@@ -23,6 +23,7 @@ public class UserModel extends Model {
     public Col email = new Col(Col.ColumnType.varchar);
     public Col state = new Col(Col.ColumnType.varchar);
     public Col country = new Col(Col.ColumnType.varchar).setDefaultValue("Algeria");
+    public Col country_code = new Col(Col.ColumnType.varchar);
     public Col followings_list = new Col(Col.ColumnType.array).setRelationalModel(UserModel.class).setCanSyncDownRelations(false);
     public Col subscribed_to_fcm = new Col(Col.ColumnType.bool).setLocalColumn().setDefaultValue(0);
     private boolean canOverwriteOnLocal;

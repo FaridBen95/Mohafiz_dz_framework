@@ -40,7 +40,7 @@ public class MFirestoreWrapper {
         this.mContext = context;
         if(requestQueue == null) {
 //            requestQueue = Volley.newRequestQueue(mContext, new HttpClientStack(new DefaultHttpClient()));
-            requestQueue = Volley.newRequestQueue(mContext, new HurlStack());
+            requestQueue = Volley.newRequestQueue(mContext, new HurlStack(null, ClientSSLSocketFactory.createSslSocketFactory()));
         }
     }
 

@@ -31,6 +31,7 @@ public class CustomNavigationClickListener implements View.OnClickListener {
     private Drawable openIcon;
     private Drawable closeIcon;
     private int h;
+    private OnBackDropMenuChangeListener onBackDropMenuChangeListener;
 
 
     //When you want to use full screen backdrop, use this , because the header will be seen at the bottom even when the backdrop contents are scrolled.
@@ -95,7 +96,9 @@ public class CustomNavigationClickListener implements View.OnClickListener {
         }
         animatorSet.play(animator);
         animator.start();
-
+        if(onBackDropMenuChangeListener != null){
+            onBackDropMenuChangeListener.onBackDropMenuChange(isBackdropMenuShown());
+        }
     }
 
     private void updateIcon(View view) {
@@ -109,5 +112,17 @@ public class CustomNavigationClickListener implements View.OnClickListener {
                 ((ImageView) view).setImageDrawable(openIcon);
             }
         }
+    }
+
+    public boolean isBackdropMenuShown() {
+        return backdropShown;
+    }
+
+    public interface OnBackDropMenuChangeListener{
+        void onBackDropMenuChange(boolean opened);
+    }
+
+    public void setOnBackDropMenuChangeListener(OnBackDropMenuChangeListener onBackDropMenuChangeListener) {
+        this.onBackDropMenuChangeListener = onBackDropMenuChangeListener;
     }
 }

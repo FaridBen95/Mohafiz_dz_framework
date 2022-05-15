@@ -434,6 +434,20 @@
 
             </androidx.cardview.widget.CardView>
 
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/spacing_large" />
+            <TextView
+                android:padding="@dimen/spacing_small"
+                android:background="@drawable/ms_tab_container_pre_lollipop_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/terms_of_use_text"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:id="@+id/termsOfUseTextView"
+                />
         </LinearLayout>
 
 

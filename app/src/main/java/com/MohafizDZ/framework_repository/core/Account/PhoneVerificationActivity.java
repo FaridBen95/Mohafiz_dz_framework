@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
+import static com.MohafizDZ.framework_repository.core.Account.MainLogInActivity.PHONE_CREDENTIAL_KEY;
 
 public class PhoneVerificationActivity extends MyAppCompatActivity implements View.OnClickListener {
     public final String TAG = PhoneVerificationActivity.class.getSimpleName();
@@ -40,6 +42,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
     private String verificationId;
     private TextView currentPhoneTextView;
     private TextView resendTextView;
+    private EditText principalEditText;
     private EditText et1;
     private EditText et2;
     private EditText et3;
@@ -70,6 +73,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
         nextLinearLayout = findViewById(R.id.nextLinearLayout);
         btnBack = findViewById(R.id.btnBack);
         progressDialog = MyUtil.getProgressDialog(this);
+        principalEditText = findViewById(R.id.principalEditText);
         et1 = findViewById(R.id.et1);
         et2 = findViewById(R.id.et2);
         et3 = findViewById(R.id.et3);
@@ -132,6 +136,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
                         for(int i = 0 ; i < 6 ; i++) {
                             codeChars[i] = code.charAt(i);
                         }
+                        principalEditText.setText(code);
                         et1.setText(String.valueOf(codeChars[0]));
                         et2.setText(String.valueOf(codeChars[1]));
                         et3.setText(String.valueOf(codeChars[2]));
@@ -140,7 +145,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
                         et6.setText(String.valueOf(codeChars[5]));
                     }else{
                         Bundle data = new Bundle();
-                        data.putParcelable(MainLogInActivity.PHONE_CREDENTIAL_KEY,phoneAuthCredential);
+                        data.putParcelable(PHONE_CREDENTIAL_KEY,phoneAuthCredential);
                         Intent intent = new Intent();
                         intent.putExtras(data);
                         setResult(RESULT_OK, intent);
@@ -196,7 +201,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
             public void afterTextChanged(Editable s) {
                 if (s.length() == 1) {
                     et2.requestFocus();
-                } else if (s.length() == 0) {
+                } else {
                     et1.clearFocus();
                 }
             }
@@ -217,7 +222,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
             public void afterTextChanged(Editable s) {
                 if (s.length() == 1) {
                     et3.requestFocus();
-                } else if (s.length() == 0) {
+                } else {
                     et1.requestFocus();
                 }
             }
@@ -238,7 +243,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
             public void afterTextChanged(Editable s) {
                 if (s.length() == 1) {
                     et4.requestFocus();
-                } else if (s.length() == 0) {
+                } else {
                     et2.requestFocus();
                 }
             }
@@ -259,7 +264,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
             public void afterTextChanged(Editable s) {
                 if (s.length() == 1) {
                     et5.requestFocus();
-                } else if (s.length() == 0) {
+                } else {
                     et3.requestFocus();
                 }
             }
@@ -280,7 +285,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
             public void afterTextChanged(Editable s) {
                 if (s.length() == 1) {
                     et6.requestFocus();
-                } else if (s.length() == 0) {
+                } else {
                     et4.requestFocus();
                 }
             }
@@ -301,7 +306,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
             public void afterTextChanged(Editable s) {
                 if (s.length() == 1) {
                     et6.requestFocus();
-                } else if (s.length() == 0) {
+                } else {
                     et5.requestFocus();
                 }
             }
@@ -326,7 +331,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
                 break;
             case R.id.nextLinearLayout:
                 if(app().inNetwork()) {
-                verifyPhone();
+                    verifyPhone();
                 }else{
                     makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
                 }
@@ -355,27 +360,27 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
     }
 
     private void verifyPhone() {
-        if(waitForCode){
+        String code = principalEditText.getText().toString();
+        if(waitForCode || TextUtils.isEmpty(code)) {
             makeText(this, R.string.please_wait_for_code, LENGTH_SHORT).show();
             return;
         }
-        char[] codeChar = new char[6];
-        try {
-            codeChar[0] = et1.getText().charAt(0);
-            codeChar[1] = et2.getText().charAt(0);
-            codeChar[2] = et3.getText().charAt(0);
-            codeChar[3] = et4.getText().charAt(0);
-            codeChar[4] = et5.getText().charAt(0);
-            codeChar[5] = et6.getText().charAt(0);
-        }catch (Exception ignored){
-            Toast.makeText(this, getResources().getString(R.string.enter_valid_code), Toast.LENGTH_SHORT).show();
-            return;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        for(int i = 0 ; i < 6 ; i ++){
-            stringBuilder.append(codeChar[i]);
-        }
-        String code = stringBuilder.toString();
+//        char[] codeChar = new char[6];
+//        try {
+//            codeChar[0] = et1.getText().charAt(0);
+//            codeChar[1] = et2.getText().charAt(0);
+//            codeChar[2] = et3.getText().charAt(0);
+//            codeChar[3] = et4.getText().charAt(0);
+//            codeChar[4] = et5.getText().charAt(0);
+//            codeChar[5] = et6.getText().charAt(0);
+//        }catch (Exception ignored){
+//            Toast.makeText(this, getResources().getString(R.string.enter_valid_code), Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//        StringBuilder stringBuilder = new StringBuilder();
+//        for(int i = 0 ; i < 6 ; i ++){
+//            stringBuilder.append(codeChar[i]);
+//        }
         PhoneAuthCredential credential;
         try {
             credential = PhoneAuthProvider.getCredential(verificationId, code);
@@ -387,7 +392,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
         }
         Intent intent = new Intent();
         Bundle data = new Bundle();
-        data.putParcelable(MainLogInActivity.PHONE_CREDENTIAL_KEY, credential);
+        data.putParcelable(PHONE_CREDENTIAL_KEY, credential);
         intent.putExtras(data);
         PhoneVerificationActivity.this.setResult(RESULT_OK, intent);
         finish();

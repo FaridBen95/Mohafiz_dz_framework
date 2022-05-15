@@ -74,6 +74,13 @@ public class DataRow extends HashMap<String, Object> implements Parcelable{
         return 0;
     }
 
+    public long getNumeric(String field){
+        try {
+            return Long.valueOf(this.get(field).toString());
+        }catch (Exception ignored){}
+        return 0;
+    }
+
     public Float getFloat(String field){
         try {
             return Float.valueOf(this.get(field).toString());

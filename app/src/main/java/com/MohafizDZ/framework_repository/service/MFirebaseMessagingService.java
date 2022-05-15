@@ -28,6 +28,15 @@ public class MFirebaseMessagingService extends FirebaseMessagingService {
 
     public Context context;
     public App app;
+    private boolean allowStopService;
+
+    @Override
+    public boolean stopService(Intent name) {
+        if(allowStopService) {
+            return super.stopService(name);
+        }
+        return false;
+    }
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -198,6 +207,24 @@ public class MFirebaseMessagingService extends FirebaseMessagingService {
         try {
             app = (App) context;
         }catch (Exception ignored){}
+    }
+
+    @Override
+    public void onSyncFinished() {
+        allowStopService = true;
+        stopSelf();
+    }
+
+    @Override
+    public void onSyncFailed() {
+        try {
+            Looper.prepare();
+        }catch (Exception ignored){}
+        new Handler().postDelayed(() -> {
+            Bundle _data = new Bundle();
+            _data.putString("from", TAG);
+            SyncUtils.requestSync(context.getApplicationContext(), NotificationModel.class, NotificationModel.AUTHORITY, _data, this);
+        }, 3000);
     }
 
     public static class SendFCMNotification extends AsyncTask<Void, Void, String>{

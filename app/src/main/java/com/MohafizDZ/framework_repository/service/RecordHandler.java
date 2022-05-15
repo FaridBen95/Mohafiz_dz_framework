@@ -588,11 +588,23 @@ public abstract class RecordHandler {
 
     public Map<String, Map<String, Object>> prepareSyncUpRecords() {
         Log.d(TAG, "performSyncUp");
-        final List<DataRow> newRows = model.getRows("removed = ? and _is_active = ? and " + Col.SYNCED +
-                " = ? ", new String[]{"0", "1","0"});
-        final List<DataRow> updateRows = model.getRows("_is_active = ? and " +
-                        Col.SYNCED + " = ? and _is_updated = ? ",
-                new String[]{ "1", "1", "1"});
+        SyncUpCondition syncUpCondition = model.getUpdateOnServerCondition();
+        String insertSelection = "removed = ? and _is_active = ? and " + Col.SYNCED +
+                " = ? ";
+        String updateSelection = "_is_active = ? and " +
+                Col.SYNCED + " = ? and _is_updated = ? ";
+        insertSelection = syncUpCondition == null? insertSelection: insertSelection + " and ( " +
+                syncUpCondition.selection + ")";
+        updateSelection = syncUpCondition == null? updateSelection: updateSelection + " and ( " +
+                syncUpCondition.selection + ")";
+        String[] insertArgs = {"0", "1","0"};
+        String[] updateArgs = {"1", "1", "1"};
+        if(syncUpCondition != null) {
+            insertArgs = MyUtil.addArgs(insertArgs, syncUpCondition.args);
+            updateArgs = MyUtil.addArgs(updateArgs, syncUpCondition.args);
+        }
+        final List<DataRow> newRows = model.getRows(insertSelection , insertArgs);
+        final List<DataRow> updateRows = model.getRows(updateSelection, updateArgs);
         Map<String, Map<String, Object>> updatedRecords = new HashMap<>();
         idsToUpdateOnServer.clear();
         for(DataRow row : newRows) {
@@ -953,5 +965,15 @@ public abstract class RecordHandler {
 
     public void setModel(Model model) {
         this.model = model;
+    }
+
+    public static class SyncUpCondition{
+        private String selection;
+        private String[] args ;
+
+        public SyncUpCondition(String selection, String[] args){
+            this.selection = selection;
+            this.args = args;
+        }
     }
 }

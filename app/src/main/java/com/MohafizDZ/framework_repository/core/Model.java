@@ -23,6 +23,7 @@ import com.MohafizDZ.framework_repository.Utils.MyUtil;
 import com.MohafizDZ.framework_repository.Utils.SQLUtil;
 import com.MohafizDZ.framework_repository.core.Account.MUser;
 import com.MohafizDZ.framework_repository.service.OrderBy;
+import com.MohafizDZ.framework_repository.service.RecordHandler;
 import com.MohafizDZ.framework_repository.service.SyncAdapter;
 import com.MohafizDZ.framework_repository.service.SyncingDomain;
 import com.MohafizDZ.framework_repository.service.SyncingReport;
@@ -498,13 +499,28 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
         List<Col> colList = getRelationColumns();
         for(Col col : colList){
             String colName = col.getName();
-            if(row.containsKey(colName)){
-                if(col.getColumnType() == Col.ColumnType.array){
-                    row.putRel(colName, getRelArray(row, colName));
-                }else if(col.getColumnType() == Col.ColumnType.many2one){
+            if(col.getColumnType() == Col.ColumnType.array){
+                row.putRel(colName, getRelArray(row, colName));
+            }else if(col.getColumnType() == Col.ColumnType.many2one){
+                if(row.containsKey(colName)) {
                     Model relModel = createInstance(mContext, col.getRelationalModel());
-                    row.putRel(colName, relModel.browse(row.getString(colName)));
+                    DataRow relRow = relModel.browse(row.getString(colName));
+                    if(relRow != null) {
+                        relRow = relModel.getArrayRelRelations(relRow);
+                    }
+                    row.putRel(colName, relRow);
                 }
+            }
+        }
+        return row;
+    }
+
+    public DataRow getArrayRelRelations(DataRow row){
+        List<Col> colList = getRelationColumns();
+        for(Col col : colList){
+            String colName = col.getName();
+            if(col.getColumnType() == Col.ColumnType.array){
+                row.putRel(colName, getRelArray(row, colName));
             }
         }
         return row;
@@ -1003,6 +1019,10 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
         }else{
             update(serverId, values);
         }
+    }
+
+    public RecordHandler.SyncUpCondition getUpdateOnServerCondition() {
+        return null;
     }
 
     public interface OnStartTransactionListener{

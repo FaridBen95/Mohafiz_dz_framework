@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.telephony.TelephonyManager;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -71,10 +72,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.TimeZone;
+
+import io.michaelrocks.libphonenumber.android.PhoneNumberUtil;
 
 public class MyUtil {
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String DEFAULT_SHARE_DATE_FORMAT = "yyyy-MM-dd HH:mm";
 
     public static String caller(){
         try{
@@ -91,6 +96,14 @@ public class MyUtil {
         TimeZone gmtTime =  TimeZone.getDefault();
         gmtFormat.setTimeZone(gmtTime);
         return gmtFormat.format(new Date());
+    }
+
+    public static String getStringFromDate(Date date, String dateFormat){
+        SimpleDateFormat gmtFormat = new SimpleDateFormat();
+        gmtFormat.applyPattern(dateFormat);
+        TimeZone gmtTime =  TimeZone.getDefault();
+        gmtFormat.setTimeZone(gmtTime);
+        return gmtFormat.format(date);
     }
 
     public static void hideKeyboard(Activity activity) {
@@ -300,14 +313,86 @@ public class MyUtil {
         return destination;
     }
 
-    public static String getNormalizedText(String title) {
-        try {
-            String s = Normalizer.normalize(title, Normalizer.Form.NFD);
-            s = s.replaceAll("[^\\p{ASCII}]", "");
-            return s.replaceAll("\\p{M}", "");
-        }catch (Exception ignored){}
-        return title;
+    public static Map<Character, Character> getAccentsMap(){
+        Map<Character, Character> accentsMap = new HashMap<>();
+        accentsMap.put('À', 'A');
+        accentsMap.put('Á', 'A');
+        accentsMap.put('Â', 'A');
+        accentsMap.put('Ã', 'A');
+        accentsMap.put('Ä', 'A');
+        accentsMap.put('È', 'E');
+        accentsMap.put('É', 'E');
+        accentsMap.put('Ê', 'E');
+        accentsMap.put('Ë', 'E');
+        accentsMap.put('Í', 'I');
+        accentsMap.put('Ì', 'I');
+        accentsMap.put('Î', 'I');
+        accentsMap.put('Ï', 'I');
+        accentsMap.put('Ù', 'U');
+        accentsMap.put('Ú', 'U');
+        accentsMap.put('Û', 'U');
+        accentsMap.put('Ü', 'U');
+        accentsMap.put('Ò', 'O');
+        accentsMap.put('Ó', 'O');
+        accentsMap.put('Ô', 'O');
+        accentsMap.put('Õ', 'O');
+        accentsMap.put('Ö', 'O');
+        accentsMap.put('Ñ', 'N');
+        accentsMap.put('Ç', 'C');
+        accentsMap.put('ª', 'A');
+        accentsMap.put('º', 'O');
+        accentsMap.put('§', 'S');
+        accentsMap.put('³', '3');
+        accentsMap.put('²', '2');
+        accentsMap.put('¹', '1');
+        accentsMap.put('à', 'a');
+        accentsMap.put('á', 'a');
+        accentsMap.put('â', 'a');
+        accentsMap.put('ã', 'a');
+        accentsMap.put('ä', 'a');
+        accentsMap.put('è', 'e');
+        accentsMap.put('é', 'e');
+        accentsMap.put('ê', 'e');
+        accentsMap.put('ë', 'e');
+        accentsMap.put('í', 'i');
+        accentsMap.put('ì', 'i');
+        accentsMap.put('î', 'i');
+        accentsMap.put('ï', 'i');
+        accentsMap.put('ù', 'u');
+        accentsMap.put('ú', 'u');
+        accentsMap.put('û', 'u');
+        accentsMap.put('ü', 'u');
+        accentsMap.put('ò', 'o');
+        accentsMap.put('ó', 'o');
+        accentsMap.put('ô', 'o');
+        accentsMap.put('õ', 'o');
+        accentsMap.put('ö', 'o');
+        accentsMap.put('ñ', 'n');
+        accentsMap.put('ç', 'c');
+        return accentsMap;
     }
+
+    public static String getNormalizedText(String text) {
+        StringBuilder sb = new StringBuilder(text);
+        Map<Character, Character> accentsMap = getAccentsMap();
+
+        for(int i = 0; i < text.length(); i++) {
+            Character c = accentsMap.get(sb.charAt(i));
+            if(c != null) {
+                sb.setCharAt(i, c.charValue());
+            }
+        }
+        return sb.toString();
+    }
+
+//    public static String getNormalizedText(String title) {
+//        try {
+//            String s = Normalizer.normalize(title, Normalizer.Form.NFD);
+//            s = s.replaceAll("[^\\p{ASCII}]", "");
+//            return s.replaceAll("\\p{M}", "");
+//        }catch (Exception ignored){}
+//        return title;
+//    }
 
     public static String getPriceText(Number value) {
         return value + " DA";
@@ -412,6 +497,13 @@ public class MyUtil {
             newArgs[newArgs.length - 1] = value;
         }
         return newArgs;
+    }
+
+    public static String[] addArgs(String[] args, String[] args2) {
+        for(String arg : args2){
+            args = addArgs(args, arg);
+        }
+        return args;
     }
 
     public static int pxToDp(int px) {
@@ -551,6 +643,18 @@ public class MyUtil {
         long minutesInMilli = secondsInMilli * 60;
         long hoursInMilli = minutesInMilli * 60;
         long daysInMilli = hoursInMilli * 24;
+        long weeksInMilli = daysInMilli * 7;
+        long monthsInMilli = weeksInMilli * 4;
+        long yearsInMilli = monthsInMilli * 12;
+
+        long elapsedYears = different / yearsInMilli;
+        different = different % yearsInMilli;
+
+        long elapsedMonths = different / monthsInMilli;
+        different = different % monthsInMilli;
+
+        long elapsedWeeks = different / weeksInMilli;
+        different = different % weeksInMilli;
 
         long elapsedDays = different / daysInMilli;
         different = different % daysInMilli;
@@ -564,8 +668,33 @@ public class MyUtil {
         long elapsedSeconds = different / secondsInMilli;
 
         String output = "";
-        if (elapsedDays > 7) {
-            output += dateFrom;
+//        if (elapsedDays > 7) {
+//            Date date = createDateObject(dateFrom, DEFAULT_SHARE_DATE_FORMAT, false);
+//            output += getStringFromDate(date, DEFAULT_SHARE_DATE_FORMAT);
+//            return output;
+//        }
+        if (elapsedYears > 1) {
+            output += elapsedYears + " " + resources.getString(R.string.years);
+            return output;
+        }
+        if (elapsedYears == 1) {
+            output += elapsedYears + " " + resources.getString(R.string.year);
+            return output;
+        }
+        if (elapsedMonths > 1) {
+            output += elapsedMonths + " " + resources.getString(R.string.months);
+            return output;
+        }
+        if (elapsedMonths == 1) {
+            output += elapsedMonths + " " + resources.getString(R.string.month);
+            return output;
+        }
+        if (elapsedWeeks > 1) {
+            output += elapsedWeeks + " " + resources.getString(R.string.weeks);
+            return output;
+        }
+        if (elapsedWeeks == 1) {
+            output += elapsedWeeks + " " + resources.getString(R.string.week);
             return output;
         }
         if (elapsedDays == 1) {
@@ -603,6 +732,10 @@ public class MyUtil {
 
     private static long convertStringDateToMillis(String currentDate) {
         return createDateObject(currentDate, DEFAULT_DATE_FORMAT, false).getTime();
+    }
+
+    public static Date getDateFromStringDate(String currentDate) {
+        return createDateObject(currentDate, DEFAULT_DATE_FORMAT, false);
     }
 
     public static void toastIconInfo(Activity activity, String message) {
@@ -671,4 +804,36 @@ public class MyUtil {
                         (screenSize & Configuration.SCREENLAYOUT_SIZE_LARGE)==Configuration.SCREENLAYOUT_SIZE_LARGE? ScreenSizeType.large :
                                 (screenSize & Configuration.SCREENLAYOUT_SIZE_XLARGE)==Configuration.SCREENLAYOUT_SIZE_XLARGE? ScreenSizeType.xlarge : null;
     }
+
+    public static String formatTime(Date time, Locale locale){
+        String timeFormat = DEFAULT_DATE_FORMAT;
+
+        SimpleDateFormat formatter;
+        formatter = new SimpleDateFormat(timeFormat, locale);
+
+//        try {
+//        } catch(Exception e) {
+////            formatter = new SimpleDateFormat(DEFAULT_TIME_FORMAT, locale);
+//        }
+        return formatter.format(time);
+    }
+
+    public static int getPhoneCode(Context context, String countryCode){
+        return PhoneNumberUtil.createInstance(context).getCountryCodeForRegion(countryCode.toUpperCase());
+    }
+
+    public static String getCountryCodeFromSettings(Context context){
+        TelephonyManager tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        return tm.getNetworkCountryIso();
+    }
+
+    public static int generateRandomColor() {
+        Random rnd = new Random();
+        int randomValue;
+        do{
+            randomValue = rnd.nextInt();
+        }while (randomValue % 255 < 120);
+        return randomValue % 255;
+    }
+
 }

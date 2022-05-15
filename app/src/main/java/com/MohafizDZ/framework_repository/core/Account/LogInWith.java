@@ -58,9 +58,15 @@ public abstract class LogInWith {
     private GoogleSignInClient googleSignInClient;
     private FirebaseUser firebaseUser;
     private JSONObject object;
+    private boolean relink;
 
     public void setLoginType(LoginType loginType) {
+        setLoginType(loginType, false);
+    }
+
+    public void setLoginType(LoginType loginType, boolean relink) {
         this.loginType = loginType;
+        this.relink = relink;
     }
 
     public LogInWith(FragmentActivity activity){
@@ -247,32 +253,46 @@ public abstract class LogInWith {
     private void FirebaseGoogleAuth(String token){
         AuthCredential authCredential = GoogleAuthProvider.getCredential(token, null);
         onSuccess();
-        firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()){
-                            firebaseUser = firebaseAuth.getCurrentUser();
-                            try {
-                                if (task.getResult().getAdditionalUserInfo().isNewUser()) {
-                                    onAuthenticated(true);
-                                    recoverData();
-                                    return;
+        if(!relink) {
+            firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                firebaseUser = firebaseAuth.getCurrentUser();
+                                try {
+                                    if (task.getResult().getAdditionalUserInfo().isNewUser()) {
+                                        onAuthenticated(true);
+                                        recoverData();
+                                        return;
+                                    }
+                                    onAuthenticated(false);
+                                } catch (Exception ignored) {
+                                    onAuthenticated(false);
                                 }
-                                onAuthenticated(false);
-                            }catch (Exception ignored){
-                                onAuthenticated(false);
-                            }
-                        }
-                        else {
-                            if(task.getException() != null) {
-                                onErrorOccurred(task.getException().getMessage());
-                            }else{
-                                onErrorOccurred(mContext.getResources().getString(R.string.try_again));
+                            } else {
+                                if (task.getException() != null) {
+                                    onErrorOccurred(task.getException().getMessage());
+                                } else {
+                                    onErrorOccurred(mContext.getResources().getString(R.string.try_again));
+                                }
                             }
                         }
                     }
-                }
-        );
+            );
+        }else{
+            firebaseUser = firebaseAuth.getCurrentUser();
+            firebaseUser.linkWithCredential(authCredential)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "Successfully linked emailLink credential!");
+                            AuthResult result = task.getResult();
+                            onAuthenticated(false);
+                        } else {
+                            Log.e(TAG, "Error linking emailLink credential", task.getException());
+                            onErrorOccurred(task.getException().getMessage());
+                        }
+                    });
+        }
     }
 
     private void FirebaseFacebookAuth(AccessToken token) {

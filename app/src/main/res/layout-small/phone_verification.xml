@@ -132,6 +132,7 @@
         app:layout_constraintStart_toStartOf="@id/guideline4"
         app:layout_constraintTop_toBottomOf="@id/fillInformTextView" />
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/verificationCodeContainer"
         android:layout_width="0dp"
@@ -141,8 +142,35 @@
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@id/guideline7"
         app:layout_constraintTop_toBottomOf="@id/divider">
+        <EditText
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:paddingHorizontal="@dimen/default_4dp"
+            android:id="@+id/principalEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:background="@color/grey_5"
+            android:gravity="center"
+            android:inputType="phone"
+            android:hint="000000"
+            android:textColorHint="@color/grey_5"
+            android:maxLength="6" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:visibility="gone"
+        android:id="@+id/verificationCodeContainer2"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="@id/guideline8"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@id/guideline7"
+        app:layout_constraintTop_toBottomOf="@id/divider">
 
         <EditText
+            app:layout_constraintTop_toTopOf="parent"
             android:id="@+id/et1"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -157,6 +185,7 @@
             app:layout_constraintWidth_percent="0.12" />
 
         <EditText
+            app:layout_constraintTop_toTopOf="parent"
             android:id="@+id/et2"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -171,6 +200,7 @@
             app:layout_constraintWidth_percent="0.12" />
 
         <EditText
+            app:layout_constraintTop_toTopOf="parent"
             android:id="@+id/et3"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -185,6 +215,7 @@
             app:layout_constraintWidth_percent="0.12" />
 
         <EditText
+            app:layout_constraintTop_toTopOf="parent"
             android:id="@+id/et4"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -199,6 +230,7 @@
             app:layout_constraintWidth_percent="0.12" />
 
         <EditText
+            app:layout_constraintTop_toTopOf="parent"
             android:id="@+id/et5"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -213,6 +245,7 @@
             app:layout_constraintWidth_percent="0.12" />
 
         <EditText
+            app:layout_constraintTop_toTopOf="parent"
             android:id="@+id/et6"
             android:layout_width="0dp"
             android:layout_height="0dp"

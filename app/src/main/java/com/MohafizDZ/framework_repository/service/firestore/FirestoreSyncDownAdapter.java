@@ -91,6 +91,9 @@ public class FirestoreSyncDownAdapter {
                 case equalTo:
                     query = query.whereEqualTo(fieldName, arg);
                     break;
+                case not_equalTo:
+                    query = query.whereNotEqualTo(fieldName, arg);
+                    break;
                 case whereIn:
                     query = query.whereIn(fieldName, (List<? extends Object>) arg);
                     break;

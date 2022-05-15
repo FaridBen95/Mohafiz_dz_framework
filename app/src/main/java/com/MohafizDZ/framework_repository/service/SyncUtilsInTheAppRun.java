@@ -81,6 +81,10 @@ public class SyncUtilsInTheAppRun {
     }
 
     public static void requestSync(Context context, Class modelClass, String authority, Bundle bundle){
+        requestSync(context, modelClass, authority, bundle, null);
+    }
+
+    public static void requestSync(Context context, Class modelClass, String authority, Bundle bundle, SyncUtilsListener listener){
 //        Bundle settingsBundle = extras == null? new Bundle() : extras;
 //        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 //        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
@@ -97,6 +101,10 @@ public class SyncUtilsInTheAppRun {
             Model currentModel = Model.createInstance(context, modelClass);
             currentModel.setCanSaveLastSyncDate(true);
             if(currentModel.isSyncing()){
+                Log.d(TAG, currentModel.getModelName() + " is in progress");
+                if(listener != null){
+                    listener.onSyncFailed();
+                }
                 return;
             }
             modelHelperList.add(new ModelHelper(currentModel));
@@ -111,6 +119,9 @@ public class SyncUtilsInTheAppRun {
             data.putString(ISyncFinishReceiver.USERNAME_KEY, currentModel.getmUser().getAndroidAccountName());
             intent.putExtras(data);
             context.getApplicationContext().sendBroadcast(intent);
+            if(listener != null){
+                listener.onSyncFinished();
+            }
 
 //                handler.post(() -> {
 //                    //UI Thread work here
@@ -161,5 +172,12 @@ public class SyncUtilsInTheAppRun {
 //            e.printStackTrace();
 //        }
 //        return null;
+    }
+
+    public interface SyncUtilsListener{
+
+        void onSyncFinished();
+
+        void onSyncFailed();
     }
 }

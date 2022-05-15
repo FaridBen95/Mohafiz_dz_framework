@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public abstract class MyAppCompatActivity extends AppCompatActivity implements ActivityListener, GlobalTouchListener {
     private String info = "No info set for this activity";
@@ -45,9 +46,17 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MyUtil.setLocale(this, MyUtil.getCurrentLanguageLocale(getApplicationContext()));
+//        MyUtil.setLocale(this, MyUtil.getCurrentLanguageLocale(getApplicationContext()));
         activityListener = this;
         info = activityListener.setInfo();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        String currentLanguage = MyUtil.getCurrentLanguageLocale(newBase);
+        newBase.getResources().getConfiguration().setLocale(new Locale(currentLanguage));
+        applyOverrideConfiguration(newBase.getResources().getConfiguration());
+        super.attachBaseContext(newBase);
     }
 
     @Override

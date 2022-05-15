@@ -48,6 +48,12 @@
     <string name="minute"> minute </string>
     <string name="minutes"> minutes </string>
     <string name="seconds"> seconds</string>
+    <string name="week">" w"</string>
+    <string name="weeks">" w"</string>
+    <string name="month">" Mo"</string>
+    <string name="months">" Mo"</string>
+    <string name="years">" y"</string>
+    <string name="year">" y"</string>
     <string name="now">Now</string>
     <string name="continue_with_facebook">Continue with Facebook</string>
     <string name="continue_with_gmail">Continue with Gmail</string>
@@ -66,4 +72,8 @@
     <string name="low_version_title">Version is low</string>
     <string name="low_version_message">You need to update the application inorder to continue</string>
     <string name="update">Update</string>
+    <string name="terms_of_use_text">By clicking "Continue" I agree that i have read and accepted the @Terms of Use</string>
+    <string name="terms_of_use_file_name">terms_of_use_en.txt</string>
+    <string name="code_sent">The code has been sent</string>
+    <string name="please_wait_for_code">Please Wait for the code</string>
 </resources>
