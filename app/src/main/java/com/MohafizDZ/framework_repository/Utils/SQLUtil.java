@@ -103,7 +103,11 @@ public class SQLUtil {
         sql.append(" (");
         sql.append("base_col_id VARCHAR");
         sql.append(", rel_col VARCHAR");
-        sql.append(", UNIQUE (base_col_id, rel_col)");
+        if(!col.canContainDuplication()) {
+            sql.append(", UNIQUE (base_col_id, rel_col)");
+        }else{
+            sql.append(", UNIQUE (base_col_id) ");
+        }
         sql.append(")");
         sqlCreateStatement.put(tableName, sql.toString());
     }

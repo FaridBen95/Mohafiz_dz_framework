@@ -36,6 +36,7 @@ import com.MohafizDZ.framework_repository.service.MSyncStatusObserverListener;
 import com.MohafizDZ.framework_repository.service.SyncUtilsInTheAppRun;
 import com.MohafizDZ.framework_repository.service.SyncUtilsWithSyncAdapter;
 import com.MohafizDZ.framework_repository.service.SyncingReport;
+import com.MohafizDZ.framework_repository.service.receiver.LowStorageBroadcastReceiver;
 import com.MohafizDZ.project.StartClassHelper;
 import com.MohafizDZ.project.models.ConfigurationModel;
 import com.MohafizDZ.project.models.UserModel;
@@ -73,6 +74,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
     private View imageView;
     private Animation animation;
     private View waitingFrameLayout;
+    private LowStorageBroadcastReceiver lowStorageBroadcastReceiver;
     private boolean allowStartProjectCode = false;
 
     @Override
@@ -174,11 +176,17 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         showProgressDialog();
         Bundle bundle = new Bundle();
         bundle.putString("from", TAG);
+        cancelLastSync();
         if(App.syncUsingBackgroundServices){
             SyncUtilsWithSyncAdapter.requestSync(this, UserModel.AUTHORITY, bundle);
         }else {
             SyncUtilsInTheAppRun.requestSync(this, UserModel.AUTHORITY, UserModel.class, bundle);
         }
+    }
+
+    private void cancelLastSync() {
+        new ConfigurationModel(this).setSyncing(false);
+        new UserModel(this).setSyncing(false);
     }
 
     private static final Intent[] POWERMANAGER_INTENTS = {
@@ -398,6 +406,11 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
             onFirstRun();
         }
         FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+        // new code
+        allowStartProjectCode = true;
+        app().createApplicationFolder();
+        //previous code
+        /*
         int WRITE_EXTERNAL_STORAGE_Check = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int CALL_PHONE_Check = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CALL_PHONE);
         int ACCESS_FINE_LOCATION_Check = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION);
@@ -406,6 +419,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
                 ACCESS_FINE_LOCATION_Check != PackageManager.PERMISSION_GRANTED ||
                 ACCESS_COARSE_LOCATION_Check != PackageManager.PERMISSION_GRANTED ||
                 WRITE_EXTERNAL_STORAGE_Check != PackageManager.PERMISSION_GRANTED ) {
+            showPermissionInfoDialog();
             ActivityCompat.requestPermissions(this,
                     new String[]{
                             android.Manifest.permission.CALL_PHONE,
@@ -416,7 +430,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         }else{
             allowStartProjectCode = true;
             app().createApplicationFolder();
-        }
+        }*/
         onChangeView = new OnChangeView() {
             @Override
             public void openedClass(Class opened) {
@@ -425,6 +439,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
                 }else{
                     findViewById(R.id.waitingFrameLayout).setVisibility(View.GONE);
                 }
+//                new android.os.storage.StorageVolume.EXTRA_STORAGE_VOLUME
             }
         };
     }
@@ -494,6 +509,16 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
                 500*1024*1024);
 //        Toast.makeText(this, maxValue + "", Toast.LENGTH_SHORT).show();
         return Math.min(value, maxValue);
+    }
+
+    private void registerLowStorageReceiver() {
+        IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+        boolean hasLowStorage = registerReceiver(lowStorageBroadcastReceiver, lowstorageFilter) != null;
+//        getApplicationContext().registerReceiver(lowStorageBroadcastReceiver, new IntentFilter(LowStorageBroadcastReceiver.INTENT_FILTER));
+    }
+
+    private void unregisterLowStorageReceiver() {
+        getApplicationContext().unregisterReceiver(lowStorageBroadcastReceiver);
     }
 
     private void onFirstRun() {
@@ -689,5 +714,17 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
     public void onBackPressed() {
         super.onBackPressed();
         animation.cancel();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerLowStorageReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+//        unregisterLowStorageReceiver();
+        super.onPause();
     }
 }

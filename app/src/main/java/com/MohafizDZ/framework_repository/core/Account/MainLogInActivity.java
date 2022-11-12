@@ -170,7 +170,10 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
                     PERMISSIONS_REQUEST_REQUIRED_PERMS );
         }
 //        validateTime();
-    }/*
+
+    }
+
+    /*
 
     private void validateTime() {
         DatabaseReference offsetRef = FirebaseDatabase.getInstance().getReference(".info/serverTimeOffset");

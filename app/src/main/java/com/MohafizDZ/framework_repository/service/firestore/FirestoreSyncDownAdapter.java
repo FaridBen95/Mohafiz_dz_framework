@@ -48,6 +48,8 @@ public class FirestoreSyncDownAdapter {
         Query query = firebaseFirestore.collection(collectionName);
         if(firestoreListener != null && firestoreListener.orderByWriteDate()){
             query = query.orderBy("write_date", Query.Direction.DESCENDING);
+        }else if (firestoreListener != null && firestoreListener.setOrderByField() != null){
+            query = query.orderBy(firestoreListener.setOrderByField(), Query.Direction.DESCENDING);
         }
         query = firestoreListener != null?
                 prepareQuery(firestoreListener.setQuery(), query) : query;
@@ -177,5 +179,6 @@ public class FirestoreSyncDownAdapter {
         DocumentSnapshot setOffset();
         List<QueryClause> setQuery();
         boolean orderByWriteDate();
+        String setOrderByField();
     }
 }

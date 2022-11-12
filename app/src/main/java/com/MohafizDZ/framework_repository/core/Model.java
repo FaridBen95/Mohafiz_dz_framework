@@ -1075,7 +1075,7 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
             Col col = getColumn(field);
             String relTableName = getArrayRelTableName(col);
             StringBuilder sql = new StringBuilder();
-            sql.append(" INSERT INTO ");
+            sql.append(" INSERT OR IGNORE INTO ");
             sql.append(relTableName);
             sql.append(" (");
             sql.append("base_col_id");
@@ -1328,7 +1328,7 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
                     val = val == null? col.getDefaultValue() : val;
                     values.put(colName, val);
                 }
-                if(col.getColumnType() == Col.ColumnType.array){
+                if(col.getColumnType() == Col.ColumnType.array && col.isCanInsertFromServer()){
                     if(col.getColumnType().equals(Col.ColumnType.array)){
                         Map<String, List<String>> _relValues = relArray.containsKey(col.getName())?
                                 relArray.get(col.getName()) : new HashMap<String, List<String>>();
@@ -1405,7 +1405,7 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
             Col col = model.getColumn(relField);
             String relTableName = model.getArrayRelTableName(col);
             StringBuilder sql = new StringBuilder();
-            sql.append(" INSERT INTO ");
+            sql.append(" INSERT OR IGNORE INTO ");
             sql.append(relTableName);
             sql.append(" (");
             sql.append("base_col_id");

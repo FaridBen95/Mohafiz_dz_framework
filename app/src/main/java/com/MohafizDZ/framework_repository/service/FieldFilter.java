@@ -17,6 +17,8 @@ public class FieldFilter {
         switch (operation){
             case equalTo:
                 return "EQUAL";
+            case notEqualTo:
+                return "NOT_EQUAL";
             case whereIn:
                 return "IN";
             case arrayContainsAny:

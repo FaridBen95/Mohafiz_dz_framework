@@ -175,7 +175,7 @@ public abstract class RecordHandler {
     private String insertValues(List<Values> toInsertValues) {
         if(toInsertValues.size() != 0) {
             List<Col> columns = model.getColumns();
-            StringBuilder insertSQL = new StringBuilder("INSERT INTO '");
+            StringBuilder insertSQL = new StringBuilder(" INSERT OR IGNORE INTO  '");
             insertSQL.append(model.getModelName());
             insertSQL.append("' (");
             for (Col col : columns) {
@@ -529,7 +529,7 @@ public abstract class RecordHandler {
             Col col = model.getColumn(relField);
             String relTableName = model.getArrayRelTableName(col);
             StringBuilder sql = new StringBuilder();
-            sql.append(" INSERT INTO ");
+            sql.append(" INSERT OR IGNORE INTO ");
             sql.append(relTableName);
             sql.append(" (");
             sql.append("base_col_id");
@@ -837,7 +837,7 @@ public abstract class RecordHandler {
         private String insertValues(List<Values> toInsertValues) {
             if(toInsertValues.size() != 0) {
                 List<Col> columns = relModel.getColumns();
-                StringBuilder insertSQL = new StringBuilder("INSERT INTO '");
+                StringBuilder insertSQL = new StringBuilder(" INSERT OR IGNORE INTO  '");
                 insertSQL.append(relModel.getModelName());
                 insertSQL.append("' (");
                 for (Col col : columns) {

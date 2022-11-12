@@ -49,14 +49,25 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
 //        MyUtil.setLocale(this, MyUtil.getCurrentLanguageLocale(getApplicationContext()));
         activityListener = this;
         info = activityListener.setInfo();
+        setLocale(this);
     }
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        String currentLanguage = MyUtil.getCurrentLanguageLocale(newBase);
-        newBase.getResources().getConfiguration().setLocale(new Locale(currentLanguage));
-        applyOverrideConfiguration(newBase.getResources().getConfiguration());
+        String currentLanguage = MUtil.getCurrentLanguageLocale(newBase);
+        Resources resources = newBase.getResources();
+        resources.getConfiguration().setLocale(new Locale(currentLanguage));
+        applyOverrideConfiguration(resources.getConfiguration());
         super.attachBaseContext(newBase);
+    }
+
+    public void setLocale(Context context) {
+        String lang = MUtil.getCurrentLanguageLocale(context);
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.locale = new Locale(lang);
+        res.updateConfiguration(conf, dm);
     }
 
     @Override
@@ -379,4 +390,13 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
             return mSearchViewChangeListener.onTextSubmit(query);
         }
     };
+
+    @NonNull
+    public Resources getLocalizedResources(Context context, Locale desiredLocale) {
+        Configuration conf = context.getResources().getConfiguration();
+        conf = new Configuration(conf);
+        conf.setLocale(desiredLocale);
+        Context localizedContext = context.createConfigurationContext(conf);
+        return localizedContext.getResources();
+    }
 }

@@ -180,6 +180,11 @@ public class FirestoreSyncDownBridge implements FirestoreSyncDownAdapter.Firesto
     }
 
     @Override
+    public String setOrderByField() {
+        return syncListener.orderByField();
+    }
+
+    @Override
     public final void onRelResult(Map<String, Map<String, DataRow>> resultMap) {
         List<Col> relColumns = model.getRelationColumns();
         for(Col col : relColumns) {
@@ -246,5 +251,6 @@ public class FirestoreSyncDownBridge implements FirestoreSyncDownAdapter.Firesto
         List<QueryClause> setQuery();
         void onSyncFailed(Exception exception);
         boolean orderByWriteDate();
+        String orderByField();
     }
 }

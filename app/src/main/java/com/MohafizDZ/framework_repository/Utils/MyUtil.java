@@ -372,6 +372,15 @@ public class MyUtil {
         return accentsMap;
     }
 
+    public static Map<Character, Character> getForbiddenCharMap(){
+        Map<Character, Character> accentsMap = new HashMap<>();
+        accentsMap.put('"', ' ');
+        accentsMap.put('\'', ' ');
+        accentsMap.put('<', ' ');
+        accentsMap.put('>', ' ');
+        return accentsMap;
+    }
+
     public static String getNormalizedText(String text) {
         StringBuilder sb = new StringBuilder(text);
         Map<Character, Character> accentsMap = getAccentsMap();
@@ -426,6 +435,21 @@ public class MyUtil {
         } catch (ParseException ignored) {
         }
         return null;
+    }
+
+    public static List<String> getArrayFromField(String field) {
+        List<String> stringArray = new ArrayList<>();
+        String text = "";
+        for(int i = 0; i< field.length(); i++){
+            char c = field.charAt(i);
+            if(c == ' '){
+                text = "";
+            }else{
+                text = text.concat(c + "");
+                stringArray.add(text);
+            }
+        }
+        return stringArray;
     }
 
     private String getTimeDiff(String time, String currentTime,String dateFormat) throws ParseException
@@ -834,6 +858,19 @@ public class MyUtil {
             randomValue = rnd.nextInt();
         }while (randomValue % 255 < 120);
         return randomValue % 255;
+    }
+
+    public static String getAllowedText(String text) {
+        StringBuilder sb = new StringBuilder(text);
+        Map<Character, Character> forbiddenCharMap = getForbiddenCharMap();
+
+        for(int i = 0; i < text.length(); i++) {
+            Character c = forbiddenCharMap.get(sb.charAt(i));
+            if(c != null) {
+                sb.setCharAt(i, c.charValue());
+            }
+        }
+        return sb.toString();
     }
 
 }

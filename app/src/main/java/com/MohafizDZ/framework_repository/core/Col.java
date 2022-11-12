@@ -13,6 +13,26 @@ public class Col {
 
     private String currentModel;
     private boolean mUnique;
+    private boolean canContainDuplication = false;
+    private boolean canInsertFromServer = true;
+
+    public boolean canContainDuplication() {
+        return canContainDuplication;
+    }
+
+    public boolean isCanInsertFromServer() {
+        return canInsertFromServer;
+    }
+
+    public Col setCanContainDuplication(boolean canContainDuplication) {
+        this.canContainDuplication = canContainDuplication;
+        return this;
+    }
+
+    public Col setCanInsertFromServer(boolean canInsertFromServer) {
+        this.canInsertFromServer = canInsertFromServer;
+        return this;
+    }
 
     public enum ColumnType {
         varchar, text, integer, real, bool, one2many, many2one, attachement, low_quality_image, array

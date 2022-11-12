@@ -17,4 +17,5 @@ public class MConstants {
     public static final String DEFAULT_CURRENCY = "DA";
 
     public static final int DATABASE_VERSION = 28;
+    public static final int FRAMEWORK_VERSION = 1;
 }

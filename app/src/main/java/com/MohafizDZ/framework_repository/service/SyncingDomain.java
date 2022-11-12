@@ -24,7 +24,7 @@ public class SyncingDomain {
         this.whereArgs = whereArgs;
     }
 
-    public enum Operation {equalTo, lessThan, lessOrEqualThan, greaterThan,
+    public enum Operation {equalTo, notEqualTo, lessThan, lessOrEqualThan, greaterThan,
         greaterOrEqualThan, whereIn, arrayContains, arrayContainsAny}
 
     public SyncingDomain(){
@@ -56,6 +56,11 @@ public class SyncingDomain {
             case equalTo:
                 if(active){
                     selection += field + " = ? ";
+                }
+                break;
+            case notEqualTo:
+                if(active){
+                    selection += field + " <> ? ";
                 }
                 break;
             case greaterOrEqualThan:
