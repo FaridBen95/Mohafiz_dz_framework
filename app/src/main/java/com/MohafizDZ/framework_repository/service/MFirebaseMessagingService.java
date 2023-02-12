@@ -3,6 +3,9 @@ package com.MohafizDZ.framework_repository.service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -12,15 +15,16 @@ import com.MohafizDZ.framework_repository.Utils.CustomNotificationBuilder;
 import com.MohafizDZ.framework_repository.datas.MConstants;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
 
 import org.json.JSONObject;
 
 import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class MFirebaseMessagingService extends FirebaseMessagingService implements SyncUtilsInTheAppRun.SyncUtilsListener{
     public static final String TAG = MFirebaseMessagingService.class.getSimpleName();
@@ -217,14 +221,7 @@ public class MFirebaseMessagingService extends FirebaseMessagingService implemen
 
     @Override
     public void onSyncFailed() {
-        try {
-            Looper.prepare();
-        }catch (Exception ignored){}
-        new Handler().postDelayed(() -> {
-            Bundle _data = new Bundle();
-            _data.putString("from", TAG);
-            SyncUtils.requestSync(context.getApplicationContext(), NotificationModel.class, NotificationModel.AUTHORITY, _data, this);
-        }, 3000);
+
     }
 
     public static class SendFCMNotification extends AsyncTask<Void, Void, String>{

@@ -39,6 +39,9 @@ import com.MohafizDZ.framework_repository.service.SyncingReport;
 import com.MohafizDZ.framework_repository.service.receiver.LowStorageBroadcastReceiver;
 import com.MohafizDZ.project.StartClassHelper;
 import com.MohafizDZ.project.models.ConfigurationModel;
+import com.MohafizDZ.project.models.ObjectiveModel;
+import com.MohafizDZ.project.models.ShareableObjectiveModel;
+import com.MohafizDZ.project.models.ShareableUserModel;
 import com.MohafizDZ.project.models.UserModel;
 import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.ArrayList;
@@ -164,7 +167,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         DataRow currentUserRow = app().getCurrentUser();
         if(app().isConnected()) {
             boolean userSynced = new UserModel(this).syncWithSuccess(15);
-            if (currentUserRow != null && ( !app().inNetwork() || userSynced)) {
+            if (currentUserRow != null && (App.TEST_MODE || !app().inNetwork() || userSynced)) {
                 openNextPage();
             }else{
                 syncUsers();
@@ -172,7 +175,18 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         }
     }
 
+    /*private void verifyObjectiveCreation() {
+        DataRow currentUserRow = app().getCurrentUser();
+        if(currentUserRow != null){
+            DataRow objectiveRow = new ObjectiveModel(this).getAssignedStore(currentUserRow);
+            if(objectiveRow != null && !ObjectiveModel.allowedObjectiveToUse(objectiveRow)){
+
+            }
+        }
+    }*/
+
     public void syncUsers(){
+        cancelLastSync();
         showProgressDialog();
         Bundle bundle = new Bundle();
         bundle.putString("from", TAG);
@@ -687,7 +701,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
 
     private void openNextPage() {
         boolean userSynced = new UserModel(MohafizMainActivity.this).syncWithSuccess(15);
-        if(!app().inNetwork() || userSynced) {
+        if(App.TEST_MODE || !app().inNetwork() || userSynced) {
             DataRow currentUserRow = app().getCurrentUser();
             if (currentUserRow == null || !currentUserRow.getBoolean("_is_active")) {
                 StartClassHelper.openSignUpActivity(this);

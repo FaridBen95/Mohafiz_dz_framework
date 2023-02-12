@@ -3,6 +3,8 @@ package com.MohafizDZ.framework_repository.core;
 import android.content.ContentValues;
 import android.util.Base64;
 
+import androidx.annotation.Nullable;
+
 import com.MohafizDZ.framework_repository.Utils.MyUtil;
 
 import java.io.File;

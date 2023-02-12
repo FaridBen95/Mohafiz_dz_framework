@@ -74,7 +74,7 @@ public class SQLUtil {
                     colStatement.append(" AUTOINCREMENT ");
                 }
                 Object default_value = col.getDefaultValue();
-                if (default_value != null && !default_value.toString().equals("")) {
+                if (default_value != null) {
                     colStatement.append(" DEFAULT ");
                     if (default_value instanceof String) {
                         colStatement.append("'").append(default_value).append("'");

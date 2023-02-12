@@ -12,12 +12,16 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 import android.text.format.DateUtils;
@@ -30,6 +34,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.DownloadListener;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -80,6 +85,7 @@ import io.michaelrocks.libphonenumber.android.PhoneNumberUtil;
 public class MyUtil {
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String DEFAULT_SHARE_DATE_FORMAT = "yyyy-MM-dd HH:mm";
+    public static final String CUSTOM_DATE_SHOWING_FORMAT = "EEEE, dd MMMM";
 
     public static String caller(){
         try{
@@ -414,7 +420,7 @@ public class MyUtil {
 
     public static String formatPrice(String price) {
         String formatedPrice = formatPrice(price, Locale.FRENCH, "DZD", "DA", "", 0);
-        char separator = formatedPrice.charAt(formatedPrice.length()-3);
+        char separator = formatedPrice.length() > 3?formatedPrice.charAt(formatedPrice.length()-3): ' ';
         return formatedPrice.replace(separator, ' ' ) ;
     }
 
@@ -434,7 +440,16 @@ public class MyUtil {
             return formatted.replace(currencyCode, displayCode);
         } catch (ParseException ignored) {
         }
-        return null;
+        return "";
+    }
+
+    public static String getCurrency(){
+        return "DA";
+    }
+
+    public static String getCurrency(Locale locale){
+        Currency currency = Currency.getInstance(locale);
+        return currency.getSymbol();
     }
 
     public static List<String> getArrayFromField(String field) {
@@ -452,6 +467,17 @@ public class MyUtil {
         return stringArray;
     }
 
+    public static void animateProgress(final FrameLayout lyt_progress) {
+        lyt_progress.setVisibility(View.VISIBLE);
+        lyt_progress.setAlpha(1.0f);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ViewAnimation.fadeOut(lyt_progress);
+            }
+        }, 1500);
+    }
     private String getTimeDiff(String time, String currentTime,String dateFormat) throws ParseException
     {
         DateFormat formatter = new SimpleDateFormat(dateFormat);
@@ -776,6 +802,20 @@ public class MyUtil {
         toast.show();
     }
 
+    public static void toastIconWarning(Activity activity, String message) {
+        Toast toast = new Toast(activity.getApplicationContext());
+        toast.setDuration(Toast.LENGTH_LONG);
+
+        //inflate view
+        View custom_view = activity.getLayoutInflater().inflate(R.layout.toast_icon_text, null);
+        ((TextView) custom_view.findViewById(R.id.message)).setText(message);
+        ((ImageView) custom_view.findViewById(R.id.icon)).setImageResource(R.drawable.ic_info);
+        ((CardView) custom_view.findViewById(R.id.parent_view)).setCardBackgroundColor(activity.getResources().getColor(R.color.android_orange_dark));
+
+        toast.setView(custom_view);
+        toast.show();
+    }
+
     public static void toastIconSuccess(Activity activity, String message) {
         Toast toast = new Toast(activity.getApplicationContext());
         toast.setDuration(Toast.LENGTH_LONG);
@@ -873,4 +913,17 @@ public class MyUtil {
         return sb.toString();
     }
 
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
+    }
 }

@@ -37,6 +37,11 @@ public class ModelsSyncingTask {
                 public void onSyncImagesFinished() {
 
                 }
+
+                @Override
+                public void onSyncFailed() {
+                    Toast.makeText(context, "syncing failed", Toast.LENGTH_SHORT).show();
+                }
             });
         }else{
             Toast.makeText(context, "syncing successfully", Toast.LENGTH_SHORT).show();

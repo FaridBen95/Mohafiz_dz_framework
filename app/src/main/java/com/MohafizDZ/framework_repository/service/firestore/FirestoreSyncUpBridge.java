@@ -74,28 +74,67 @@ public final class FirestoreSyncUpBridge implements IFirestoreSync.SyncUpOutputL
             for(DataRow row : rows){
                 for(Col col : relColumns){
                     String colName = col.getName();
-                    DataRow relRow = row.getRelRow(colName);
-                    if(relRow == null){
-                        row = mModel.getRelations(row);
-                        relRow = row.getRelRow(colName);
-                    }
-                    Map<String, Object> relRecordMap;
-                    Class relationalModelClass = col.getRelationalModel();
-                    if(!relModels.containsKey(relationalModelClass.getSimpleName())){
-                        relModels.put(relationalModelClass.getSimpleName(),
-                                mModel.createInstance(relationalModelClass));
-                    }
+                    if(col.getColumnType() == Col.ColumnType.many2one) {
+                        DataRow relRow = row.getRelRow(colName);
+                        if (relRow == null) {
+                            row = mModel.getRelations(row);
+                            relRow = row.getRelRow(colName);
+                        }
+                        Map<String, Object> relRecordMap;
+                        Class relationalModelClass = col.getRelationalModel();
+                        if (!relModels.containsKey(relationalModelClass.getSimpleName())) {
+                            relModels.put(relationalModelClass.getSimpleName(),
+                                    mModel.createInstance(relationalModelClass));
+                        }
 //                        mModel.createInstance(col.getRelationalModel()).prepareUpdateRecords(relRow, 0)
-                    Model relModel = relModels.get(relationalModelClass.getSimpleName());
-                    long currentDateInMillis = MyUtil.dateToMilliSec(MyUtil.getCurrentDate());
-                    if(relRow != null && relRow.getBoolean("synced")){
-                        relRecordMap = relModel.prepareUpdateRecords(relRow, currentDateInMillis);
-                        firestoreSyncUpAdapter.addUpdate(relModel.getModelName(),
-                                relRow.getString(Col.SERVER_ID), relRecordMap);
+                        Model relModel = relModels.get(relationalModelClass.getSimpleName());
+                        long currentDateInMillis = MyUtil.dateToMilliSec(MyUtil.getCurrentDate());
+                        if (relRow != null && relRow.getBoolean("synced")) {
+                            relRecordMap = relModel.prepareUpdateRecords(relRow, currentDateInMillis);
+                            firestoreSyncUpAdapter.addUpdate(relModel.getModelName(),
+                                    relRow.getString(Col.SERVER_ID), relRecordMap);
+                        } else {
+                            relRecordMap = relModel.prepareInsertRecords(relRow, currentDateInMillis);
+                            firestoreSyncUpAdapter.addInsertOrUpdate(relModel.getModelName(),
+                                    String.valueOf(relRecordMap.get(Col.SERVER_ID)), relRecordMap);
+                        }
                     }else{
-                        relRecordMap = relModel.prepareInsertRecords(relRow, currentDateInMillis);
-                        firestoreSyncUpAdapter.addInsertOrUpdate(relModel.getModelName(),
-                                String.valueOf(relRecordMap.get(Col.SERVER_ID)), relRecordMap);
+                        List<String> relArrayIds = row.getRelStringList(colName);
+                        if (relArrayIds == null) {
+                            row = mModel.getRelations(row);
+                            relArrayIds = row.getRelStringList(colName);
+                        }
+                        Map<String, Object> relRecordMap;
+                        Class relationalModelClass = col.getRelationalModel();
+                        if (!relModels.containsKey(relationalModelClass.getSimpleName())) {
+                            relModels.put(relationalModelClass.getSimpleName(),
+                                    mModel.createInstance(relationalModelClass));
+                        }
+//                        mModel.createInstance(col.getRelationalModel()).prepareUpdateRecords(relRow, 0)
+                        Model relModel = null;
+                        try {
+                            relModel = relModels.get(relationalModelClass.getSimpleName());
+                        }catch (Exception ignored){
+                            continue;
+                        }
+                        long currentDateInMillis = MyUtil.dateToMilliSec(MyUtil.getCurrentDate());
+                        String[] whereArgs = new String[relArrayIds.size()];
+                        for(int i = 0 ; i < relArrayIds.size(); i++){
+                            whereArgs[i] = relArrayIds.get(i);
+                        }
+                        List<DataRow> relRows = relModel.select(" _is_updated = 1 and " + Col.SERVER_ID +
+                                " in (" + MyUtil.repeat("?, ", whereArgs.length - 1) + " ?)", whereArgs);
+                        for(DataRow relRow : relRows) {
+                            if (relRow != null && relRow.getBoolean("synced")) {
+                                relRecordMap = relModel.prepareUpdateRecords(relRow, currentDateInMillis);
+                                firestoreSyncUpAdapter.addUpdate(relModel.getModelName(),
+                                        relRow.getString(Col.SERVER_ID), relRecordMap);
+                            } else {
+                                relRecordMap = relModel.prepareInsertRecords(relRow, currentDateInMillis);
+                                firestoreSyncUpAdapter.addInsertOrUpdate(relModel.getModelName(),
+                                        String.valueOf(relRecordMap.get(Col.SERVER_ID)), relRecordMap);
+                            }
+                        }
                     }
                 }
             }

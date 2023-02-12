@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -43,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Model implements DatabaseListener, DefaultSyncListener, DatabaseListener.TransactionsListener {
     public static final String TAG = Model.class.getSimpleName();
@@ -644,10 +648,22 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
     }
 
     public void sync(DefaultSyncListener defaultSyncListener){
-//        new SyncAdapter(mContext, this.getClass(), defaultSyncListener).performSync();
-        new SyncAdapter(mContext, this.getClass()).performSync(null, null, null,
+        new SyncAdapter(mContext, this.getClass(), defaultSyncListener).performSync(null, null, null,
                 null, null, null, null, null, null,
                 null, null, null);
+    }
+
+    public void syncUsingAsyncTask(DefaultSyncListener defaultSyncListener){
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+//        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            //Background work here
+            sync(defaultSyncListener);
+//            handler.post(() -> {
+//                //UI Thread work here
+//            });
+        });
     }
 
     public void syncUp(){
@@ -682,6 +698,11 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
     }
 
     public void onSyncImagesFinished() {
+    }
+
+    @Override
+    public void onSyncFailed() {
+
     }
 
     @Override
@@ -1433,5 +1454,17 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
                 db.execSQL(sql.toString());
             }
         }
+    }
+
+    public boolean canSyncUp(){
+        String insertSelection = "removed = ? and _is_active = ? and " + Col.SYNCED +
+                " = ? ";
+        String updateSelection = "_is_active = ? and " +
+                Col.SYNCED + " = ? and _is_updated = ? ";
+        String[] insertArgs = {"0", "1","0"};
+        String[] updateArgs = {"1", "1", "1"};
+        final List<DataRow> newRows = getRows(insertSelection , insertArgs);
+        final List<DataRow> updateRows = getRows(updateSelection, updateArgs);
+        return updateRows.size() != 0 || newRows.size() != 0;
     }
 }

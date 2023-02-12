@@ -69,6 +69,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
 
     public SyncAdapter(Context context, Class<? extends Model> modelClass, DefaultSyncListener defaultSyncListener, boolean autoInitialize){
         super(context, autoInitialize);
+        this.defaultSyncListener = defaultSyncListener;
         init(context, modelClass);
     }
 
@@ -276,6 +277,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                 if(model.canSaveLastSyncDate() != null && model.canSaveLastSyncDate()) {
                     recordHandler.saveSyncingDate(model.getModelName(), recordHandler.savingDate);
                 }
+
                 onSyncFinished();
                 model.onSyncFinished();
             } catch (Exception e) {
@@ -571,11 +573,15 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
     }
 
     protected void onSyncFinished(){
-
+        if(defaultSyncListener != null){
+            defaultSyncListener.onSyncFinished();
+        }
     }
 
     protected void onSyncFailed() {
-
+        if(defaultSyncListener != null){
+            defaultSyncListener.onSyncFailed();
+        }
     }
 
     public void setModel(Model model) {
