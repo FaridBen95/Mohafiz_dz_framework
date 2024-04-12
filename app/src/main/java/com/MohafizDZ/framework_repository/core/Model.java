@@ -34,8 +34,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -233,9 +235,48 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
             field.setAccessible(true);
             Col col = (Col) field.get(this);
             col.setName(field.getName());
+            Method method = checkForFunctionalColumn(field);
+            if(method != null){
+                col.setIsFunctional(true);
+                col.setFunctionalMethod(method);
+                col.setFunctionalDepends(getFunctionalDepends(field));
+                col.setFunctionalOnlyToStore(isFunctionalOnlyToStore(field));
+            }
             return col;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String[] getFunctionalDepends(Field field) {
+        Annotation annotation = field.getAnnotation(MAnnotations.Functional.class);
+        if (annotation != null) {
+            MAnnotations.Functional functional = (MAnnotations.Functional) annotation;
+            return functional.depends();
+        }
+        return null;
+    }
+
+    public boolean isFunctionalOnlyToStore(Field field) {
+        Annotation annotation = field.getAnnotation(MAnnotations.Functional.class);
+        if (annotation != null) {
+            MAnnotations.Functional functional = (MAnnotations.Functional) annotation;
+            return functional.onlyToStore();
+        }
+        return true;
+    }
+
+    private Method checkForFunctionalColumn(Field field) {
+        Annotation annotation = field.getAnnotation(MAnnotations.Functional.class);
+        if (annotation != null) {
+            MAnnotations.Functional functional = (MAnnotations.Functional) annotation;
+            String method_name = functional.method();
+            try {
+                return getClass().getMethod(method_name, Values.class);
+            } catch (NoSuchMethodException e) {
+                Log.e(TAG, "No Such Method: " + e.getMessage());
+            }
         }
         return null;
     }
@@ -743,7 +784,19 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
                     }
                 }
                 if (!values.containsKey(col.getName()) || values.get(col.getName()) == null) {
-                    updateValues.put(col.getName(), col.getDefaultValue());
+                    if(col.isFunctional()) {
+                        List<String> depends = col.getFunctionalDepends();
+                        Values dependValues = new Values();
+                        for (String depend : depends) {
+                            if (values.containsKey(depend)) {
+                                dependValues.put(depend, values.get(depend));
+                            }
+                        }
+                        Object value = getFunctionalMethodValue(col, dependValues);
+                        updateValues.put(col.getName(), value);
+                    }else{
+                        updateValues.put(col.getName(), col.getDefaultValue());
+                    }
                 }
             }
         }
@@ -766,12 +819,38 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
                     }
                 }
                 if (!values.containsKey(col.getName()) || values.get(col.getName()) == null) {
-                    insertValues.put(col.getName(), col.getDefaultValue());
+                    if(col.isFunctional()) {
+                        List<String> depends = col.getFunctionalDepends();
+                        Values dependValues = new Values();
+                        for (String depend : depends) {
+                            if (values.containsKey(depend)) {
+                                dependValues.put(depend, values.get(depend));
+                            }
+                        }
+                        Object value = getFunctionalMethodValue(col, dependValues);
+                        insertValues.put(col.getName(), value);
+                    }else{
+                        insertValues.put(col.getName(), col.getDefaultValue());
+                    }
                 }
             }
         }
         return insertValues;
     }
+
+    public Object getFunctionalMethodValue(Col column, Object record) {
+        if (column.isFunctional()) {
+            Method method = column.getFunctionalMethod();
+            Model model = this;
+            try {
+                return method.invoke(model, record);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
 
     public boolean allowDeleteInLocal() {
         return true;
@@ -1009,6 +1088,9 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
     }
 
     public void insertOrUpdateRowFromServerRecord(DataRow row, List<String> toUpdateRelCol) {
+        if(row == null){
+            return;
+        }
         row.put("synced", 1);
         row.put("_is_updated", 0);
         Values values = new Values();
@@ -1044,6 +1126,10 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
 
     public RecordHandler.SyncUpCondition getUpdateOnServerCondition() {
         return null;
+    }
+
+    public void onModelCreated(SQLiteDatabase db) {
+
     }
 
     public interface OnStartTransactionListener{
@@ -1335,6 +1421,7 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
         Map<String, Model> modelNameModelMap = new HashMap<>();
         for(DataRow row : records){
             Values values = new Values();
+            row.put("synced", 1);
             for(Col col : cols) {
                 String colName = col.getName();
                 if(colName.equals(Col.ROWID) || colName.equals("_write_date") || colName.equals("_create_date")){

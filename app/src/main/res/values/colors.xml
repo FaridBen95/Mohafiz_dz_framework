@@ -64,6 +64,7 @@
     <!--Material color list from https://material.io/guidelines/style/color.html-->
 
     <color name="red_900_">#B4B71C1C</color>
+    <color name="red_900">#B71C1C</color>
 
     <color name="green_500">#4CAF50</color>
 
@@ -115,7 +116,10 @@
 
 
     <color name="shrineColorAccent">@color/main_theme_primary</color>
+    <color name="grey_4">#F1F1F1</color>
 
     <!-- Rally Colors -->
+    <color name="orange_white">#EFE2C8</color>
+    <color name="orange_white_transparent">#A1EFE202</color>
 
 </resources>

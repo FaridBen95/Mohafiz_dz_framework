@@ -40,6 +40,9 @@ public class SQLUtil {
         List<Col> allColumns = new ArrayList<>();
         List<String> uniqueColumns = new ArrayList<>();
         for(Col col : cols){
+            if(!col.isDBColumn()){
+                continue;
+            }
             if(col.getColumnType().equals(Col.ColumnType.attachement) && !col.isLocal()){
                 Col imageSyncedDown = new Col(Col.ColumnType.bool);
                 imageSyncedDown.setName(col.getName()+ "_saved_in_local");
@@ -74,7 +77,7 @@ public class SQLUtil {
                     colStatement.append(" AUTOINCREMENT ");
                 }
                 Object default_value = col.getDefaultValue();
-                if (default_value != null) {
+                if (default_value != null && !default_value.toString().equals("")) {
                     colStatement.append(" DEFAULT ");
                     if (default_value instanceof String) {
                         colStatement.append("'").append(default_value).append("'");

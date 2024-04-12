@@ -330,6 +330,10 @@ public abstract class RecordHandler {
                             }else {
                                 updateSQL.append("'");
                             }
+                        }if(col.getColumnType().equals(Col.ColumnType.bool) &&
+                                object instanceof Boolean){
+                            boolean v = (boolean) object;
+                            object = v? 1 : 0;
                         }
                         updateSQL.append(object);
                         if (col.getColumnType().equals(Col.ColumnType.text) ||

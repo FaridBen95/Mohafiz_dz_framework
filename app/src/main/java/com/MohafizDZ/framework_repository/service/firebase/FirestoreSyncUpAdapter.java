@@ -1,4 +1,4 @@
-package com.MohafizDZ.framework_repository.service.firestore;
+package com.MohafizDZ.framework_repository.service.firebase;
 
 import com.MohafizDZ.framework_repository.service.FirestoreSingleton;
 import com.google.firebase.firestore.CollectionReference;

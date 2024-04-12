@@ -1,4 +1,4 @@
-package com.MohafizDZ.framework_repository.service.firestore;
+package com.MohafizDZ.framework_repository.service.firebase;
 
 public class QueryClause {
     private String fieldName;

@@ -25,7 +25,9 @@ import com.MohafizDZ.framework_repository.core.DataRow;
 import com.MohafizDZ.framework_repository.core.Values;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CursorUtils {
     public static final String TAG = CursorUtils.class.getSimpleName();
@@ -77,5 +79,16 @@ public class CursorUtils {
             }while(cursor.moveToNext());
         }
         return  rowsList;
+    }
+
+    public static Map<String, DataRow> cursorToMap(Cursor cursor, String key){
+        Map<String, DataRow> map = new HashMap<>();
+        if(cursor != null && cursor.moveToFirst()){
+            do{
+                DataRow row = toDatarow(cursor);
+                map.put(row.getString(key), row);
+            }while(cursor.moveToNext());
+        }
+        return map;
     }
 }

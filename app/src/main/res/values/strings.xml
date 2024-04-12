@@ -76,4 +76,23 @@
     <string name="terms_of_use_file_name">terms_of_use_en.txt</string>
     <string name="code_sent">The code has been sent</string>
     <string name="please_wait_for_code">Please Wait for the code</string>
+    <string name="scan_qr_code_failed_msg">Failed to scan QR Code</string>
+    <string name="login_required_msg">You should login inorder to use this operation</string>
+    <string name="log_in">LOG IN</string>
+    <string name="dialog_ok">OK</string>
+    <string name="error_auth_email">An error while authenticate with email</string>
+    <string name="email">Email</string>
+    <string name="password_label">Password</string>
+    <string name="confirm_password_label">Confirm password</string>
+    <string name="login_details_txt">Don\\\'t have an account? @Sign up</string>
+    <string name="sign_up">Sign up</string>
+    <string name="signup_details_txt">Do you have an account? @Log in</string>
+    <string name="email_required">Email is required</string>
+    <string name="password_short_txt">Password is required</string>
+    <string name="passwords_differents_txt">Password aren\'t the same</string>
+    <string name="navigation_drawer_open">Open drawer menu\n</string>
+    <string name="navigation_drawer_close">Close drawer menu</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="continue_with_email">Continue with Email|Password</string>
+    <string name="skip_label">Skip</string>
 </resources>

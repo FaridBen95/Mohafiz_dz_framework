@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -45,6 +46,7 @@ public abstract class LogInWith {
     public static final int FACEBOOK_REQUEST_CODE = 64206;
     public static final String PHONE_CREDENTIAL_KEY = "phone_credential_key";
     public static final int PHONE_VERIFICATION_KEY = 317;
+    public static final int EMAIL_AUTH_KEY = 5046;
 
     private FragmentActivity activity;
     private Context mContext;
@@ -134,6 +136,13 @@ public abstract class LogInWith {
                 linkWithCredential(data);
             }else{
                 onErrorOccurred(mContext.getString(R.string.error_confirming_phone_code));
+            }
+        }
+        if(requestCode == EMAIL_AUTH_KEY){
+            if(resultCode == Activity.RESULT_OK) {
+                onAuthenticated(false);
+            }else{
+                onErrorOccurred(mContext.getString(R.string.error_auth_email));
             }
         }
     }
@@ -244,16 +253,57 @@ public abstract class LogInWith {
                         "first_name,last_name");
                 request.setParameters(parameters);
                 request.executeAsync();
+            }else{
+                final Values userValues = new Values();
+                userValues.put("name", "Anonymous");
+                userValues.put("last_name", "");
+                userValues.put("email", "anonymous");
+                userValues.put("user_id", firebaseUser.getUid());
+                userValues.put("is_anonymous", 1);
+                onDataRecovered(userValues);
             }
         }catch (Exception ignored){
             onErrorOccurred(mContext.getResources().getString(R.string.try_again));
         }
     }
 
+    public void loginAsGuest(){
+        firebaseAuth.signInAnonymously().addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    firebaseUser = firebaseAuth.getCurrentUser();
+                    try {
+                        if (task.getResult().getAdditionalUserInfo().isNewUser()) {
+                            onAuthenticated(true);
+                            recoverData();
+                            return;
+                        }
+                        onAuthenticated(false);
+                    } catch (Exception ignored) {
+                        onAuthenticated(false);
+                    }
+                } else {
+                    if (task.getException() != null) {
+                        onErrorOccurred(task.getException().getMessage());
+                    } else {
+                        onErrorOccurred(mContext.getResources().getString(R.string.try_again));
+                    }
+                }
+            }
+        });
+    }
+
     private void FirebaseGoogleAuth(String token){
         AuthCredential authCredential = GoogleAuthProvider.getCredential(token, null);
         onSuccess();
         if(!relink) {
+            firebaseUser = firebaseAuth.getCurrentUser();
+            if(firebaseUser != null && firebaseUser.isAnonymous()){
+                firebaseUser.delete().addOnCompleteListener(activity, task -> {
+                    task.isSuccessful();
+                });
+            }
             firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {

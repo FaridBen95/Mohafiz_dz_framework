@@ -1,9 +1,10 @@
-package com.MohafizDZ.framework_repository.service.firestore;
+package com.MohafizDZ.framework_repository.service.firebase;
 
 import android.util.Pair;
 import com.MohafizDZ.framework_repository.core.Col;
 import com.MohafizDZ.framework_repository.core.DataRow;
 import com.MohafizDZ.framework_repository.core.Model;
+import com.MohafizDZ.framework_repository.core.Values;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class FirestoreSyncDownBridge implements FirestoreSyncDownAdapter.FirestoreListener {
     private final Model model;
     private final Integer limit;
+    private final String collectionName;
     private Integer offset = 0;
     private Pair<Integer, DocumentSnapshot> offsetPair;
     private FirestoreSyncDownAdapter firestoreSyncDownAdapter;
@@ -23,14 +25,18 @@ public class FirestoreSyncDownBridge implements FirestoreSyncDownAdapter.Firesto
     private final SyncListener syncListener;
 
     public FirestoreSyncDownBridge(Model model, Integer limit, SyncListener syncListener) {
+        this(model, limit, syncListener, model.getModelName());
+    }
+    public FirestoreSyncDownBridge(Model model, Integer limit, SyncListener syncListener, String collectionName) {
         this.model = model;
+        this.collectionName = collectionName;
         this.limit = limit;
         this.syncListener = syncListener;
         init();
     }
 
     private void init() {
-        firestoreSyncDownAdapter = new FirestoreSyncDownAdapter(limit, model.getModelName());
+        firestoreSyncDownAdapter = new FirestoreSyncDownAdapter(limit, collectionName);
         firestoreSyncDownAdapter.setFirestoreListener(this);
     }
 
@@ -120,7 +126,18 @@ public class FirestoreSyncDownBridge implements FirestoreSyncDownAdapter.Firesto
                         value = recordLineMap.get(Col.SERVER_ID);
                     }
                     if(value == null){
-                        value = col.getDefaultValue();
+                        if(col.isFunctional() && !col.isFunctionalStoreOnly()){
+                            List<String> depends = col.getFunctionalDepends();
+                            Values dependValues = new Values();
+                            for (String depend : depends) {
+                                if (recordLineMap.containsKey(depend)) {
+                                    dependValues.put(depend, recordLineMap.get(depend));
+                                }
+                            }
+                            value  = model.getFunctionalMethodValue(col, dependValues);
+                        }else {
+                            value = col.getDefaultValue();
+                        }
                     }
                     if(col.getColumnType() != Col.ColumnType.one2many && col.getColumnType() != Col.ColumnType.array) {
                         row.put(colName, value != null? value : col.getDefaultValue());
@@ -221,7 +238,7 @@ public class FirestoreSyncDownBridge implements FirestoreSyncDownAdapter.Firesto
             Col col = colModelPair.first;
             Model model = colModelPair.second;
             Map<String, DataRow> rowMap = resultMap.containsKey(col.getName()) ?
-            resultMap.get(col.getName()) : new HashMap<>();
+                    resultMap.get(col.getName()) : new HashMap<>();
             rowMap = rowMap == null? new HashMap<>() : rowMap;
             for(Map<String, Object> recordLine : record.second) {
                 DataRow row = model.mapToRow(recordLine);

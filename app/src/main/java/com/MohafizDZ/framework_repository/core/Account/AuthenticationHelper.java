@@ -12,6 +12,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public abstract class AuthenticationHelper {
 
@@ -35,16 +36,16 @@ public abstract class AuthenticationHelper {
     }
 
     public void execute(){
-        if (checkAuthentication()) {
+        final FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            onStartAuthentication(currentUser.isAnonymous());
             createAccountManager();
         }else{
             noUserIsConnected();
         }
     }
 
-    private boolean checkAuthentication() {
-        return firebaseAuth.getCurrentUser() != null;
-    }
+    protected abstract void onStartAuthentication(boolean anonymous);
 
     void skip(){
         skipped = true;
@@ -124,10 +125,7 @@ public abstract class AuthenticationHelper {
             mUser.setPhoneNumber(firebaseAuth.getCurrentUser().getPhoneNumber());
         }
         AccountCreator accountCreator = new AccountCreator(mContext,this, mUser);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            accountCreator.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        else
-            accountCreator.execute();
+        accountCreator.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     MUser getmUser() {

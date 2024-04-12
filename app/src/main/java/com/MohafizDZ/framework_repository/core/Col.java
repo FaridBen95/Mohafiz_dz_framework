@@ -1,6 +1,10 @@
 package com.MohafizDZ.framework_repository.core;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Col {
     public static String ROWID = "_id";
@@ -15,6 +19,19 @@ public class Col {
     private boolean mUnique;
     private boolean canContainDuplication = false;
     private boolean canInsertFromServer = true;
+    private boolean isFunctional = false;
+    private Method functionalMethod;
+    private String[] functionalDepends;
+    private boolean functionalOnlyToStore;
+    private boolean addToDB = true;
+
+    public boolean isDBColumn() {
+        return addToDB;
+    }
+
+    public void setAddToDB(boolean addToDB) {
+        this.addToDB = addToDB;
+    }
 
     public boolean canContainDuplication() {
         return canContainDuplication;
@@ -32,6 +49,40 @@ public class Col {
     public Col setCanInsertFromServer(boolean canInsertFromServer) {
         this.canInsertFromServer = canInsertFromServer;
         return this;
+    }
+
+    public void setIsFunctional(boolean isFunctional) {
+        this.isFunctional = isFunctional;
+    }
+
+    public boolean isFunctional() {
+        return isFunctional;
+    }
+
+    public void setFunctionalMethod(Method method) {
+        this.functionalMethod = method;
+    }
+
+    public Method getFunctionalMethod() {
+        return functionalMethod;
+    }
+
+    public void setFunctionalDepends(String[] functionalDepends) {
+        this.functionalDepends = functionalDepends;
+    }
+
+    public List<String> getFunctionalDepends() {
+        if (functionalDepends != null)
+            return Arrays.asList(functionalDepends);
+        return new ArrayList<String>();
+    }
+
+    public void setFunctionalOnlyToStore(boolean functionalOnlyToStore) {
+        this.functionalOnlyToStore = functionalOnlyToStore;
+    }
+
+    public boolean isFunctionalStoreOnly() {
+        return functionalOnlyToStore;
     }
 
     public enum ColumnType {

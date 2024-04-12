@@ -11,7 +11,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 
-import com.MohafizDZ.market_me_more.R;
+import com.MohafizDZ.empty_project.R;
 
 import java.util.Calendar;
 import java.util.Objects;
@@ -34,7 +34,7 @@ public class MyDateFragment extends DialogFragment {
         int yy = calendar.get(Calendar.YEAR);
         int mm = calendar.get(Calendar.MONTH);
         int dd = calendar.get(Calendar.DAY_OF_MONTH);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(requireActivity(), R.style.DialogTheme,
+        DatePickerDialog datePickerDialog = new DatePickerDialog(requireActivity(), com.facebook.R.style.Base_Theme_AppCompat_Dialog,
                 datePickerListener,
                 yy, mm, dd);
         Long minDate = datePickerListener.setMinDate();

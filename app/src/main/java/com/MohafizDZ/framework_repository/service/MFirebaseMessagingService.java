@@ -12,7 +12,11 @@ import androidx.annotation.NonNull;
 
 import com.MohafizDZ.App;
 import com.MohafizDZ.framework_repository.Utils.CustomNotificationBuilder;
+import com.MohafizDZ.framework_repository.core.Col;
+import com.MohafizDZ.framework_repository.core.DataRow;
+import com.MohafizDZ.framework_repository.core.Values;
 import com.MohafizDZ.framework_repository.datas.MConstants;
+import com.MohafizDZ.project.models.ConfigurationModel;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -66,6 +70,54 @@ public class MFirebaseMessagingService extends FirebaseMessagingService implemen
 
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
+    }
+
+    private void setAppBlockParameter(int forceQuitApp, Map<String, String> data) {
+        final ConfigurationModel configurationModel = new ConfigurationModel(context);
+        {
+            Values values = new Values();
+            values.put("key", ConfigurationModel.FORCE_QUIT_APP_OFFLINE_KEY);
+            values.put("value", forceQuitApp);
+            DataRow forceQuitAppOfflineRow = configurationModel.getValue(ConfigurationModel.FORCE_QUIT_APP_OFFLINE_KEY);
+            if (forceQuitAppOfflineRow != null) {
+                configurationModel.update(forceQuitAppOfflineRow.getInteger(Col.ROWID), values);
+            } else {
+                configurationModel.insert(values);
+            }
+        }
+        {
+            Values values = new Values();
+            values.put("key", ConfigurationModel.FORCE_QUIT_APP_OFFLINE_AR_MSG_KEY);
+            values.put("value", data.get("message_ar"));
+            DataRow forceQuitAppOfflineRow = configurationModel.getValue(ConfigurationModel.FORCE_QUIT_APP_OFFLINE_AR_MSG_KEY);
+            if (forceQuitAppOfflineRow != null) {
+                configurationModel.update(forceQuitAppOfflineRow.getInteger(Col.ROWID), values);
+            } else {
+                configurationModel.insert(values);
+            }
+        }
+        {
+            Values values = new Values();
+            values.put("key", ConfigurationModel.FORCE_QUIT_APP_OFFLINE_FR_MSG_KEY);
+            values.put("value", data.get("message_fr"));
+            DataRow forceQuitAppOfflineRow = configurationModel.getValue(ConfigurationModel.FORCE_QUIT_APP_OFFLINE_FR_MSG_KEY);
+            if (forceQuitAppOfflineRow != null) {
+                configurationModel.update(forceQuitAppOfflineRow.getInteger(Col.ROWID), values);
+            } else {
+                configurationModel.insert(values);
+            }
+        }
+        {
+            Values values = new Values();
+            values.put("key", ConfigurationModel.FORCE_QUIT_APP_OFFLINE_EN_MSG_KEY);
+            values.put("value", data.get("message_en"));
+            DataRow forceQuitAppOfflineRow = configurationModel.getValue(ConfigurationModel.FORCE_QUIT_APP_OFFLINE_EN_MSG_KEY);
+            if (forceQuitAppOfflineRow != null) {
+                configurationModel.update(forceQuitAppOfflineRow.getInteger(Col.ROWID), values);
+            } else {
+                configurationModel.insert(values);
+            }
+        }
     }
 
     private void showNotification(String message, String imageUri) {
@@ -221,7 +273,15 @@ public class MFirebaseMessagingService extends FirebaseMessagingService implemen
 
     @Override
     public void onSyncFailed() {
-
+        try {
+            Looper.prepare();
+        }catch (Exception ignored){}
+        //todo add this when implement notificaiton model
+//        new Handler().postDelayed(() -> {
+//            Bundle _data = new Bundle();
+//            _data.putString("from", TAG);
+//            SyncUtils.requestSync(context.getApplicationContext(), NotificationModel.class, NotificationModel.AUTHORITY, _data, this);
+//        }, 3000);
     }
 
     public static class SendFCMNotification extends AsyncTask<Void, Void, String>{

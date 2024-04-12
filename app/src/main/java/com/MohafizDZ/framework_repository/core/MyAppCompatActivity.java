@@ -1,6 +1,7 @@
 package com.MohafizDZ.framework_repository.core;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
@@ -8,10 +9,12 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,11 +25,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.MohafizDZ.App;
+import com.MohafizDZ.empty_project.R;
 import com.MohafizDZ.framework_repository.local_sentry.GlobalTouchListener;
 import com.MohafizDZ.framework_repository.Utils.MySharedPreferences;
 import com.MohafizDZ.framework_repository.Utils.FragmentUtils;
 import com.MohafizDZ.framework_repository.Utils.MyUtil;
 import com.MohafizDZ.framework_repository.service.MSyncStatusObserverListener;
+import com.MohafizDZ.framework_repository.service.receiver.IOnlineDateReceiver;
 import com.MohafizDZ.framework_repository.service.receiver.ISyncFinishReceiver;
 import com.MohafizDZ.framework_repository.service.receiver.ISyncStartReceiver;
 
@@ -37,7 +42,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 public abstract class MyAppCompatActivity extends AppCompatActivity implements ActivityListener, GlobalTouchListener {
+    public static final String LOCAL_DATE_INCORRECT = "local_date_incorrect";
+    public static final String TAG = MyAppCompatActivity.class.getSimpleName();
     private String info = "No info set for this activity";
     private ActivityListener activityListener;
     public static OnChangeView onChangeView;
@@ -46,6 +55,7 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
     private MSyncStatusObserverListener mSyncStatusObserverListener;
     private MSearchViewChangeListener mSearchViewChangeListener;
     private SearchView mSearchView;
+    public SweetAlertDialog dateDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,9 +66,18 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
         setLocale(this);
     }
 
+    //to modify anything after the creation of action bar use the method below
+    public void setTitleBar(ActionBar actionBar) {
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_chevron_left_black);
+        getSupportActionBar().setTitle(null);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+
     @Override
     protected void attachBaseContext(Context newBase) {
-        String currentLanguage = MUtil.getCurrentLanguageLocale(newBase);
+        String currentLanguage = MyUtil.getCurrentLanguageLocale(newBase);
         Resources resources = newBase.getResources();
         resources.getConfiguration().setLocale(new Locale(currentLanguage));
         applyOverrideConfiguration(resources.getConfiguration());
@@ -66,11 +85,11 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
     }
 
     public void setLocale(Context context) {
-        String lang = MUtil.getCurrentLanguageLocale(context);
+        String lang = MyUtil.getCurrentLanguageLocale(context);
         Resources res = getResources();
         DisplayMetrics dm = res.getDisplayMetrics();
         Configuration conf = res.getConfiguration();
-        conf.locale = new Locale(lang);
+        conf.setLocale(new Locale(lang));
         res.updateConfiguration(conf, dm);
     }
 
@@ -248,6 +267,7 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
             try {
                 getApplicationContext().unregisterReceiver(syncFinishReceiver);
                 getApplicationContext().unregisterReceiver(syncStartReceiver);
+                getApplicationContext().unregisterReceiver(onlineDateReceiver);
             } catch (Exception e) {
                 // Skipping issue related to unregister receiver
             }
@@ -282,9 +302,6 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
     public void removeFragment(Fragment fragment) {
         FragmentUtils.get(this, null).removeFragment(fragment);
     }
-
-    //to modify anything after the creation of action bar use the method below
-    public abstract void setTitleBar(ActionBar actionBar);
 
     //set to null in case you want to use the standard action bar
     public abstract Toolbar setToolBar();
@@ -344,6 +361,40 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
         }
     };
 
+    private IOnlineDateReceiver onlineDateReceiver = new IOnlineDateReceiver() {
+        @Override
+        public void onReceive(Context context_, Intent intent) {
+            Context context = MyAppCompatActivity.this;
+            Bundle data = intent.getExtras();
+            if(data != null){
+                boolean localDateIncorrect = data.getBoolean(LOCAL_DATE_INCORRECT);
+                if(localDateIncorrect){
+                    new MySharedPreferences(context).setBoolean(LOCAL_DATE_INCORRECT, true);
+                    try {
+                        runOnUiThread(() -> {
+                            if(dateDialog != null && dateDialog.isShowing()){
+                                return;
+                            }
+                            dateDialog = new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE);
+                            dateDialog.setTitleText(getString(R.string.incorrect_date))
+                                    .setContentText(getString(R.string.incorrect_date_msg)).setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                        @Override
+                                        public void onDismiss(DialogInterface dialog) {
+                                            Log.d(TAG + "date_incorrect", "date is incorrect");
+                                            MyAppCompatActivity.this.finishAffinity();
+                                            System.exit(0);
+                                        }
+                                    });
+                            dateDialog.show();
+                        });
+                    }catch (Exception ignored){}
+                }else{
+                    new MySharedPreferences(context).setBoolean(LOCAL_DATE_INCORRECT, false);
+                }
+            }
+        }
+    };
+
     public void sethasSyncListener(MSyncStatusObserverListener mSyncStatusObserverListener){
         this.mSyncStatusObserverListener = mSyncStatusObserverListener;
     }
@@ -351,6 +402,7 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
     @Override
     public void onResume() {
         super.onResume();
+        registerReceiver(onlineDateReceiver, new IntentFilter(IOnlineDateReceiver.ONLINE_DATE_STARTED));
         getApplicationContext().registerReceiver(syncStartReceiver, new IntentFilter(ISyncStartReceiver.SYNC_START));
         getApplicationContext().registerReceiver(syncFinishReceiver, new IntentFilter(ISyncFinishReceiver.SYNC_FINISH));
     }
@@ -403,4 +455,17 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
         Context localizedContext = context.createConfigurationContext(conf);
         return localizedContext.getResources();
     }
+
+    public void showToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    public void showSimpleDialog(String title, String msg) {
+        MyUtil.showSimpleDialog(this, title, msg);
+    }
+
+    public boolean inNetwork() {
+        return app().inNetwork();
+    }
+
 }

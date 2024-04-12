@@ -12,6 +12,7 @@ import com.MohafizDZ.framework_repository.datas.MConstants;
 import com.MohafizDZ.framework_repository.Utils.SQLUtil;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MySqlite extends SQLiteOpenHelper{
     public static final String TAG = MySqlite.class.getSimpleName();
@@ -46,17 +47,28 @@ public class MySqlite extends SQLiteOpenHelper{
         Log.i(TAG, "Creating database.");
         ModelRegistryUtils registryUtils = App.getModelRegistryUtils();
         HashMap<String, Class<? extends Model>> models = registryUtils.getModels();
+        Map<String, String> modelNameClassNameMap = new HashMap<>();
         for (String key : models.keySet()){
             Model model = App.getModel(mContext, key, mUser.getAndroidAccountName());
             assert model != null;
             if(Model.class.equals(model.getClass().getSuperclass())) {
                 SQLUtil.generateCreateStatement(model);
+                modelNameClassNameMap.put(model.getModelName(), key);
             }
         }
         HashMap<String, String> sqlCreateStatement = SQLUtil.getSqlCreateStatement();
         for(String modelName : sqlCreateStatement.keySet()){
             final String createQuery = sqlCreateStatement.get(modelName);
+            String className = modelNameClassNameMap.containsKey(modelName)? modelNameClassNameMap.get(modelName) : null;
             db.execSQL(createQuery);
+            if(className != null) {
+                Model model = App.getModel(mContext, className, mUser.getAndroidAccountName());
+                if (model != null) {
+                    if (Model.class.equals(model.getClass().getSuperclass())) {
+                        model.onModelCreated(db);
+                    }
+                }
+            }
         }
         Log.i(TAG, "Tables Created ");
 

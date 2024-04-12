@@ -10,14 +10,20 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+
+import androidx.appcompat.widget.AppCompatSpinner;
+
 import com.MohafizDZ.empty_project.R;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 
-public class KeyValueSpinner extends android.widget.Spinner {
+public class KeyValueSpinner extends AppCompatSpinner {
 
     public static final String DEFAULT_KEY = "DEFAULT_KEY";
 
@@ -77,7 +83,18 @@ public class KeyValueSpinner extends android.widget.Spinner {
         }
 
         ready = true;
-        Iterator<Map.Entry<String, String>> it = keyValMap.entrySet().iterator();
+        List<Map.Entry<String, String>> list = new ArrayList(keyValMap.entrySet());
+
+        Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
+            @Override
+            public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
+                // Sort by value in ascending order
+                return o1.getValue().compareTo(o2.getValue());
+            }
+        });
+
+        Iterator<Map.Entry<String, String>> it = list.iterator();
+//        Iterator<Map.Entry<String, String>> it = keyValMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, String> pairs = it.next();
             mNamesList.add(pairs.getValue());
@@ -145,24 +162,24 @@ public class KeyValueSpinner extends android.widget.Spinner {
 
     /**
      * usage example
-     * 
+     *
      * in layout xml use com.dypix.util.KeyValueSpinner class instead of Spinner
-     * 
+     *
      * <com.dypix.util.KeyValueSpinner android:id="@+id/category_spinner"
      * android:layout_width="wrap_content"
      * android:layout_height="match_parent"/>
-     * 
+     *
      * //in java code set your keyValueSpinner public KeyValueSpinner
      * categoriesFilter;
-     * 
+     *
      * //set layout using the casting class KeyValueSpinner categoriesFilter =
      * (KeyValueSpinner) mView.findViewById(R.id.category_spinner);
-     * 
+     *
      * //add default value categoriesFilter.addDefaultValue( "All categories" );
-     * 
+     *
      * //load HashMap key-Value list to spinner categoriesFilter.setKeyValueMap(
      * categoriesMap );
-     * 
+     *
      * //use the value of the spinner, check if not null or default
      * if(categoriesFilter != null && categoriesFilter.getCurrentKey() !=
      * KeyValueSpinner.DEFAULT_KEY) { categoriesFilter.getCurrentKey() }

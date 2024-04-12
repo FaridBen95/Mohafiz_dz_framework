@@ -32,6 +32,7 @@ import com.MohafizDZ.framework_repository.core.Values;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -50,6 +51,8 @@ import static android.widget.Toast.makeText;
 public class MainLogInActivity extends MyAppCompatActivity implements View.OnClickListener {
     public static final String TAG = MainLogInActivity.class.getSimpleName();
     public static final String PHONE_KEY = "phone_key";
+    public static final String sEMAIL_LOGIN_FIREBASE_USER_KEY = "email_login_firebase_user";
+    public static final String FIRST_RUN_KEY = "first_run_key";
     private static final int PERMISSIONS_REQUEST_REQUIRED_PERMS = 13;
     public static final String PHONE_CREDENTIAL_KEY = "phone_credential_key";
     private AuthenticationHelper authenticationHelper;
@@ -61,6 +64,8 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
     private LinearLayout languageLinearLayout;
     private String selectedLanguage;
     private TextView termsOfUseTextView;
+    private boolean loggedIn;
+    private View intoAppContainer;
 
     private enum LogInType {phone, email}
     private LogInType logInType = LogInType.email;
@@ -70,7 +75,7 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+        setContentView(R.layout.main_login);
         initConfig();
         initAuthentication();
         prepareView();
@@ -84,8 +89,9 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
 
     private void init() {
         progressDialog = MyUtil.getProgressDialog(this);
-        facebookLinearLayout = findViewById(R.id.facebookLinearLayout);
-        gmailLinearLayout = findViewById(R.id.gmailLinearLayout);
+//        facebookLinearLayout = findViewById(R.id.facebookLinearLayout);
+        intoAppContainer = findViewById(R.id.intoAppContainer);
+        gmailLinearLayout = findViewById(R.id.googleLinearLayout);
         phoneLinearLayout = findViewById(R.id.phoneLinearLayout);
         languageLinearLayout = findViewById(R.id.languageLinearLayout);
         languageTextView = findViewById(R.id.languageTextView);
@@ -149,7 +155,7 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
     }
 
     private void setControls() {
-        facebookLinearLayout.setOnClickListener(this);
+//        facebookLinearLayout.setOnClickListener(this);
         gmailLinearLayout.setOnClickListener(this);
         phoneLinearLayout.setOnClickListener(this);
         findViewById(R.id.parentView).setOnClickListener(this);
@@ -199,13 +205,22 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
     private void initAuthentication() {
         authenticationHelper = new AuthenticationHelper(this) {
             @Override
+            protected void onStartAuthentication(boolean anonymous) {
+                if(!anonymous) {
+                    intoAppContainer.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
             protected void onAccountManagerAuthenticated(boolean newAccount, MUser mUser,
                                                          boolean skipped) {
-                if(getFirebaseAuth().getCurrentUser() != null) {
-                    getFirebaseAuth().getCurrentUser().getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                final FirebaseUser currentUser = getFirebaseAuth().getCurrentUser();
+                if(currentUser != null) {
+                    currentUser.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
                         @Override
                         public void onComplete(@NonNull Task<GetTokenResult> task) {
                             try {
+                                loggedIn = true;
                                 if(progressDialog != null && progressDialog.isShowing()){
                                     progressDialog.dismiss();
                                 }
@@ -219,6 +234,10 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
                             } catch (Exception ignored) {
                             }
                             requestSyncAdapters();
+//                            if(!mFirstRun && !currentUser.isAnonymous()) {
+//                                setResult(RESULT_OK);
+//                                finish();
+//                            }
                             startMainActivity();
                         }
                     });
@@ -239,7 +258,8 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
 
             @Override
             protected void noUserIsConnected() {
-                setContentView(R.layout.main_login);
+                loggedIn = false;
+//                setContentView(R.layout.main_login);
                 initActivity();
             }
         };
@@ -273,24 +293,30 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.gmailLinearLayout) {
+        if (id == R.id.googleLinearLayout) {
             if (app().inNetwork()) {
                 logInWith.setLoginType(LogInWith.LoginType.gmail);
                 logInWith.signIn();
             } else {
                 makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
             }
-        } else if (id == R.id.facebookLinearLayout) {
+        }/* else if (id == R.id.facebookLinearLayout) {
             if (app().inNetwork()) {
                 logInWith.setLoginType(LogInWith.LoginType.facebook);
                 logInWith.signIn();
             } else {
                 makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
             }
-        } else if (id == R.id.phoneLinearLayout) {
+        }*/ else if (id == R.id.phoneLinearLayout) {
             if (app().inNetwork()) {
                 Intent intent = new Intent(this, PhoneLogInActivity.class);
                 startActivityForResult(intent, LogInWith.PHONE_VERIFICATION_KEY);
+            } else {
+                makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
+            }
+        }else if (id == R.id.emailLinearLayout) {
+            if (app().inNetwork()) {
+                openEmailPasswordActivity();
             } else {
                 makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
             }
@@ -299,6 +325,11 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
         } else if (id == R.id.termsOfUseTextView) {
             showTermsOfUseDialog();
         }
+    }
+
+    private void openEmailPasswordActivity() {
+        Intent intent = new Intent(this, LoginWithEmailActivity.class);
+        startActivityForResult(intent, LogInWith.EMAIL_AUTH_KEY);
     }
 
     private void showTermsOfUseDialog() {
@@ -372,8 +403,11 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
                     finish();
                 }
             }
-        }
-        else {
+        }else if(requestCode == LogInWith.EMAIL_AUTH_KEY){
+            if(logInWith != null){
+                logInWith.onActivityResult(requestCode, resultCode, null);
+            }
+        }else {
             if (logInWith != null) {
                 logInWith.onActivityResult(requestCode, resultCode, data);
             }
@@ -389,9 +423,16 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
     }
 
     private void startMainActivity() {
-        Intent intent = new Intent(this, MohafizMainActivity.class);
-        startActivity(intent);
-        finish();
+        if(!loggedIn) {
+            if(progressDialog != null && !progressDialog.isShowing()){
+                progressDialog.show();
+            }
+            logInWith.loginAsGuest();
+        }else {
+            Intent intent = new Intent(this, MohafizMainActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     private void requestSyncAdapters() {

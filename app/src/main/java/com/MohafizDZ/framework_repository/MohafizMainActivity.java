@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,9 +40,6 @@ import com.MohafizDZ.framework_repository.service.SyncingReport;
 import com.MohafizDZ.framework_repository.service.receiver.LowStorageBroadcastReceiver;
 import com.MohafizDZ.project.StartClassHelper;
 import com.MohafizDZ.project.models.ConfigurationModel;
-import com.MohafizDZ.project.models.ObjectiveModel;
-import com.MohafizDZ.project.models.ShareableObjectiveModel;
-import com.MohafizDZ.project.models.ShareableUserModel;
 import com.MohafizDZ.project.models.UserModel;
 import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.ArrayList;
@@ -94,11 +92,11 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
             SweetAlertDialog dateDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
             dateDialog.setTitleText(getString(R.string.incorrect_date))
                     .setContentText(getString(R.string.incorrect_date_msg)).setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    finish();
-                }
-            });
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            finish();
+                        }
+                    });
             dateDialog.show();
             return;
         }
@@ -703,13 +701,18 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         boolean userSynced = new UserModel(MohafizMainActivity.this).syncWithSuccess(15);
         if(App.TEST_MODE || !app().inNetwork() || userSynced) {
             DataRow currentUserRow = app().getCurrentUser();
-            if (currentUserRow == null || !currentUserRow.getBoolean("_is_active")) {
+            if (currentUserRow == null ||
+                    (!currentUserRow.getBoolean("is_anonymous")
+                            && (!currentUserRow.getBoolean("_is_active") || !currentUserRow.getBoolean("signed_from_mobile")))) {
                 StartClassHelper.openSignUpActivity(this);
             }else{
                 StartClassHelper.openProjectMainActivity(this);
             }
-        }else{
-            finish();
+        }else{//todo maybe i need to force finish if the user isn't synced
+            Log.d(TAG, "user not synced");
+            if(!new MySharedPreferences(this).getBoolean(LOCAL_DATE_INCORRECT, false)) {
+                finish();
+            }
         }
     }
 

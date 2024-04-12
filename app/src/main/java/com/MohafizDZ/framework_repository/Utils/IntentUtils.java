@@ -30,6 +30,19 @@ public class IntentUtils {
         }
     }
 
+    public static void startActivity(Context context, Intent intent){
+        if(intent != null){
+            context.startActivity(intent);
+        }
+        try {
+            if(MyAppCompatActivity.onChangeView != null){
+                MyAppCompatActivity.onChangeView.openedClass(Class.forName(intent.getComponent().getClassName()));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public static void redirectToMap(Context context, String location) {
         if (!location.equals("false") && !location.equals("")) {
             String map = "geo:0,0?q=" + location;

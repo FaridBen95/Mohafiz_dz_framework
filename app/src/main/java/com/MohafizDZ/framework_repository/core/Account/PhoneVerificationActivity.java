@@ -325,37 +325,34 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btnBack:
-                finish();
-                break;
-            case R.id.nextLinearLayout:
-                if(app().inNetwork()) {
-                    verifyPhone();
-                }else{
-                    makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
-                }
-                break;
-            case R.id.resendTextView:
-                if(app().inNetwork()) {
-                    progressDialog.show();
+        int id = v.getId();
+        if (id == R.id.btnBack) {
+            finish();
+        } else if (id == R.id.nextLinearLayout) {
+            if (app().inNetwork()) {
+                verifyPhone();
+            } else {
+                makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
+            }
+        } else if (id == R.id.resendTextView) {
+            if (app().inNetwork()) {
+                progressDialog.show();
 //                PhoneAuthProvider.getInstance().verifyPhoneNumber(
 //                        phoneNumber,        // Phone number to verify
 //                        60,                 // Timeout duration
 //                        TimeUnit.SECONDS,   // Unit of timeout
 //                        TaskExecutors.MAIN_THREAD,               // Activity (for callback binding)
 //                        mCallbacks);
-                    PhoneAuthOptions options = PhoneAuthOptions.newBuilder(app().firebaseAuth).
-                            setPhoneNumber(preparePhoneNumber(phoneNumber))
-                            .setTimeout(60L, TimeUnit.SECONDS)
-                            .setCallbacks(mCallbacks)
-                            .setActivity(this)
-                            .build();
-                    PhoneAuthProvider.verifyPhoneNumber(options);
-                }else{
-                    makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
-                }
-                break;
+                PhoneAuthOptions options = PhoneAuthOptions.newBuilder(app().firebaseAuth).
+                        setPhoneNumber(preparePhoneNumber(phoneNumber))
+                        .setTimeout(60L, TimeUnit.SECONDS)
+                        .setCallbacks(mCallbacks)
+                        .setActivity(this)
+                        .build();
+                PhoneAuthProvider.verifyPhoneNumber(options);
+            } else {
+                makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
+            }
         }
     }
 

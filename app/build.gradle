@@ -1,21 +1,22 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'com.google.gms.google-services'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-android'
+//apply plugin: 'kotlin-android-extensions'
+//apply plugin: 'kotlin-android'
 
 android {
+    namespace "com.MohafizDZ.empty_project"
     defaultConfig {
 //        multiDexEnabled true
     }
     dexOptions {
         javaMaxHeapSize "4g"
     }
-    compileSdkVersion 28
+    compileSdkVersion 33
     defaultConfig {
         useLibrary 'org.apache.http.legacy'
         applicationId "com.MohafizDZ.empty_project"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 33
         versionCode 1
         versionName "2.b.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -65,10 +66,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable false
         }
     }
 
-    configurations.all {
+    configurations.configureEach {
 //        resolutionStrategy.force 'org.hamcrest:hamcrest-core:1.1'
         resolutionStrategy.eachDependency { DependencyResolveDetails details ->
             def requested = details.requested
@@ -109,11 +111,17 @@ android {
     }
     buildFeatures {
         viewBinding true
+        buildConfig = true
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    configurations.implementation {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+    }
+
 }
 
 
@@ -130,7 +138,20 @@ dependencies {
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.core:core-ktx:1.0.1"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.google.firebase:firebase-messaging:23.0.8'
+    implementation 'com.google.firebase:firebase-functions:20.1.1'
+    implementation 'com.google.firebase:firebase-invites:17.0.0'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-auth:21.0.8'
+    implementation 'com.google.firebase:firebase-core:21.1.1'
+    implementation 'com.google.firebase:firebase-storage:20.0.2'
+    implementation "com.google.firebase:firebase-iid:21.1.0"
+    implementation 'com.google.firebase:firebase-database:20.0.6'
+    implementation 'com.firebaseui:firebase-ui-storage:3.2.1'
+    implementation 'com.google.firebase:firebase-appcheck-debug:16.0.2'
+    implementation platform('com.google.firebase:firebase-bom:32.7.2')
+    implementation 'com.firebase:geofire-android-common:3.1.0'
+//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     //    implementation ("com.android.support:appcompat-v7:$supportVersion")
 
@@ -147,44 +168,13 @@ dependencies {
     //    }
 
     //    implementation ("com.android.support:design:$supportVersion")
-    implementation 'com.google.firebase:firebase-messaging:21.0.1'
-    testImplementation 'junit:junit:4.13'
-    testImplementation 'org.mockito:mockito-all:1.10.19'    //    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-
-    //    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.google.firebase:firebase-firestore:22.1.2'
-
-    //    implementation 'com.google.firebase:firebase-firestore:17.1.2'
-
-    //    implementation 'com.google.firebase:firebase-auth:16.0.5'
-
-    //    implementation 'com.google.firebase:firebase-core:16.0.4'
-
-    //    implementation 'androidx.multidex:multidex:2.0.0'
-
-    //    implementation 'com.google.firebase:firebase-storage:16.0.4'
-
-    //    implementation 'com.facebook.android:facebook-login:[5,6]'
-
-    //    implementation 'com.google.android.gms:play-services-auth:16.0.1'
-    implementation 'com.google.firebase:firebase-auth:20.0.4'
-    implementation 'com.google.firebase:firebase-core:18.0.3'
+//    testImplementation 'junit:junit:4.13'
+//    testImplementation 'org.mockito:mockito-all:1.10.19'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.google.firebase:firebase-storage:19.2.2'
-
-    //    implementation ('com.facebook.android:facebook-login:5.15.3'){
-
-    //        exclude group: 'com.android.support'
-
-    ////        exclude module: 'appcompat-v7'
-
-    //        exclude module: 'support-v4'
-
-    //    }
     implementation('com.facebook.android:facebook-android-sdk:12.1.0') {
 //        exclude group : 'com.android.support', module : 'support-compat'
     }
-    implementation 'com.google.android.gms:play-services-auth:19.0.0'
+    implementation 'com.google.android.gms:play-services-auth:19.2.0'
 
     //    implementation ("com.android.support:support-annotations:$supportVersion"){
 
@@ -194,64 +184,64 @@ dependencies {
 
     //    annotationProcessor "com.android.support:support-annotations:$supportVersion"
 
-    implementation 'id.zelory:compressor:2.1.0'
+    implementation 'id.zelory:compressor:2.1.1'
 //    implementation 'com.github.patgdut:RadioRealButton:v2.1.2'
 //    implementation('com.google.android.material:material:1.1.0') {
 //        exclude group: 'androidx.core', module: 'core'
 //    }
     implementation 'com.getbase:floatingactionbutton:1.10.1'
-    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
     implementation 'com.stepstone.stepper:material-stepper:4.3.1'
     implementation 'com.github.zcweng:switch-button:0.0.3@aar'
     // butter knife
-    implementation 'com.jakewharton:butterknife:9.0.0'
+//    implementation 'com.jakewharton:butterknife:9.0.0'
     implementation 'nl.psdcompany:duo-navigation-drawer:3.0.0'
     implementation 'com.github.pchmn:MaterialChipsInput:1.0.8'
     implementation 'com.github.delight-im:Android-SimpleLocation:v1.0.1'
     implementation 'com.beardedhen:androidbootstrap:2.3.2'
-    implementation 'com.google.firebase:firebase-database:19.7.0'
-    implementation 'com.android.volley:volley:1.0.0'
+    implementation 'com.android.volley:volley:1.1.0'
     implementation 'com.squareup.retrofit2:retrofit:2.0.2'
     implementation 'com.squareup.retrofit2:converter-gson:2.0.2'
     implementation 'com.google.code.gson:gson:2.8.6'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:9.0.0'
-    implementation 'androidx.annotation:annotation:1.0.2'
+//    annotationProcessor 'com.jakewharton:butterknife-compiler:9.0.0'
+    implementation 'androidx.annotation:annotation:1.2.0'
+//    androidTestImplementation 'junit:junit:4.12'
 
 
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 //    implementation 'com.android.support:localbroadcastmanager:28.0.0'
 
     //ecomerce x libs
 
     // google support library ---------------------------------------------------------------------
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
 
     // third party dependencies -------------------------------------------------------------------
     implementation 'com.balysv:material-ripple:1.0.2'                  // ripple effect
     implementation 'com.mikhaellopez:circularimageview:3.2.0'          // circle image view
     implementation 'com.hootsuite.android:nachos:1.1.1'                // material chips
-    implementation 'com.google.android:flexbox:0.3.2'                  // google flexible box
+    implementation 'com.google.android:flexbox:1.1.0'                  // google flexible box
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.crystal:crystalrangeseekbar:1.1.3'            // range seek bar
 
     // google gson --------------------------------------------------------------------------------
-    implementation 'com.google.code.gson:gson:2.8.4'
+    implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.wang.avi:library:2.1.3'
 //    implementation 'cn.pedant.sweetalert:library:1.3'
-    implementation 'com.firebaseui:firebase-ui-storage:3.2.1'
-    implementation 'gun0912.ted:tedimagepicker:1.1.4'
+    implementation 'io.github.ParkSangGwon:tedimagepicker:1.5.0'
     implementation 'com.isseiaoki:simplecropview:1.1.8'
     implementation 'com.github.f0ris.sweetalert:library:1.6.2'
     implementation 'com.github.tfcporciuncula:phonemoji:1.1.1'
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-maps:18.2.0'
     implementation 'uk.co.samuelwall:material-tap-target-prompt:3.3.0'
-    implementation 'com.google.firebase:firebase-appcheck-debug:16.0.0-beta03'
-//    implementation 'com.github.amanjeetsingh150:ImageZipper:1.3'
+    implementation 'com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.0'
+    implementation 'com.github.iammert:MaterialIntroView:1.6.0'
+    implementation 'com.github.yuriy-budiyev:code-scanner:2.3.2'
+    implementation 'com.google.android.gms:play-services-vision:20.1.3'
 }

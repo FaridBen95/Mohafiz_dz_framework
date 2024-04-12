@@ -101,17 +101,15 @@ public class PhoneLogInActivity extends MyAppCompatActivity implements View.OnCl
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btnBack:
-                onBackPressed();
-                break;
-            case R.id.nextLinearLayout:
-                if(app().inNetwork()) {
-                    logIn();
-                }else{
-                    makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
-                }
-                break;
+        int id = v.getId();
+        if (id == R.id.btnBack) {
+            onBackPressed();
+        } else if (id == R.id.nextLinearLayout) {
+            if (app().inNetwork()) {
+                logIn();
+            } else {
+                makeText(this, getResources().getString(R.string.you_need_internet_connection), LENGTH_SHORT).show();
+            }
         }
     }
 

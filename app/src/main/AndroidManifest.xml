@@ -46,6 +46,7 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:resizeableActivity="false"
             android:screenOrientation="portrait"
+            android:exported="true"
             android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             >
             <intent-filter>
@@ -157,7 +158,8 @@
             </intent-filter>
         </service>
 
-        <service android:name="com.MohafizDZ.framework_repository.core.Account.AuthService">
+        <service android:name="com.MohafizDZ.framework_repository.core.Account.AuthService"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>

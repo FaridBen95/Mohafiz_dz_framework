@@ -26,6 +26,8 @@
 
     <dimen name="backdrop_height1">132dp</dimen>
     <dimen name="spacing_xxlarge">50dp</dimen>
+    <dimen name="main_square_size">180dp</dimen>
+    <dimen name="main_circle_size">220dp</dimen>
 
 
     <!--

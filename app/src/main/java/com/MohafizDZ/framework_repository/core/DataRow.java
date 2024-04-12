@@ -4,32 +4,24 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+
 import com.MohafizDZ.App;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class DataRow extends HashMap<String, Object> implements Parcelable{
+public class DataRow extends ParcelableDataRow{
 
-    private String modelName;
+
+    public DataRow(ParcelableDataRow parcelableDataRow) {
+        super(parcelableDataRow);
+    }
 
     public DataRow(){
-
+        super(new ParcelableDataRow());
+        Parcel parcel = Parcel.obtain();
+        writeToParcel(parcel, 0);
     }
-
-    protected DataRow(Parcel in) {
-    }
-
-    public static final Creator<DataRow> CREATOR = new Creator<DataRow>() {
-        @Override
-        public DataRow createFromParcel(Parcel in) {
-            return new DataRow(in);
-        }
-
-        @Override
-        public DataRow[] newArray(int size) {
-            return new DataRow[size];
-        }
-    };
 
     public DataRow addAll(DataRow row){
         this.putAll(row);
@@ -109,15 +101,6 @@ public class DataRow extends HashMap<String, Object> implements Parcelable{
         return this.get(field).toString();
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-    }
-
     public DataRow getRelRow(String colName) {
         colName = "#".concat(colName);
         return (DataRow) get(colName);
@@ -144,11 +127,11 @@ public class DataRow extends HashMap<String, Object> implements Parcelable{
     }
 
     public String getModelName() {
-        return modelName;
+        return super.getModelName();
     }
 
     public void setModelName(String modelName) {
-        this.modelName = modelName;
+        super.setModelName(modelName);
     }
 
     public boolean containsRelKey(String colName) {

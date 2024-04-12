@@ -109,9 +109,7 @@ public class SyncUtilsInTheAppRun {
             }
             modelHelperList.add(new ModelHelper(currentModel));
             SyncModels syncModels = new SyncModels(context, modelHelperList);
-            try {
-                syncModels.performSync();
-            }catch (Exception ignored){}
+            syncModels.performSync();
             Intent intent = new Intent();
             intent.setAction(ISyncFinishReceiver.SYNC_FINISH);
             Bundle data = bundle == null? new Bundle() : bundle;

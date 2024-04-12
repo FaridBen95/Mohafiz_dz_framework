@@ -45,10 +45,13 @@ import androidx.cardview.widget.CardView;
 
 import com.MohafizDZ.empty_project.R;
 import com.MohafizDZ.framework_repository.MohafizMainActivity;
+import com.MohafizDZ.framework_repository.core.Account.MainLogInActivity;
 import com.MohafizDZ.framework_repository.core.Col;
 import com.MohafizDZ.framework_repository.core.DataRow;
 import com.MohafizDZ.framework_repository.datas.MConstants;
 import com.MohafizDZ.framework_repository.service.receiver.NotificationPublisher;
+import com.firebase.geofire.GeoFireUtils;
+import com.firebase.geofire.GeoLocation;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -80,6 +83,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.michaelrocks.libphonenumber.android.PhoneNumberUtil;
 
 public class MyUtil {
@@ -467,6 +471,11 @@ public class MyUtil {
         return stringArray;
     }
 
+    public static void preventDoubleClick(View view) {
+        view.setEnabled(false);
+        new Handler().postDelayed(() -> view.setEnabled(true), 300);
+    }
+
     public static void animateProgress(final FrameLayout lyt_progress) {
         lyt_progress.setVisibility(View.VISIBLE);
         lyt_progress.setAlpha(1.0f);
@@ -478,6 +487,20 @@ public class MyUtil {
             }
         }, 1500);
     }
+
+    public static void showSimpleDialog(Context context, String title, String msg) {
+        final androidx.appcompat.app.AlertDialog.Builder builder =
+                new androidx.appcompat.app.AlertDialog.Builder(context);
+        if(title != null){
+            builder.setTitle(title);
+        }
+        if(msg != null){
+            builder.setMessage(msg);
+        }
+        builder.setPositiveButton(context.getString(R.string.dialog_ok), null);
+        builder.create().show();
+    }
+
     private String getTimeDiff(String time, String currentTime,String dateFormat) throws ParseException
     {
         DateFormat formatter = new SimpleDateFormat(dateFormat);
@@ -526,6 +549,7 @@ public class MyUtil {
         builder.setCancelable(true);
         builder.setView(ll);
 
+        builder.setCancelable(false);
         AlertDialog dialog = builder.create();
         Window window = dialog.getWindow();
         if (window != null) {
@@ -789,8 +813,12 @@ public class MyUtil {
     }
 
     public static void toastIconInfo(Activity activity, String message) {
+        toastIconInfo(activity, message, Toast.LENGTH_LONG);
+    }
+
+    public static Toast toastIconInfo(Activity activity, String message, int toastLength) {
         Toast toast = new Toast(activity.getApplicationContext());
-        toast.setDuration(Toast.LENGTH_LONG);
+        toast.setDuration(toastLength);
 
         //inflate view
         View custom_view = activity.getLayoutInflater().inflate(R.layout.toast_icon_text, null);
@@ -800,6 +828,7 @@ public class MyUtil {
 
         toast.setView(custom_view);
         toast.show();
+        return toast;
     }
 
     public static void toastIconWarning(Activity activity, String message) {
@@ -836,7 +865,9 @@ public class MyUtil {
         if(bundleKeyValueMap != null) {
             for (String key : bundleKeyValueMap.keySet()) {
                 Object value = bundleKeyValueMap.get(key);
-                if (value instanceof Integer) {
+                if(value instanceof Boolean){
+                    data.putBoolean(key, (Boolean) bundleKeyValueMap.get(key));
+                } else if (value instanceof Integer) {
                     data.putInt(key, (Integer) bundleKeyValueMap.get(key));
                 } else if (value instanceof String) {
                     data.putString(key, (String) bundleKeyValueMap.get(key));
@@ -900,6 +931,15 @@ public class MyUtil {
         return randomValue % 255;
     }
 
+    public static int generateRandomLightColor() {
+        Random rnd = new Random();
+        int randomValue;
+        do{
+            randomValue = rnd.nextInt();
+        }while (randomValue % 240 < 120);
+        return randomValue % 240;
+    }
+
     public static String getAllowedText(String text) {
         StringBuilder sb = new StringBuilder(text);
         Map<Character, Character> forbiddenCharMap = getForbiddenCharMap();
@@ -911,6 +951,57 @@ public class MyUtil {
             }
         }
         return sb.toString();
+    }
+
+    public static int countCommonChars(String phrase, String word) {
+        int count = 0;
+        int maxCount = 0;
+        for (int i = 0; i < phrase.length(); i++) {
+            char c = phrase.charAt(i);
+            if (word.indexOf(c) != -1) {
+                count++;
+            }else if(count != 0){
+                maxCount = Math.max(count, maxCount);
+                count = 0;
+            }
+        }
+
+        return maxCount;
+    }
+
+    public static SweetAlertDialog showLogInRequiredDialog(Activity activity, int activityKey){
+        return showLogInRequiredDialog(activity, activityKey, true);
+    }
+
+    public static SweetAlertDialog showLogInRequiredDialog(Activity activity, int activityKey, boolean show){
+        String title = activity.getString(R.string.log_in);
+        String message = activity.getString(R.string.login_required_msg);
+        String positiveButtonTitle = activity.getString(R.string.log_in);
+        SweetAlertDialog dialog = new SweetAlertDialog(activity, SweetAlertDialog.WARNING_TYPE);
+        dialog.setTitleText(title);
+        dialog.setContentText(message);
+        dialog.setConfirmText(positiveButtonTitle);
+        dialog.setConfirmClickListener(sweetAlertDialog -> {
+            Bundle data = new Bundle();
+            data.putBoolean(MainLogInActivity.FIRST_RUN_KEY, false);
+            Intent intent = new Intent(activity, MainLogInActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.putExtras(data);
+            activity.startActivityForResult(intent, activityKey, intent.getExtras());
+            activity.finish();
+            sweetAlertDialog.dismiss();
+        });
+        dialog.setCancelButton(activity.getString(R.string.cancel), null);
+        dialog.setCancelClickListener(null);
+        dialog.setCancelable(false);
+        if(show) {
+            dialog.show();
+        }
+        return dialog;
+    }
+
+    public String getLocation(double lat, double lng){
+        return GeoFireUtils.getGeoHashForLocation(new GeoLocation(lat, lng));
     }
 
     public static Bitmap drawableToBitmap (Drawable drawable) {
