@@ -1,5 +1,8 @@
 package com.MohafizDZ.framework_repository.Utils;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import androidx.annotation.NonNull;
 
 import java.util.concurrent.Callable;
@@ -8,6 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class MyAsyncTask<T> {
+    private static final String TAG = MyAsyncTask.class.getSimpleName();
 
     private final Callable<T> backgroundTask;
     private final ExecutorListener<T> executorListener;
@@ -25,18 +29,23 @@ public class MyAsyncTask<T> {
             executorListener.onPreExecute();
         }
 
-        Future<T> future = executorService.submit(backgroundTask);
+//        Future<T> future = executorService.submit(backgroundTask);
 
-        try {
-            T result = future.get();
-            if (executorListener != null) {
-                executorListener.onPostExecute(result);
+        executorService.submit(() -> {
+            try {
+                T result = backgroundTask.call();
+                if (executorListener != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> executorListener.onPostExecute(result));
+//                    executorListener.onPostExecute(result);
+                }
+            } catch (Exception e) {
+                if (executorListener != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> executorListener.onFailed(e));
+//                    executorListener.onFailed(e);
+                }
             }
-        } catch (Exception e) {
-            if (executorListener != null) {
-                executorListener.onFailed(e);
-            }
-        }
+            executorService.shutdown();
+        });
     }
 
     public static class Builder<T> {

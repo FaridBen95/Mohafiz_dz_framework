@@ -13,14 +13,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.MohafizDZ.App;
 import com.MohafizDZ.empty_project.R;
-import com.MohafizDZ.framework_repository.core.Account.MainLogInActivity;
+import com.MohafizDZ.framework_repository.core.Account.LauncherActivity;
 import com.MohafizDZ.framework_repository.core.Col;
 import com.MohafizDZ.framework_repository.core.DataRow;
 import com.MohafizDZ.framework_repository.core.Values;
@@ -104,7 +104,7 @@ public abstract class AttachmentSyncUpForegroundService extends Service {
     private Notification getMyActivityNotification(String text){
         // The PendingIntent to launch our activity if the user selects
         // this notification
-        Intent notificationIntent = new Intent(this, MainLogInActivity.class);
+        Intent notificationIntent = new Intent(this, LauncherActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                 | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         Intent intent = setNotificationIntent(notificationIntent, extras);

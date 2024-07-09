@@ -39,8 +39,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 
-public abstract class LogInWith {
-    public static final String TAG = LogInWith.class.getSimpleName();
+public abstract class LogInWith2 {
+    public static final String TAG = LogInWith2.class.getSimpleName();
 
     public static final int GMAIL_SIGN_IN_KEY = 1 ;
     public static final int FACEBOOK_REQUEST_CODE = 64206;
@@ -71,7 +71,7 @@ public abstract class LogInWith {
         this.relink = relink;
     }
 
-    public LogInWith(FragmentActivity activity){
+    public LogInWith2(FragmentActivity activity){
         this.activity = activity;
         this.mContext = activity;
         init();
@@ -90,7 +90,7 @@ public abstract class LogInWith {
         facebookLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             public void onSuccess(final LoginResult loginResult) {
                 facebookLogInResult = loginResult;
-                LogInWith.this.onSuccess();
+                LogInWith2.this.onSuccess();
                 FirebaseFacebookAuth(AccessToken.getCurrentAccessToken());
             }
             @Override

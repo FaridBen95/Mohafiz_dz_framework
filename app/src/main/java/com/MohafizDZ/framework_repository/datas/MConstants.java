@@ -5,7 +5,7 @@ import com.MohafizDZ.empty_project.BuildConfig;
 public class MConstants {
     public static final String DATABASE_NAME = "my_database.db";
     public static final String PROJECT_ID = "firebase_project_id";
-    public static final String KEY_ACCOUNT_TYPE = "com.mohafizDZ." + BuildConfig.APPLICATION_ID + ".auth";
+    public static final String KEY_ACCOUNT_TYPE = "com.mohafizDZ.empty_project.auth";
     public static final String DEFAULT_ANDROID_NAME = "MohafizDZ_" + BuildConfig.APPLICATION_ID +"_default";
     public static final String LOG_FILE_NAME = BuildConfig.APPLICATION_ID + "_log.txt";
     public static final String FIREBASE_STORAGE_LINK = "attachment";
@@ -17,5 +17,6 @@ public class MConstants {
     public static final String DEFAULT_CURRENCY = "DA";
 
     public static final int DATABASE_VERSION = 28;
-    public static final int FRAMEWORK_VERSION = 7;
+    public static final int FRAMEWORK_VERSION = 8;
+    //updated from cfeed on 09/07/2024
 }

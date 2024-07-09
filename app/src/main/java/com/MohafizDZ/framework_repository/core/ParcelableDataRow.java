@@ -60,7 +60,7 @@ public class ParcelableDataRow implements Parcelable {
 
 
     public void putAll(DataRow row) {
-        hashMap.putAll(row.getHashMap());
+        hashMap.putAll(row);
     }
 
     public boolean containsKey(String colName) {

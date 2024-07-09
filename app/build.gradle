@@ -11,12 +11,12 @@ android {
     dexOptions {
         javaMaxHeapSize "4g"
     }
-    compileSdkVersion 33
+    compileSdkVersion 34
     defaultConfig {
         useLibrary 'org.apache.http.legacy'
         applicationId "com.MohafizDZ.empty_project"
-        minSdkVersion 21
-        targetSdkVersion 33
+        minSdkVersion 24
+        targetSdkVersion 34
         versionCode 1
         versionName "2.b.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -216,7 +216,7 @@ dependencies {
 
     // google support library ---------------------------------------------------------------------
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
@@ -244,4 +244,5 @@ dependencies {
     implementation 'com.github.iammert:MaterialIntroView:1.6.0'
     implementation 'com.github.yuriy-budiyev:code-scanner:2.3.2'
     implementation 'com.google.android.gms:play-services-vision:20.1.3'
+    implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC3'
 }

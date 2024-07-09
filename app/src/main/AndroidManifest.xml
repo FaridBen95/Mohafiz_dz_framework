@@ -42,8 +42,8 @@
         android:theme="@style/AppTheme"
         >
         <activity
-            android:name="com.MohafizDZ.framework_repository.core.Account.MainLogInActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:name="com.MohafizDZ.framework_repository.core.Account.LauncherActivity"
+            android:theme="@style/AppTheme"
             android:resizeableActivity="false"
             android:screenOrientation="portrait"
             android:exported="true"
@@ -58,7 +58,7 @@
         <activity
             android:screenOrientation="portrait"
             android:name="com.MohafizDZ.framework_repository.MohafizMainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/AppTheme"
             android:resizeableActivity="false"
             android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             >
@@ -66,7 +66,7 @@
         <activity
             android:screenOrientation="portrait"
             android:name="com.MohafizDZ.framework_repository.core.Account.PhoneLogInActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/AppTheme"
             android:resizeableActivity="false"
             android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             >
@@ -74,7 +74,7 @@
         <activity
             android:screenOrientation="portrait"
             android:name="com.MohafizDZ.framework_repository.core.Account.PhoneVerificationActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/AppTheme"
             android:resizeableActivity="false"
             android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             >

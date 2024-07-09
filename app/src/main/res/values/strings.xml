@@ -88,11 +88,21 @@
     <string name="sign_up">Sign up</string>
     <string name="signup_details_txt">Do you have an account? @Log in</string>
     <string name="email_required">Email is required</string>
-    <string name="password_short_txt">Password is required</string>
+    <string name="password_required">Password is Required.</string>
+    <string name="password_short_txt">Password is short</string>
     <string name="passwords_differents_txt">Password aren\'t the same</string>
     <string name="navigation_drawer_open">Open drawer menu\n</string>
     <string name="navigation_drawer_close">Close drawer menu</string>
     <string name="continue_with_google">Continue with Google</string>
     <string name="continue_with_email">Continue with Email|Password</string>
     <string name="skip_label">Skip</string>
+    <string name="english_label" translatable="false">English</string>
+    <string name="french_label" translatable="false">Français</string>
+    <string name="arabic_label" translatable="false">العربية</string>
+    <string name="visible_label">Visible</string>
+    <string name="or_label">Or</string>
+    <string name="welcome_log_in_msg">Please log in to your account</string>
+    <string name="welcome_sign_up_msg">Please sign up your new account</string>
+    <string name="or_continue_with">Or continue with</string>
+    <string name="welcome_label">Welcome</string>
 </resources>

@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
-import static com.MohafizDZ.framework_repository.core.Account.MainLogInActivity.PHONE_CREDENTIAL_KEY;
+import static com.MohafizDZ.framework_repository.core.Account.LauncherActivity.PHONE_CREDENTIAL_KEY;
 
 public class PhoneVerificationActivity extends MyAppCompatActivity implements View.OnClickListener {
     public final String TAG = PhoneVerificationActivity.class.getSimpleName();
@@ -87,7 +87,7 @@ public class PhoneVerificationActivity extends MyAppCompatActivity implements Vi
     private void initArgs() {
         Bundle data = getIntent().getExtras();
         if (data != null) {
-            phoneNumber = data.getString(MainLogInActivity.PHONE_KEY, "");
+            phoneNumber = data.getString(LauncherActivity.PHONE_KEY, "");
             currentPhoneTextView.setText(phoneNumber);
             lastFrom = data.containsKey("last_from")? data.getString("last_from") : null;
         }

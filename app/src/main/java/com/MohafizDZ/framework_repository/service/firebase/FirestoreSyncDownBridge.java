@@ -238,7 +238,7 @@ public class FirestoreSyncDownBridge implements FirestoreSyncDownAdapter.Firesto
             Col col = colModelPair.first;
             Model model = colModelPair.second;
             Map<String, DataRow> rowMap = resultMap.containsKey(col.getName()) ?
-                    resultMap.get(col.getName()) : new HashMap<>();
+            resultMap.get(col.getName()) : new HashMap<>();
             rowMap = rowMap == null? new HashMap<>() : rowMap;
             for(Map<String, Object> recordLine : record.second) {
                 DataRow row = model.mapToRow(recordLine);

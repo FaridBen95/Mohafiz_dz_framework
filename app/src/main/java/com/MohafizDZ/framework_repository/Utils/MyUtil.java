@@ -7,7 +7,6 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -18,22 +17,22 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 import android.text.format.DateUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.BaseInputConnection;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.DownloadListener;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -45,7 +44,7 @@ import androidx.cardview.widget.CardView;
 
 import com.MohafizDZ.empty_project.R;
 import com.MohafizDZ.framework_repository.MohafizMainActivity;
-import com.MohafizDZ.framework_repository.core.Account.MainLogInActivity;
+import com.MohafizDZ.framework_repository.core.Account.LauncherActivity;
 import com.MohafizDZ.framework_repository.core.Col;
 import com.MohafizDZ.framework_repository.core.DataRow;
 import com.MohafizDZ.framework_repository.datas.MConstants;
@@ -66,7 +65,6 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.text.DateFormat;
-import java.text.Normalizer;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -82,11 +80,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.michaelrocks.libphonenumber.android.PhoneNumberUtil;
 
 public class MyUtil {
+    public static final String DEFAULT_LANGUAGE = "not_provided";
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String DEFAULT_SHARE_DATE_FORMAT = "yyyy-MM-dd HH:mm";
     public static final String CUSTOM_DATE_SHOWING_FORMAT = "EEEE, dd MMMM";
@@ -471,6 +471,16 @@ public class MyUtil {
         return stringArray;
     }
 
+    public static String getLinkFromString(String how_to_link) {
+        List<String> links = new ArrayList<String>();
+        Matcher m = Patterns.WEB_URL.matcher(how_to_link);
+        while (m.find()) {
+            String url = m.group();
+            return url;
+        }
+        return null;
+    }
+
     public static void preventDoubleClick(View view) {
         view.setEnabled(false);
         new Handler().postDelayed(() -> view.setEnabled(true), 300);
@@ -641,7 +651,7 @@ public class MyUtil {
     public enum Language {english, french, arabic}
 
     public static Language getCurrentLanguage(Context context){
-        String locale = new MySharedPreferences(context).getString(MohafizMainActivity.LANGUAGE_KEY, MohafizMainActivity.DEFAULT_LANGUAGE);
+        String locale = new MySharedPreferences(context).getString(LauncherActivity.LANGUAGE_KEY, DEFAULT_LANGUAGE);
         if(locale.equals("fr")){
             return Language.french;
         }else if (locale.equals("ar")){
@@ -653,7 +663,7 @@ public class MyUtil {
     }
 
     public static String getCurrentLanguageLocale(Context context){
-        String locale = new MySharedPreferences(context).getString(MohafizMainActivity.LANGUAGE_KEY, MohafizMainActivity.DEFAULT_LANGUAGE);
+        String locale = new MySharedPreferences(context).getString(LauncherActivity.LANGUAGE_KEY, DEFAULT_LANGUAGE);
         if(locale.equals("not_provided")){
             return context.getResources().getConfiguration().locale.getLanguage();
         }
@@ -983,8 +993,8 @@ public class MyUtil {
         dialog.setConfirmText(positiveButtonTitle);
         dialog.setConfirmClickListener(sweetAlertDialog -> {
             Bundle data = new Bundle();
-            data.putBoolean(MainLogInActivity.FIRST_RUN_KEY, false);
-            Intent intent = new Intent(activity, MainLogInActivity.class);
+            data.putBoolean(LauncherActivity.FIRST_RUN_KEY, false);
+            Intent intent = new Intent(activity, LauncherActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.putExtras(data);
             activity.startActivityForResult(intent, activityKey, intent.getExtras());
@@ -1016,5 +1026,10 @@ public class MyUtil {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    public static void performImeOption(EditText editText){
+        BaseInputConnection inputConnection = new BaseInputConnection(editText, true);
+        inputConnection.performEditorAction(EditorInfo.IME_ACTION_UNSPECIFIED);
     }
 }

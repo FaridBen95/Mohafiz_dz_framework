@@ -38,14 +38,6 @@
 
     <!-- Application theme. -->
 
-    <style name="AppTheme" parent="AppTheme.Base">
-        <!-- Customize your theme here. -->
-        <item name="actionOverflowButtonStyle">@style/OverFlow</item>
-        <item name="buttonCorner">@color/light200</item>
-        <item name="textColorSecondary">@color/fontColor</item>
-
-    </style>
-
     <style name="OverFlow" parent="@style/Widget.AppCompat.Light.ActionButton.Overflow">
         <item name="android:src">@drawable/ic_more_vert</item>
     </style>

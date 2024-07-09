@@ -11,10 +11,40 @@
     <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_medium">14sp</dimen>
     <dimen name="text_size_xmedium">16sp</dimen>
+    <dimen name="text_size_large">18sp</dimen>
     <dimen name="text_size_xxlarge">25sp</dimen>
 
 
     <!-- Eshop colors -->
     <dimen name="eshop_tiny_font">10dp</dimen>
+
+
+    <dimen name="main_login_launcher_size">96dp</dimen>
+
+
+    <dimen name="padding_small">4dp</dimen>
+    <dimen name="padding_medium">8dp</dimen>
+    <dimen name="padding_large">16dp</dimen>
+    <dimen name="padding_xlarge">24dp</dimen>
+    <dimen name="padding_xxlarge">32dp</dimen>
+    <dimen name="padding_xxxlarge">48dp</dimen>
+
+    <dimen name="margin_xsmall">2dp</dimen>
+    <dimen name="margin_small">4dp</dimen>
+    <dimen name="margin_medium">8dp</dimen>
+    <dimen name="margin_large">16dp</dimen>
+    <dimen name="margin_xlarge">24dp</dimen>
+    <dimen name="margin_xxlarge">32dp</dimen>
+
+    <dimen name="divider_small">4dp</dimen>
+    <dimen name="divider_medium">8dp</dimen>
+    <dimen name="divider_large">16dp</dimen>
+    <dimen name="divider_xlarge">24dp</dimen>
+
+    <dimen name="elevation_low">4dp</dimen>
+    <dimen name="elevation_medium">8dp</dimen>
+    <dimen name="elevation_height">16dp</dimen>
+
+    <dimen name="height_small">48dp</dimen>
 
 </resources>

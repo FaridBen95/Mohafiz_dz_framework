@@ -28,7 +28,7 @@ import androidx.multidex.MultiDexApplication;
 import com.MohafizDZ.framework_repository.Utils.MySharedPreferences;
 import com.MohafizDZ.framework_repository.Utils.MyUtil;
 import com.MohafizDZ.framework_repository.core.Account.MUser;
-import com.MohafizDZ.framework_repository.core.Account.MainLogInActivity;
+import com.MohafizDZ.framework_repository.core.Account.LauncherActivity;
 import com.MohafizDZ.framework_repository.core.Account.MyAccountManager;
 import com.MohafizDZ.framework_repository.core.Col;
 import com.MohafizDZ.framework_repository.core.DataRow;
@@ -331,7 +331,7 @@ public class App extends MultiDexApplication {
         return firebaseAuth.getCurrentUser();
     }
     public static void restartApp(Activity activity){
-        Intent mainIntent = new Intent(activity, MainLogInActivity.class);
+        Intent mainIntent = new Intent(activity, LauncherActivity.class);
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         activity.finishAffinity();
         activity.getApplicationContext().startActivity(mainIntent);

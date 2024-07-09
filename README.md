@@ -17,3 +17,7 @@
 - activate firebase authentication, firestore, storage and notification
 
 - open StartClassHelper and add the sign up activity intent (after authentication) and add your main activity
+
+- update onSyncFinished in the MohafizMainActivity
+
+- update usermodel
