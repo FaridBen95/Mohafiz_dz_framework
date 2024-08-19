@@ -100,7 +100,7 @@ public class CompanyUserModel extends Model {
             insert(values);
         }else{
             long localUpdateTimeInMillis = MyUtil.dateToMilliSec(currentRow.getString("_write_date"));
-            long serverUpdateTimeInMillis = recordLineMap.containsKey("write_date")?
+            long serverUpdateTimeInMillis = recordLineMap != null && recordLineMap.containsKey("write_date")?
                     Long.valueOf("" + recordLineMap.get("write_date")) : 0;
             if(serverUpdateTimeInMillis > localUpdateTimeInMillis) {
                 update(currentRow.getString(Col.SERVER_ID), values);

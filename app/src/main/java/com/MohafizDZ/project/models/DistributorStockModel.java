@@ -52,6 +52,7 @@ public class DistributorStockModel extends Model {
             if(row == null){
                 return initStockRow(tourRow);
             }
+            return row;
         }
         return null;
     }

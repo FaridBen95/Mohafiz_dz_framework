@@ -211,7 +211,8 @@ public class ProductPresenterImpl implements IProductPresenter.Presenter{
     }
 
     private DataRow getProduct(String productCode){
-        return models.companyProductModel.browse(" code = ? ", new String[] {productCode});
+        return productCode.equals("") || productCode.equals("false") ? null:
+                models.companyProductModel.browse(" code = ? ", new String[] {productCode});
     }
 
     @Override

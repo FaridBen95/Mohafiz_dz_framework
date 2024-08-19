@@ -52,7 +52,7 @@ public class OpeningStockPresenterImpl implements IOpeningStockPresenter.Present
     public void onViewCreated() {
         view.setToolbarTitle(getString(R.string.initial_stock_title));
         initData();
-        isEditable = stockRow.getString("state").equals(DistributorStockModel.STATE_DRAFT);
+        isEditable = stockRow != null && stockRow.getString("state").equals(DistributorStockModel.STATE_DRAFT);
         view.initAdapter(rows);
         onRefresh();
     }

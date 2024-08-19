@@ -272,7 +272,8 @@ public class CustomerFormPresenterImpl implements ICustomerFormPresenter.Present
     }
 
     private DataRow getCustomer(String customerCode){
-        return models.companyCustomerModel.browse(" customer_code = ? ", new String[] {customerCode});
+        return customerCode.equals("") || customerCode.equals("false")? null :
+                models.companyCustomerModel.browse(" customer_code = ? ", new String[] {customerCode});
     }
 
     private boolean allowCustomer(DataRow scannedCustomer){

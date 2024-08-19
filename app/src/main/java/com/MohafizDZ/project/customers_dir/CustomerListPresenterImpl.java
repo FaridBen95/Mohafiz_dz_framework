@@ -67,7 +67,9 @@ public class CustomerListPresenterImpl implements ICustomersListPresenter.Presen
         distributorRow = models.distributorModel.getCurrentDistributor(currentUserRow);
         currentTourRow = models.tourModel.getCurrentTour(distributorRow);
         configurations.clear();
-        configurations.addAll(currentTourRow.getRelArray(models.tourModel, "configurations"));
+        if(currentTourRow != null) {
+            configurations.addAll(currentTourRow.getRelArray(models.tourModel, "configurations"));
+        }
     }
 
     @Override
@@ -80,8 +82,8 @@ public class CustomerListPresenterImpl implements ICustomersListPresenter.Presen
     @Override
     public void onCustomerChanged(int selectedPosition) {
         DataRow selectedRow = rows.get(selectedPosition);
-        String selection = " tour_id = ? ";
-        String[] args = {currentTourRow.getString(Col.SERVER_ID)};
+        String selection = currentTourRow != null? " tour_id = ? " : null;
+        String[] args = currentTourRow != null? new String[]{currentTourRow.getString(Col.SERVER_ID)} : null;
         Map<String, DataRow> visits = models.visitModel.getMap(selection, args, null, "customer_id");
         DataRow visitRow = visits.getOrDefault(selectedRow.getString(Col.SERVER_ID), null);
         selectedRow.put("visited", visitRow != null && visitRow.getString("state").equals(TourVisitModel.STATE_VISITED));

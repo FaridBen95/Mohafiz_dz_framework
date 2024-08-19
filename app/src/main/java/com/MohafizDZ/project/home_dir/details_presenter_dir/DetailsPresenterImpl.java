@@ -3,11 +3,14 @@ package com.MohafizDZ.project.home_dir.details_presenter_dir;
 import android.content.Context;
 import android.util.Log;
 
+import com.MohafizDZ.framework_repository.Utils.MyUtil;
 import com.MohafizDZ.framework_repository.core.Col;
 import com.MohafizDZ.framework_repository.core.DataRow;
 import com.MohafizDZ.framework_repository.core.Model;
+import com.MohafizDZ.framework_repository.core.Values;
 import com.MohafizDZ.framework_repository.service.ModelHelper;
 import com.MohafizDZ.framework_repository.service.SyncModels;
+import com.MohafizDZ.framework_repository.service.SyncingReport;
 import com.MohafizDZ.framework_repository.service.firebase.FirestoreSyncDownBridge;
 import com.MohafizDZ.framework_repository.service.firebase.IFirestoreSync;
 import com.MohafizDZ.framework_repository.service.firebase.QueryClause;
@@ -42,7 +45,9 @@ import java.util.Map;
 
 public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncModels.SyncModelsListener {
     private static final String TAG = DetailsPresenterImpl.class.getSimpleName();
-    private static final int REGION_SYNC_DOWN_DELAY = 30;
+    private static final String SYNC_KEY_SUFFIX = "__";
+    private static final int DEFAULT_SYNC_DOWN_DELAY = 30;
+    private static final int REGION_SYNC_DOWN_DELAY = DEFAULT_SYNC_DOWN_DELAY;
 
     private final IDetailsPresenter.View view;
     private final Context context;
@@ -59,18 +64,17 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
 
     @Override
     public void onViewCreated() {
-        if(!models.companyUserModel.hasSynced()){
-            requestSyncCompanyUser();
-        }
-        if(!models.distributorModel.hasSynced()){
-            requestSyncDistributor();
-        }
-        if(!models.plannerModel.hasSynced()){
-            requestSyncPlannerModel();
-        }
-        if(!models.regionModel.syncWithSuccess(REGION_SYNC_DOWN_DELAY)){
-            requestSyncRegions();
-        }
+        requestSyncCompanyUser();
+        requestSyncDistributor();
+        requestSyncPlannerModel();
+        requestSyncRegions();
+        requestSyncDown(models.customerModel);
+        requestSyncDown(models.customerCategoryModel);
+        requestSyncDown(models.productModel);
+        requestSyncDown(models.productCategoryModel);
+        requestSyncDown(models.expenseSubjectModel);
+        requestSyncDown(models.denominationModel);
+        requestSyncDown(models.visitNoActionCategoryModel);
         if(isAdmin()){
             DataRow plannerRow = models.plannerModel.getCurrentPlanner(currentUserRow);
             if(!plannerRow.getBoolean("synced")){
@@ -132,6 +136,10 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
     private void requestSyncDistributor() {
         //todo switch to firebase functions
         onSyncStateChanged(isRefreshing(true));
+        final String key = models.distributorModel.getModelName() + "_down_" + SYNC_KEY_SUFFIX;
+        if(hasSynced(key)){
+            return;
+        }
         models.distributorModel.syncDistributor(currentUserRow.getString(Col.SERVER_ID),
                 new IFirestoreSync.SyncDownListener() {
             @Override
@@ -146,11 +154,16 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
                 onSyncStateChanged(isRefreshing(false));
                 Map<String, Object> recordLineMap = resultList.size() > 0? resultList.get(0) : null;
                 models.distributorModel.insertOrUpdateDistributor(recordLineMap, currentUserRow);
+                saveSyncingDate(key, MyUtil.getCurrentDate());
             }
         });
     }
 
     private void requestSyncCompanyUser() {
+        final String key = models.companyUserModel.getModelName() + "_down_" + SYNC_KEY_SUFFIX;
+        if(hasSynced(key)){
+            return;
+        }
         onSyncStateChanged(isRefreshing(true));
         models.companyUserModel.syncUser(currentUserRow.getString(Col.SERVER_ID),
                 new IFirestoreSync.SyncDownListener() {
@@ -166,17 +179,23 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
                         onSyncStateChanged(isRefreshing(false));
                         Map<String, Object> recordLineMap = resultList.size() > 0? resultList.get(0) : null;
                         models.companyUserModel.insertOrUpdateCompanyUser(recordLineMap, currentUserRow);
+                        saveSyncingDate(key, MyUtil.getCurrentDate());
                     }
                 });
     }
 
     private void requestSyncPlannerModel(){
+        final String key = models.plannerModel.getModelName() + "_down_" + SYNC_KEY_SUFFIX;
+        if(hasSynced(key)){
+            return;
+        }
         final FirestoreSyncDownBridge firestoreSyncDownBridge = new FirestoreSyncDownBridge(models.plannerModel, null, new FirestoreSyncDownBridge.SyncListener() {
             @Override
             public void onSyncFinished(List<DataRow> records) {
                 onSyncStateChanged(isRefreshing(false));
                 models.plannerModel.insertRecords(records);
                 models.plannerModel.getCurrentPlanner(currentUserRow);
+                saveSyncingDate(key, MyUtil.getCurrentDate());
             }
 
             @Override
@@ -210,11 +229,16 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
     }
 
     private void requestSyncRegions(){
+        final String key = models.regionModel.getModelName() + "_down_" + SYNC_KEY_SUFFIX;
+        if(syncWithSuccess(key, REGION_SYNC_DOWN_DELAY)){
+            return;
+        }
         final FirestoreSyncDownBridge firestoreSyncDownBridge = new FirestoreSyncDownBridge(models.regionModel, null, new FirestoreSyncDownBridge.SyncListener() {
             @Override
             public void onSyncFinished(List<DataRow> records) {
                 onSyncStateChanged(isRefreshing(false));
                 models.regionModel.insertRecords(records);
+                saveSyncingDate(key, MyUtil.getCurrentDate());
             }
 
             @Override
@@ -226,6 +250,86 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
             public List<QueryClause> setQuery() {
                 List<QueryClause> list = new ArrayList<>();
                 list.add(new QueryClause("state_id", QueryClause.Operator.equalTo, currentUserRow.getString("state_id")));
+                list.add(new QueryClause("write_date", QueryClause.Operator.greaterOrEqualThan, getLastSyncDate(key)));
+                return list;
+            }
+
+            @Override
+            public void onSyncFailed(Exception exception) {
+                onSyncStateChanged(isRefreshing(false));
+                exception.printStackTrace();
+            }
+
+            @Override
+            public boolean orderByWriteDate() {
+                return false;
+            }
+
+            @Override
+            public String orderByField() {
+                return null;
+            }
+        });
+        onSyncStateChanged(isRefreshing(true));
+        firestoreSyncDownBridge.syncPaging(false);
+    }
+
+    public void saveSyncingDate(String key, String currentDate) {
+        Values values = new Values();
+        values.put("model_name", key);
+        values.put("last_sync_date", currentDate);
+        DataRow row = models.syncingReport.browse("model_name = ? ",
+                new String[]{key});
+        if(row != null){
+            models.syncingReport.update(row.getInteger(Col.ROWID), values);
+        }else{
+            models.syncingReport.insert(values);
+        }
+    }
+
+    public boolean syncWithSuccess(String key, int beforeMinutes){
+        return models.syncingReport.browse(" model_name = ? and last_sync_date > ? ",
+                new String[]{key, MyUtil.getDateBeforeMins(beforeMinutes)}) != null;
+    }
+
+    public boolean hasSynced(String key){
+        return models.syncingReport.browse(" model_name = ? ",
+                new String[]{key}) != null;
+    }
+
+    public long getLastSyncDate(String key){
+        DataRow syncingRow = models.syncingReport.browse(" model_name = ? ",
+                new String[]{key});
+        String lastSyncDate = syncingRow != null ? syncingRow.getString("last_sync_date") : "";
+        return MyUtil.dateToMilliSec(lastSyncDate);
+    }
+
+
+
+
+    private void requestSyncDown(Model model){
+        final String key = model.getModelName() + "_down_" + SYNC_KEY_SUFFIX;
+        if(syncWithSuccess(key, DEFAULT_SYNC_DOWN_DELAY)){
+            return;
+        }
+        final FirestoreSyncDownBridge firestoreSyncDownBridge = new FirestoreSyncDownBridge(model, null, new FirestoreSyncDownBridge.SyncListener() {
+            @Override
+            public void onSyncFinished(List<DataRow> records) {
+                onSyncStateChanged(isRefreshing(false));
+                model.insertRecords(records);
+                saveSyncingDate(key, MyUtil.getCurrentDate());
+            }
+
+            @Override
+            public boolean isSyncable(Col col) {
+                return false;
+            }
+
+            @Override
+            public List<QueryClause> setQuery() {
+                List<QueryClause> list = new ArrayList<>();
+                final long lastSyncDate = getLastSyncDate(key);
+                list.add(new QueryClause("write_date", QueryClause.Operator.greaterThan, lastSyncDate));
                 return list;
             }
 
@@ -373,6 +477,8 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
         private final TourVisitActionModel actionModel;
         private final VisitOrderModel orderModel;
         private final VisitOrderLineModel orderLineModel;
+        private final SyncingReport syncingReport;
+
         private Models(Context context){
             this.distributorModel = new DistributorModel(context);
             this.plannerModel = new PlannerModel(context);
@@ -398,6 +504,8 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
             this.actionModel = new TourVisitActionModel(context);
             this.orderModel = new VisitOrderModel(context);
             this.orderLineModel = new VisitOrderLineModel(context);
+
+            this.syncingReport = new SyncingReport(context);
         }
     }
 }

@@ -9,6 +9,7 @@ import com.MohafizDZ.framework_repository.core.DataRow;
 import com.MohafizDZ.framework_repository.core.Model;
 import com.MohafizDZ.framework_repository.core.Values;
 import com.MohafizDZ.framework_repository.service.FirestoreSingleton;
+import com.MohafizDZ.own_distributor.BuildConfig;
 import com.google.firebase.firestore.DocumentReference;
 
 public class CompanyModel extends Model {
