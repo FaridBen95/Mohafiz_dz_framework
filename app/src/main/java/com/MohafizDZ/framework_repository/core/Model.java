@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.telephony.TelephonyManager;
+import android.util.ArraySet;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -19,7 +20,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.MohafizDZ.App;
 import com.MohafizDZ.framework_repository.Utils.MySharedPreferences;
-import com.MohafizDZ.empty_project.BuildConfig;
+import com.MohafizDZ.own_distributor.BuildConfig;
 import com.MohafizDZ.framework_repository.Utils.CursorUtils;
 import com.MohafizDZ.framework_repository.Utils.MyUtil;
 import com.MohafizDZ.framework_repository.Utils.SQLUtil;
@@ -29,12 +30,15 @@ import com.MohafizDZ.framework_repository.service.RecordHandler;
 import com.MohafizDZ.framework_repository.service.SyncAdapter;
 import com.MohafizDZ.framework_repository.service.SyncingDomain;
 import com.MohafizDZ.framework_repository.service.SyncingReport;
+import com.MohafizDZ.project.models.CompanyModel;
+import com.google.firebase.firestore.DocumentReference;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -367,6 +371,43 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
         return allRows;
     }
 
+    public Map<String, DataRow> getMap(String keyField){
+        return getMap(null, null, null, keyField);
+    }
+
+    public Map<String, DataRow> getMap(String selection, String[] selectionArgs, String sort, String keyField){
+        return getMap(null, selection, selectionArgs, sort, keyField);
+    }
+
+    public Map<String, DataRow> getMap(String[] projections, String selection, String[] selectionArgs, String sort, String keyField){
+        Map<String, DataRow> allRows = new HashMap<>();
+        Cursor cr = null;
+        try{
+            cr = mContext.getContentResolver().
+                    query(createUri(BASE_AUTHORITY), projections, selection, selectionArgs, sort);
+        }catch (IllegalStateException e){
+            e.printStackTrace();
+            return getMap(projections, selection, selectionArgs, sort, keyField);
+        }
+        try{
+            if (cr != null && cr.moveToFirst()) {
+                do {
+                    DataRow row = CursorUtils.toDatarow(cr);
+                    allRows.put(row.getString(keyField), row);
+                } while (cr.moveToNext());
+            }
+        }finally {
+            if(cr != null){
+                cr.close();
+            }
+        }
+        return allRows;
+    }
+
+    public int count(String selection, String[] args){
+        return getRows(selection, args).size();
+    }
+
     public int insert(Values values){
         return insert(values, false);
     }
@@ -487,6 +528,12 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
         String selection = Col.ROWID + " = ? ";
         String[] where = new String[]{_id + ""};
         return delete(selection, where, permanently);
+    }
+
+    public int delete(String id, boolean permanently){
+        String selection = " id = ? ";
+        String[] args = {id};
+        return delete(selection, args, permanently);
     }
 
     public int delete(@Nullable String selection, @Nullable String[] selectionArgs){
@@ -1132,6 +1179,14 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
 
     }
 
+    public DocumentReference getDocumentReference() {
+        return CompanyModel.getMainDocumentReference(mContext);
+    }
+
+    public String getCollectionPath(){
+        return CompanyModel.getCollectionPath(mContext);
+    }
+
     public interface OnStartTransactionListener{
         public boolean startedTransaction();
     }
@@ -1143,6 +1198,11 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
     public boolean syncWithSuccess(int beforeMinutes){
         return new SyncingReport(mContext).browse(" model_name = ? and last_sync_date > ? ",
                 new String[]{getModelName(), MyUtil.getDateBeforeMins(beforeMinutes)}) != null;
+    }
+
+    public boolean hasSynced(){
+        return new SyncingReport(mContext).browse(" model_name = ? ",
+                new String[]{getModelName()}) != null;
     }
 
     public int countUpdatedRows(){
@@ -1169,6 +1229,19 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
             update(row.getInteger(Col.ROWID), values);
         }
         return insertedNum;
+    }
+
+    public Integer getCreateId() {
+        int newId = 0;
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cr = db.query("sqlite_sequence", new String[] { "name", "seq" }, "name = ?",
+                new String[] { getModelName() }, null, null, null);
+        if (cr.moveToFirst()) {
+            newId = cr.getInt(cr.getColumnIndex("seq"));
+        }
+        cr.close();
+//        db.close();
+        return newId;
     }
 
     public void insertRelArray(String baseServerId, String field, List<String> relServerIds){
@@ -1292,6 +1365,17 @@ public class Model implements DatabaseListener, DefaultSyncListener, DatabaseLis
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<DataRow> getRelArrayRows(DataRow row, String columnName){
+        Col col = getColumn(columnName);
+        String relatedColumn = col.getRelatedColumn();
+        relatedColumn = relatedColumn != null? relatedColumn : Col.SERVER_ID;
+        List<String> array = getRelArray(row, col);
+        String selection = relatedColumn + " in (" + MyUtil.repeat("?, ", array.size() - 1) + " ?)";
+        String[] args = array.toArray(new String[(array.size())]);;
+        Model relModel = createInstance(col.getRelationalModel());
+        return relModel.select(selection, args);
     }
 
     public List<String> getExistingColumns(SQLiteDatabase db){

@@ -6,7 +6,7 @@
 
 - uncomment apply plugin: 'com.google.gms.google-services' in gradle
 
-- replace all empty_project by your project id (preferable to be the same as the firebase project id) by using ctrl + shift + r 
+- replace all own_distributor by your project id (preferable to be the same as the firebase project id) by using ctrl + shift + r 
 
 - replace empty project with your app name
 

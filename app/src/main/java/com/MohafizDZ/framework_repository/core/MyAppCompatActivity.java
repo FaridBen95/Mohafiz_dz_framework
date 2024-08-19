@@ -1,5 +1,6 @@
 package com.MohafizDZ.framework_repository.core;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,7 +26,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.MohafizDZ.App;
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 import com.MohafizDZ.framework_repository.local_sentry.GlobalTouchListener;
 import com.MohafizDZ.framework_repository.Utils.MySharedPreferences;
 import com.MohafizDZ.framework_repository.Utils.FragmentUtils;
@@ -56,6 +57,7 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
     private MSearchViewChangeListener mSearchViewChangeListener;
     private SearchView mSearchView;
     public SweetAlertDialog dateDialog;
+    private AlertDialog progressDialog = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,10 +70,12 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
 
     //to modify anything after the creation of action bar use the method below
     public void setTitleBar(ActionBar actionBar) {
-        toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_chevron_left_black);
-        getSupportActionBar().setTitle(null);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if(actionBar != null){
+            toolbar = findViewById(R.id.toolbar);
+            toolbar.setNavigationIcon(R.drawable.ic_chevron_left_black);
+            actionBar.setTitle(null);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
 
@@ -402,9 +406,14 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
     @Override
     public void onResume() {
         super.onResume();
-        registerReceiver(onlineDateReceiver, new IntentFilter(IOnlineDateReceiver.ONLINE_DATE_STARTED));
-        getApplicationContext().registerReceiver(syncStartReceiver, new IntentFilter(ISyncStartReceiver.SYNC_START));
-        getApplicationContext().registerReceiver(syncFinishReceiver, new IntentFilter(ISyncFinishReceiver.SYNC_FINISH));
+        try {
+            //todo check these
+            registerReceiver(onlineDateReceiver, new IntentFilter(IOnlineDateReceiver.ONLINE_DATE_STARTED), RECEIVER_NOT_EXPORTED);
+            getApplicationContext().registerReceiver(syncStartReceiver, new IntentFilter(ISyncStartReceiver.SYNC_START), RECEIVER_NOT_EXPORTED);
+            getApplicationContext().registerReceiver(syncFinishReceiver, new IntentFilter(ISyncFinishReceiver.SYNC_FINISH), RECEIVER_NOT_EXPORTED);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void setHasSearchView(MSearchViewChangeListener listener,
@@ -457,7 +466,7 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
     }
 
     public void showToast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        runOnUiThread(() -> Toast.makeText(this, msg, Toast.LENGTH_SHORT).show());
     }
 
     public void showSimpleDialog(String title, String msg) {
@@ -466,6 +475,23 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
 
     public boolean inNetwork() {
         return app().inNetwork();
+    }
+
+    public void toggleLoading(boolean isRefreshing){
+        runOnUiThread(() -> {
+            if(progressDialog == null) {
+                progressDialog = MyUtil.getProgressDialog(this);
+            }
+            if(isRefreshing) {
+                progressDialog.show();
+            }else if(progressDialog.isShowing()){
+                progressDialog.dismiss();
+            }
+        });
+    }
+
+    public void setToolbarTitle(String title){
+        getSupportActionBar().setTitle(title);
     }
 
 }

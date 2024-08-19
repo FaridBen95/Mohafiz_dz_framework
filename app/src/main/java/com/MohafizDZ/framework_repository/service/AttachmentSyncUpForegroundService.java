@@ -19,7 +19,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.MohafizDZ.App;
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 import com.MohafizDZ.framework_repository.core.Account.LauncherActivity;
 import com.MohafizDZ.framework_repository.core.Col;
 import com.MohafizDZ.framework_repository.core.DataRow;
@@ -110,7 +110,7 @@ public abstract class AttachmentSyncUpForegroundService extends Service {
         Intent intent = setNotificationIntent(notificationIntent, extras);
         notificationIntent = intent == null? notificationIntent : intent;
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                notificationIntent, 0);
+                notificationIntent, PendingIntent.FLAG_IMMUTABLE);
         CharSequence title = getResources().getString(R.string.uploading_attachments);
 
         Bitmap icon = BitmapFactory.decodeResource(getResources(),

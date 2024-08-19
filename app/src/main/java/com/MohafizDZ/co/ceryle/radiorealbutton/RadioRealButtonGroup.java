@@ -44,7 +44,7 @@ import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
 
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 
 import java.util.ArrayList;
 import java.util.List;

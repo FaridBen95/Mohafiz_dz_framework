@@ -14,7 +14,7 @@ import android.widget.ImageView;
 
 import androidx.appcompat.widget.Toolbar;
 
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 import com.google.android.material.appbar.AppBarLayout;
 
 import java.util.Objects;

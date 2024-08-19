@@ -29,7 +29,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.MohafizDZ.framework_repository.core.MyAppCompatActivity;
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 
 public class FragmentUtils {
     public static final String TAG = FragmentUtils.class.getSimpleName();

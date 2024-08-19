@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="@dimen/padding_medium">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_marginTop="@dimen/margin_medium"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/denomination_label"
+        android:textColorHint="?attr/colorOnSurface"
+        app:boxBackgroundColor="?attr/colorSurfaceDim"
+        app:boxStrokeColor="?attr/colorOnSurface"
+        app:hintTextColor="?attr/colorOnSurface"
+        >
+        <com.MohafizDZ.framework_repository.controls.KeyValueAutoComplete
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_small"
+            android:inputType="number"
+            android:imeOptions="actionNext"
+            android:id="@+id/denominationDropDownView"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/noteTextInputLayout"
+        style="?attr/textInputOutlinedDenseStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:textColorHint="?attr/colorOnSurface"
+        app:boxBackgroundColor="?attr/colorSurfaceDim"
+        app:boxStrokeColor="?attr/colorOnSurface"
+        app:hintTextColor="?attr/colorOnSurface"
+        app:startIconTint="?attr/colorOnSurface"
+        android:hint="@string/count_label"
+        app:endIconMode="clear_text"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/countTextInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="@dimen/text_size_medium"
+            android:inputType="number"
+            android:lines="1"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+</LinearLayout>

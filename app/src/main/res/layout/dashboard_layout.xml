@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+
+    <com.google.android.material.navigation.NavigationView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:id="@+id/drawerMenu"
+        android:visibility="gone"
+        />
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="@dimen/elevation_low"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_chevron_left_black"
+        app:navigationIconTint="?attr/colorOnSurface"/>
+
+    <LinearLayout
+        android:layout_below="@id/toolbar"
+        android:id="@+id/datesContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:weightSum="2"
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        >
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/dateStartButton"
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/date_start_label"
+            android:gravity="start|center_vertical"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_marginEnd="@dimen/margin_small"
+            />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/dateEndButton"
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/date_end_label"
+            android:gravity="start|center_vertical"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_marginStart="@dimen/margin_small"
+            />
+
+    </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_marginHorizontal="@dimen/margin_xlarge"
+        android:layout_below="@id/datesContainer"
+        android:layout_marginTop="@dimen/margin_medium"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tourSelectionContainer"
+        android:hint="@string/tour_selection_label"
+        android:textColorHint="?attr/colorOnSurface"
+        app:boxBackgroundColor="?attr/colorSurfaceDim"
+        app:boxStrokeColor="?attr/colorOnSurface"
+        app:hintTextColor="?attr/colorOnSurface"
+        >
+        <com.MohafizDZ.framework_repository.controls.KeyValueAutoComplete
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_small"
+            android:inputType="none"
+            android:id="@+id/tourDropDownView"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <ScrollView
+        android:layout_above="@id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tourSelectionContainer"
+        android:fillViewport="true"
+        android:scrollbars="vertical"
+        >
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/margin_xlarge"
+            >
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/padding_xxxlarge">
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tourDetailsContainer"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+                    <LinearLayout
+                        android:layout_margin="@dimen/margin_medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        >
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="2"
+                            >
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dip"
+                                android:layout_gravity="center"
+                                android:text="@string/name_label_"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                />
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dip"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:layout_gravity="center"
+                                android:gravity="end"
+                                android:id="@+id/tourNameTextView"
+                                android:textStyle="bold"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="2"
+                            >
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dip"
+                                android:layout_gravity="center"
+                                android:text="@string/vehicle_label_"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                />
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dip"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:layout_gravity="center"
+                                android:gravity="end"
+                                android:id="@+id/vehicleTextView"
+                                android:textStyle="bold"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="2"
+                            >
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dip"
+                                android:layout_gravity="center"
+                                android:text="@string/region_label_"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                />
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dip"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:layout_gravity="center"
+                                android:gravity="end"
+                                android:id="@+id/regionTextView"
+                                android:textStyle="bold"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:id="@+id/planingContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                >
+                                <!-- Media -->
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="@dimen/margin_large">
+
+                                    <!-- Title, secondary and supporting text -->
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        android:text="@string/tour_planing_label"
+                                        android:textStyle="bold"
+                                        />
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Buttons -->
+                            <LinearLayout
+                                android:layout_gravity="end"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/margin_medium"
+                                android:orientation="horizontal">
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/planingViewDetailsButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="@dimen/margin_medium"
+                                    style="?attr/borderlessButtonStyle"
+                                    android:text="@string/view_details_label"
+                                    />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:id="@+id/openingContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                >
+                                <!-- Media -->
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="@dimen/margin_large">
+
+                                    <!-- Title, secondary and supporting text -->
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        android:text="@string/opening_label"
+                                        android:textStyle="bold"
+                                        />
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Buttons -->
+                            <LinearLayout
+                                android:layout_gravity="end"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/margin_medium"
+                                android:orientation="horizontal">
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/openingViewDetailsButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="@dimen/margin_medium"
+                                    style="?attr/borderlessButtonStyle"
+                                    android:text="@string/view_details_label"
+                                    />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:id="@+id/tourContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                >
+                                <!-- Media -->
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="@dimen/margin_large">
+
+                                    <!-- Title, secondary and supporting text -->
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        android:text="@string/tour_label"
+                                        android:textStyle="bold"
+                                        />
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Buttons -->
+                            <LinearLayout
+                                android:layout_gravity="end"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/margin_medium"
+                                android:orientation="horizontal">
+                                <com.google.android.material.button.MaterialButton
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+                                    app:cornerRadius="0dp"
+                                    app:strokeWidth="0dp"
+                                    app:iconSize="@dimen/icon_medium_size"
+                                    app:icon="@drawable/ic_arrow_drop_down_black_24dp"
+                                    android:layout_gravity="start"
+                                    android:id="@+id/tourToggleButton"
+                                    />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:id="@+id/tourProgressContainer">
+                    <include
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:id="@+id/visitContainer"
+                        layout="@layout/visit_container_layout"
+                        />
+                </LinearLayout>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:id="@+id/preClosingContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                >
+                                <!-- Media -->
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="@dimen/margin_large">
+
+                                    <!-- Title, secondary and supporting text -->
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        android:text="@string/pre_closing_title"
+                                        android:textStyle="bold"
+                                        />
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Buttons -->
+                            <LinearLayout
+                                android:layout_gravity="end"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/margin_medium"
+                                android:orientation="horizontal">
+                                <com.google.android.material.button.MaterialButton
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+                                    app:cornerRadius="0dp"
+                                    app:strokeWidth="0dp"
+                                    app:iconSize="@dimen/icon_medium_size"
+                                    app:icon="@drawable/ic_arrow_drop_down_black_24dp"
+                                    android:layout_gravity="start"
+                                    android:id="@+id/preClosingToggleButton"
+                                    />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:id="@+id/preClosingDetailsContainer">
+                    <include
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        layout="@layout/pre_closing_container_layout"
+                        />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/bottomContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical">
+
+
+            </LinearLayout>
+        </RelativeLayout>
+    </ScrollView>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/goalFloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottomNavigation"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:src="@drawable/baseline_goal_24"
+        app:fabCustomSize="@dimen/icon_button_size_large"
+        />
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_alignParentBottom="true"
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:menu="@menu/bottom_navigation_menu"
+        />
+
+</RelativeLayout>

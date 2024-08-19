@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.MohafizDZ.framework_repository.Utils.ViewAnimation;
 import com.MohafizDZ.framework_repository.core.DataRow;
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;

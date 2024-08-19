@@ -13,7 +13,7 @@ import android.widget.Spinner;
 
 import androidx.appcompat.widget.AppCompatSpinner;
 
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

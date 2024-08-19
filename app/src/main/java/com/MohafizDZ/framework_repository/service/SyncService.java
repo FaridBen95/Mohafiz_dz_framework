@@ -16,7 +16,7 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 import com.MohafizDZ.framework_repository.MohafizMainActivity;
 import com.MohafizDZ.framework_repository.Utils.MySharedPreferences;
 import com.MohafizDZ.framework_repository.core.Model;
@@ -151,7 +151,7 @@ public abstract class SyncService extends Service {
         restartService.setPackage(getPackageName());
         PendingIntent restartServicePI = PendingIntent.getService(
                 getApplicationContext(), 1, restartService,
-                PendingIntent.FLAG_ONE_SHOT);
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
         AlarmManager alarmService = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() +1000, restartServicePI);
     }

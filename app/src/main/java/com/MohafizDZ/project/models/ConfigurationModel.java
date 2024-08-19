@@ -5,7 +5,7 @@ import android.content.Context;
 import com.MohafizDZ.framework_repository.core.Col;
 import com.MohafizDZ.framework_repository.core.DataRow;
 import com.MohafizDZ.framework_repository.core.Model;
-import com.MohafizDZ.empty_project.BuildConfig;
+import com.MohafizDZ.own_distributor.BuildConfig;
 
 public class ConfigurationModel extends Model {
     public static final String TAG = ConfigurationModel.class.getSimpleName();

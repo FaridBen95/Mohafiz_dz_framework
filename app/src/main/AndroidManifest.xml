@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.MohafizDZ.empty_project">
+    package="com.MohafizDZ.own_distributor">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -9,14 +9,18 @@
     <uses-permission
         android:name="android.permission.MANAGE_ACCOUNTS"
         android:maxSdkVersion="22" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"   tools:node="replace"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"  tools:node="replace" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"  tools:node="replace"/>
+    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
-<!--    <uses-permission android:name="android.permission.CAMERA" />-->
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.SEND_SMS"/>
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -64,8 +68,258 @@
             >
         </activity>
         <activity
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:name="com.MohafizDZ.framework_repository.core.Account.PhoneLogInActivity"
+            android:name="com.MohafizDZ.project.home_dir.HomeActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.framework_repository.core.Account.MainLogInActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.sign_up_dir.AccountDetailsActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.company_scan_dir.CompanyScanActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.scan_dir.ScanActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.tour_edit_dir.distributor_form_dir.DistributionFormActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.tour_edit_dir.TourFormActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.regions_map_dir.RegionsMapActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.customers_dir.CustomersListActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.catalog_dir.CatalogActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.product_form_dir.ProductFormActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.product_form_dir.ProductScanActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.customer_details_dir.form_dir.CustomerFormActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.customer_details_dir.CustomerDetailsActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.visit_action_dir.VisitActionActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.catalog_dir.cart_order_dir.CartOrderActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.payment_dir.PaymentActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.order_details_dir.OrderDetailsActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.orders_list_dir.OrdersListActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.payment_details_dir.PaymentDetailsActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.payments_list_dir.PaymentsListActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.expenses_list_dir.ExpensesListActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.expenses_list_dir.expense_dir.ExpenseActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.cash_box_dir.CashBoxActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.sales_dir.SalesActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.visit_action_list_dir.ActionsListActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.opening_stock_dir.OpeningStockActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.inventory_dir.InventoryActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.dashboard_dir.DashboardActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.tour_edit_dir.tour_details_dir.TourDetailsActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.customers_dir.customers_map_dir.CustomersMapActivity"
+            android:theme="@style/AppTheme"
+            android:resizeableActivity="false"
+            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.MohafizDZ.project.settings_dir.SettingsActivity"
             android:theme="@style/AppTheme"
             android:resizeableActivity="false"
             android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -125,28 +379,63 @@
             </intent-filter>
         </activity>
 
-
         <provider
             android:name="com.MohafizDZ.framework_repository.core.MyBaseProvider"
-            android:authorities="com.MohafizDZ.empty_project.main_provider"
+            android:authorities="com.MohafizDZ.own_distributor.main_provider"
             android:multiprocess="true" />
 
         <provider
             android:name="com.MohafizDZ.framework_repository.service.SyncingReportProvider"
-            android:authorities="com.MohafizDZ.empty_project.syncing_report_provider"
+            android:authorities="com.MohafizDZ.own_distributor.syncing_report_provider"
             android:label="report provider"
             android:multiprocess="true" />
 
         <provider
             android:name="com.MohafizDZ.project.providers.ConfigurationSyncProvider"
-            android:authorities="com.MohafizDZ.empty_project.global_configuration_provider"
+            android:authorities="com.MohafizDZ.own_distributor.global_configuration_provider"
             android:label="global Configuration"
             android:multiprocess="true" />
 
         <provider
             android:name="com.MohafizDZ.project.providers.UsersSyncProvider"
-            android:authorities="com.MohafizDZ.empty_project.users_provider"
+            android:authorities="com.MohafizDZ.own_distributor.users_provider"
             android:label="Users table"
+            android:multiprocess="true" />
+
+        <provider
+            android:name="com.MohafizDZ.project.providers.PreClosingSalesProvider"
+            android:authorities="com.MohafizDZ.own_distributor.pre_closing_sales_authority"
+            android:label="sales"
+            android:multiprocess="true" />
+
+        <provider
+            android:name="com.MohafizDZ.project.providers.ProductDetailsProvider"
+            android:authorities="com.MohafizDZ.own_distributor.product_details_provider"
+            android:label="@string/availability_label_"
+            android:multiprocess="true" />
+
+        <provider
+            android:name="com.MohafizDZ.project.providers.VisitOrderDetailsProvider"
+            android:authorities="com.MohafizDZ.own_distributor.order_details_authority"
+            android:label="@string/orders_label"
+            android:multiprocess="true" />
+
+        <provider
+            android:name="com.MohafizDZ.project.providers.PaymentsProvider"
+            android:authorities="com.MohafizDZ.own_distributor.payments_details_authority"
+            android:label="@string/payments_label"
+            android:multiprocess="true" />
+
+        <provider
+            android:name="com.MohafizDZ.project.providers.ActionsProvider"
+            android:authorities="com.MohafizDZ.own_distributor.actions_details_authority"
+            android:label="@string/actions_label"
+            android:multiprocess="true" />
+
+        <provider
+            android:name="com.MohafizDZ.project.providers.CustomersProvider"
+            android:authorities="com.MohafizDZ.own_distributor.customers_list_authority"
+            android:label="Customers"
             android:multiprocess="true" />
 
         <service android:name="com.MohafizDZ.framework_repository.service.MFirebaseMessagingService"

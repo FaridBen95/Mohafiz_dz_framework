@@ -135,7 +135,9 @@ public class MyBaseProvider extends ContentProvider {
         long new_id = 0;
         try {
             new_id = insertOrUpdate(db, uri, model.getModelName(), values);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if(transactionsListener != null){
             transactionsListener.onPostInsert(new Values().getValuesFrom(values));
         }

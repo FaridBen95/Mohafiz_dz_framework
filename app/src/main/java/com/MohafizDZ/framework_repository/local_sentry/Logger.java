@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Environment;
 import android.widget.Toast;
 
-import com.MohafizDZ.empty_project.BuildConfig;
+import com.MohafizDZ.own_distributor.BuildConfig;
 import com.MohafizDZ.framework_repository.datas.MConstants;
 import com.MohafizDZ.framework_repository.Utils.MyUtil;
 

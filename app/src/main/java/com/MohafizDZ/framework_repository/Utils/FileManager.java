@@ -45,7 +45,7 @@ import android.widget.Toast;
 import androidx.core.content.FileProvider;
 
 import com.MohafizDZ.App;
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 import com.MohafizDZ.framework_repository.core.DevicePermissionHelper;
 import com.MohafizDZ.framework_repository.core.MyAppCompatActivity;
 import com.MohafizDZ.framework_repository.core.Values;

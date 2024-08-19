@@ -25,7 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 
 import co.mobiwise.materialintro.MaterialIntroConfiguration;
 import co.mobiwise.materialintro.animation.AnimationFactory;

@@ -1,21 +1,24 @@
 package com.MohafizDZ.framework_repository.core.Account;
 
+import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.Settings;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -29,10 +32,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.MohafizDZ.App;
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.framework_repository.Utils.IntentUtils;
+import com.MohafizDZ.own_distributor.R;
 import com.MohafizDZ.framework_repository.MohafizMainActivity;
 import com.MohafizDZ.framework_repository.Utils.MySharedPreferences;
 import com.MohafizDZ.framework_repository.Utils.MyUtil;
@@ -40,6 +44,8 @@ import com.MohafizDZ.framework_repository.core.Account.login_helper_dir.ILogIn;
 import com.MohafizDZ.framework_repository.core.Account.login_helper_dir.LogInHelper;
 import com.MohafizDZ.framework_repository.core.MyAppCompatActivity;
 import com.MohafizDZ.framework_repository.core.Values;
+import com.MohafizDZ.project.models.CompanyModel;
+import com.MohafizDZ.project.company_scan_dir.CompanyScanActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
@@ -58,8 +64,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
@@ -83,13 +87,14 @@ public class LauncherActivity extends MyAppCompatActivity implements View.OnClic
     private String selectedLanguage;
     private TextView termsOfUseTextView;
     private View logoView;
+    private View qrCodeFab;
     private View circleImageView;
     private View intoAppContainer;
     private boolean loggedIn = true;
-    private MohafizMainActivity.IntentType intentType = null;
     private View googleAnimationView;
     private boolean canShowTuto = true;
-    private ActivityResultLauncher<Intent> logInActivityResultLauncher;
+    private ActivityResultLauncher<Intent> logInActivityResultLauncher, storagePermissionResultLauncher;
+    private boolean opened;
 
     @Override
     public void toggleLoading(boolean isRefreshing) {
@@ -135,6 +140,7 @@ public class LauncherActivity extends MyAppCompatActivity implements View.OnClic
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
 //        setContentView(R.layout.activity_start);
         setContentView(R.layout.main_login);
+        initResultLaunchers();
         initArgs();
         initConfig();
         initAuthentication();
@@ -150,11 +156,14 @@ public class LauncherActivity extends MyAppCompatActivity implements View.OnClic
     }
 
     private void prepareAnimationView() {
-        circleImageView = findViewById(R.id.circleImageView);
-
+        qrCodeFab.setVisibility(View.VISIBLE);
         // Create a fade-in animation with a duration of 750 milliseconds
         Animation fadeInAnimation = new AlphaAnimation(0, 1);
         fadeInAnimation.setDuration(750);
+
+        // Apply the animation to your view
+        qrCodeFab.startAnimation(fadeInAnimation);
+        circleImageView = findViewById(R.id.circleImageView);
 
 
         ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(circleImageView, "scaleX", 0f, 1f);
@@ -213,7 +222,6 @@ public class LauncherActivity extends MyAppCompatActivity implements View.OnClic
 
     private void init() {
         findViewById();
-        initResultLaunchers();
     }
 
     private void initResultLaunchers(){
@@ -232,6 +240,14 @@ public class LauncherActivity extends MyAppCompatActivity implements View.OnClic
                         }
                     }
                 });
+        storagePermissionResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()){
+                app().createApplicationFolder();
+            }else{
+                showToast(getString(R.string.accept_permission));
+                finish();
+            }
+        });
     }
 
     private void findViewById() {
@@ -241,6 +257,7 @@ public class LauncherActivity extends MyAppCompatActivity implements View.OnClic
         termsOfUseTextView = findViewById(R.id.termsOfUseTextView);
         logoView = findViewById(R.id.logo_up);
         circleImageView = findViewById(R.id.circleImageView);
+        qrCodeFab = findViewById(R.id.qrCodeFab);
     }
 
     private void initLogInWith() {
@@ -329,10 +346,12 @@ public class LauncherActivity extends MyAppCompatActivity implements View.OnClic
         languageContainer.setOnClickListener(this);
         termsOfUseTextView.setOnClickListener(this);
         logoView.setOnClickListener(this);
+        qrCodeFab.setOnClickListener(this);
     }
 
     private void initConfig() {
         FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+        requestAppPermissions();
 //        int WRITE_EXTERNAL_STORAGE_Check = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
 //        int CALL_PHONE_Check = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CALL_PHONE);
 //        if(CALL_PHONE_Check != PackageManager.PERMISSION_GRANTED ||
@@ -345,6 +364,29 @@ public class LauncherActivity extends MyAppCompatActivity implements View.OnClic
 //        }
 //        validateTime();
 
+    }
+    private void requestAppPermissions() {
+        requestStoragePermission();
+    }
+
+    private void requestStoragePermission(){
+        // Check if the permissions are already granted
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                // Permission is granted, proceed with the operation
+                app().createApplicationFolder();
+            } else {
+                // Request for MANAGE_EXTERNAL_STORAGE
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                storagePermissionResultLauncher.launch(intent);
+            }
+        } else {
+            // Request WRITE_EXTERNAL_STORAGE for older versions
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSIONS_REQUEST_REQUIRED_PERMS);
+        }
     }
 
     /*
@@ -412,9 +454,7 @@ public class LauncherActivity extends MyAppCompatActivity implements View.OnClic
                                 canShowTuto = true;
                                 logoView.performClick();
                             }else {
-                                if (intentType != null) {
-                                    startMainActivity(intentType);
-                                }
+                                startMainActivity();
                             }
                         }
                     });
@@ -484,6 +524,8 @@ public class LauncherActivity extends MyAppCompatActivity implements View.OnClic
             if(canShowTuto) {
                 prepareAnimationView();
             }
+        }else if(id == R.id.qrCodeFab){
+            IntentUtils.startActivity(this, CompanyScanActivity.class, null);
         }
     }
 
@@ -608,23 +650,27 @@ public class LauncherActivity extends MyAppCompatActivity implements View.OnClic
         super.onPause();
     }
 
-    private void startMainActivity(MohafizMainActivity.IntentType intentType) {
-        if(!loggedIn) {
-            this.intentType = intentType;
-            logInPresenter.loginAsGuest();
-        }else {
-            if(intentType != MohafizMainActivity.IntentType.fromApp){
-                Intent intent = MohafizMainActivity.getIntent(this, MohafizMainActivity.IntentType.home);
-                startActivity(intent);
+    private void startMainActivity() {
+        if (logInPresenter != null && logInPresenter.isUserConnected() && CompanyModel.isCompanyScanned(this)) {
+            if(!loggedIn) {
+                logInPresenter.loginAsGuest();
+            }else {
+                if(opened){
+                    return;
+                }
+                opened = true;
+                IntentUtils.startActivity(this, MohafizMainActivity.getIntent(this));
+                finish();
             }
-            if (intentType != MohafizMainActivity.IntentType.home) {
-                Intent intent = MohafizMainActivity.getIntent(this, intentType);
-                startActivity(intent);
-            }
-            finish();
         }
     }
 
     private void requestSyncAdapters() {
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        startMainActivity();
     }
 }

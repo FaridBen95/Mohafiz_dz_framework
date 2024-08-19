@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            android:orientation="vertical">
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:elevation="@dimen/elevation_low"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:navigationIcon="@drawable/ic_chevron_left_black"
+                app:navigationIconTint="?attr/colorOnSurface"/>
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin_large"
+                android:layout_marginHorizontal="@dimen/margin_large">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        >
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            >
+                            <LinearLayout
+                                android:layout_margin="@dimen/margin_medium"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                >
+
+                                <LinearLayout
+                                    android:layout_marginTop="@dimen/margin_medium"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:weightSum="2"
+                                    >
+                                    <TextView
+                                        android:layout_weight="1"
+                                        android:layout_width="0dip"
+                                        android:layout_gravity="center"
+                                        android:text="@string/customer_label_"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        />
+
+                                    <TextView
+                                        android:id="@+id/customerNameTextView"
+                                        android:layout_width="0dip"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="end"
+                                        android:gravity="end"
+                                        android:layout_marginStart="@dimen/margin_small"
+                                        android:layout_weight="1"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_marginTop="@dimen/margin_medium"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:weightSum="2"
+                                    >
+                                    <TextView
+                                        android:layout_weight="1"
+                                        android:layout_width="0dip"
+                                        android:layout_gravity="center"
+                                        android:text="@string/tour_label_"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        />
+                                    <TextView
+                                        android:layout_weight="1"
+                                        android:layout_width="0dip"
+                                        android:layout_marginStart="@dimen/margin_small"
+                                        android:layout_gravity="center"
+                                        android:gravity="end"
+                                        android:id="@+id/tourTextview"
+                                        android:textStyle="bold"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        />
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_marginTop="@dimen/margin_medium"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:weightSum="2"
+                                    >
+                                    <TextView
+                                        android:layout_weight="1"
+                                        android:layout_width="0dip"
+                                        android:layout_gravity="center"
+                                        android:text="@string/action_label_"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        />
+
+                                    <TextView
+                                        android:id="@+id/actionTextView"
+                                        android:layout_width="0dip"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="end"
+                                        android:gravity="end"
+                                        android:layout_marginStart="@dimen/margin_small"
+                                        android:layout_weight="1"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_marginTop="@dimen/margin_medium"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:weightSum="2"
+                                    >
+                                    <TextView
+                                        android:layout_weight="1"
+                                        android:layout_width="0dip"
+                                        android:layout_gravity="center"
+                                        android:text="@string/distance_label_"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        />
+
+                                    <TextView
+                                        android:id="@+id/distanceTextView"
+                                        android:layout_width="0dip"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="end"
+                                        android:gravity="end"
+                                        android:layout_marginStart="@dimen/margin_small"
+                                        android:layout_weight="1"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_marginTop="@dimen/margin_medium"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:weightSum="2"
+                                    >
+                                    <TextView
+                                        android:layout_weight="1"
+                                        android:layout_width="0dip"
+                                        android:layout_gravity="center"
+                                        android:text="@string/date_label_"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        />
+                                    <TextView
+                                        android:layout_weight="1"
+                                        android:layout_width="0dip"
+                                        android:layout_marginStart="@dimen/margin_small"
+                                        android:layout_gravity="center"
+                                        android:gravity="end"
+                                        android:id="@+id/dateTextView"
+                                        android:textStyle="bold"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                                        />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:id="@+id/attachmentsContainer"
+                            >
+
+                            <TextView
+                                android:layout_marginTop="@dimen/margin_medium"
+                                android:layout_width="wrap_content"
+                                android:layout_gravity="start"
+                                android:text="@string/attachments_label_"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                />
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:layout_marginTop="@dimen/margin_medium"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/recyclerView"
+                                android:layout_marginStart="@dimen/margin_medium"
+                                />
+                        </LinearLayout>
+
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/amountsContainer"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            >
+                            <LinearLayout
+                                android:layout_margin="@dimen/margin_medium"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                >
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:layout_marginTop="@dimen/margin_medium"
+                                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="@string/category_label"
+                                    android:textColorHint="?attr/colorOnSurface"
+                                    app:boxBackgroundColor="?attr/colorSurfaceDim"
+                                    app:boxStrokeColor="?attr/colorOnSurface"
+                                    app:hintTextColor="?attr/colorOnSurface"
+                                    android:id="@+id/noActionCategoryInputLayout"
+                                    >
+                                    <com.MohafizDZ.framework_repository.controls.KeyValueAutoComplete
+                                        android:layout_width="match_parent"
+                                        android:layout_height="@dimen/height_small"
+                                        android:inputType="text"
+                                        android:imeOptions="actionNext"
+                                        android:id="@+id/categoryDropDownView"
+                                        />
+                                </com.google.android.material.textfield.TextInputLayout>
+
+                                <TextView
+                                    android:layout_marginTop="@dimen/margin_medium"
+                                    android:layout_width="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:text="@string/note_label_"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                                    />
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_marginStart="@dimen/margin_small"
+                                    android:gravity="start"
+                                    android:lines="3"
+                                    android:id="@+id/noteTextView"
+                                    android:textStyle="bold"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                                    />
+
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:id="@+id/noteTextInputLayout"
+                                    style="?attr/textInputOutlinedDenseStyle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_small"
+                                    android:textColorHint="?attr/colorOnSurface"
+                                    app:boxBackgroundColor="?attr/colorSurfaceDim"
+                                    app:boxStrokeColor="?attr/colorOnSurface"
+                                    app:hintTextColor="?attr/colorOnSurface"
+                                    app:startIconTint="?attr/colorOnSurface"
+                                    app:endIconMode="clear_text"
+                                    >
+
+                                    <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/noteTextInput"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?attr/colorOnSurface"
+                                        android:textSize="@dimen/text_size_medium"
+                                        android:inputType="textMultiLine"
+                                        android:lines="3"
+                                        />
+                                </com.google.android.material.textfield.TextInputLayout>
+
+
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </LinearLayout>
+
+
+                </RelativeLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addFloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/validateFloatingActionButton"
+        android:layout_marginStart="@dimen/margin_large"
+        android:layout_marginTop="@dimen/margin_large"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:layout_marginEnd="@dimen/margin_large"
+        android:contentDescription="@string/create_account_label"
+        app:srcCompat="@drawable/baseline_add_photo_alternate_24" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/validateFloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@string/create_account_label"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:layout_marginEnd="@dimen/margin_large"
+        app:srcCompat="@drawable/ic_check"/>
+
+</RelativeLayout>

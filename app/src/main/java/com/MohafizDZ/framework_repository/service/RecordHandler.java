@@ -714,11 +714,11 @@ public abstract class RecordHandler {
             }
             String serverId = String.valueOf(lineMap.get(Col.SERVER_ID));
             Date _write_date_obj = MyUtil.createDateObject(writeDates.get(serverId),
-                    MyUtil.DEFAULT_DATE_FORMAT, false);
+                    MyUtil.DEFAULT_DATE_TIME_FORMAT, false);
             String write_date = MyUtil.milliSecToDate(Long.valueOf(
                     lineMap.get("write_date").toString()));
             Date write_date_obj = MyUtil.createDateObject(write_date,
-                    MyUtil.DEFAULT_DATE_FORMAT, false);
+                    MyUtil.DEFAULT_DATE_TIME_FORMAT, false);
             if (write_date_obj.compareTo(_write_date_obj) > 0) {
                 toUpdateOnServerRecords.remove(serverId);
             }
@@ -785,7 +785,7 @@ public abstract class RecordHandler {
                                           String currentDate) {
             String serverId = String.valueOf(serverDocument.get(Col.SERVER_ID));
             Date _write_date_obj = MyUtil.createDateObject(localRow.get("_write_date").toString(),
-                    MyUtil.DEFAULT_DATE_FORMAT, false);
+                    MyUtil.DEFAULT_DATE_TIME_FORMAT, false);
             String write_date = MyUtil.milliSecToDate(Long.valueOf(
                     serverDocument.get("write_date").toString()));
             serverDocument.put("write_date", write_date);
@@ -795,7 +795,7 @@ public abstract class RecordHandler {
             }catch (Exception ignored){}
             serverDocument.put("create_date", MyUtil.milliSecToDate(create_date));
             Date write_date_obj = MyUtil.createDateObject(write_date,
-                    MyUtil.DEFAULT_DATE_FORMAT, false);
+                    MyUtil.DEFAULT_DATE_TIME_FORMAT, false);
             if (write_date_obj.compareTo(_write_date_obj) > 0 || relModel.forceOverwriteOnLocal()) {
                 Values values = relModel.recordToValues(serverDocument);
                 values.put("id", serverId);

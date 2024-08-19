@@ -22,7 +22,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 import com.MohafizDZ.framework_repository.core.MyAppCompatActivity;
 import com.MohafizDZ.framework_repository.datas.MConstants;
 import com.budiyev.android.codescanner.CodeScanner;
@@ -74,6 +74,7 @@ public class CodeScannerActivity extends MyAppCompatActivity implements View.OnC
                 setResult(RESULT_OK, data);
                 CodeScannerActivity.this.finish();
             }else{
+                Log.d(TAG, result.getText());
                 scanListener.onScanCompleted(result.getText());
             }
         });
@@ -134,7 +135,8 @@ public class CodeScannerActivity extends MyAppCompatActivity implements View.OnC
     }
 
     private void loadImage() {
-        if(!tedImagePickerIsShown) {
+        if(!tedImagePickerIsShown) {//todo remove the next line
+            app().createApplicationFolder();
             tedImagePicker.savedDirectoryName(MConstants.applicationImagesFolder).
                     start(uri -> {
                         String decodedText = decodeQRCodeFromUri(CodeScannerActivity.this, uri);

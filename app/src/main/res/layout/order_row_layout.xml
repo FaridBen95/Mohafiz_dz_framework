@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/margin_medium">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_marginVertical="@dimen/margin_small"
+            android:layout_width="4dp"
+            android:layout_gravity="center"
+            android:id="@+id/divider"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/margin_small"
+            />
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_marginVertical="@dimen/margin_small"
+            android:layout_width="4dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:id="@+id/errorDivider"
+            app:dividerColor="?attr/colorError"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/margin_small"
+            />
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_marginVertical="@dimen/margin_small"
+            android:layout_width="4dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:id="@+id/validatedDivider"
+            app:dividerColor="@android:color/holo_green_dark"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/margin_small"
+            />
+
+        <LinearLayout
+            android:id="@+id/customerDetailsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_medium"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    >
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/baseline_rotate_left_24"
+                        android:id="@+id/backOrderImageView"
+                        android:layout_marginEnd="1dp"
+                        />
+                    <TextView
+                        android:id="@+id/orderRefTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        />
+                </LinearLayout>
+                <TextView
+                    android:gravity="end"
+                    android:id="@+id/amountTextView"
+                    android:textColor="?attr/colorPrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+                <TextView
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:id="@+id/customerNameTextView"
+                    android:layout_width="0dip"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    />
+                <TextView
+                    android:gravity="end"
+                    android:id="@+id/dateTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    />
+
+            </LinearLayout>
+
+
+            <TextView
+                android:gravity="end"
+                android:id="@+id/cancelStateTextView"
+                android:textColor="?attr/colorError"
+                android:text="@string/canceled_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                />
+
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

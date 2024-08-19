@@ -10,5 +10,9 @@ public interface BasePresenter {
         void showToast(String msg);
         void showSimpleDialog(String title, String msg);
         boolean inNetwork();
+
+        void toggleLoading(boolean isRefreshing);
+
+        void setToolbarTitle(String title);
     }
 }

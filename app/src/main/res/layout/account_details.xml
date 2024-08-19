@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/splash_screen_no_logo_transparent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="@dimen/elevation_low"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_chevron_left_black"
+        app:navigationIconTint="?attr/colorOnSurface"/>
+
+    <ScrollView
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:fillViewport="true"
+        android:scrollbars="vertical"
+        >
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/margin_xlarge"
+            android:layout_marginBottom="@dimen/margin_xlarge"
+            >
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_above="@id/bottomContainer"
+                android:id="@+id/logInContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                android:elevation="@dimen/elevation_medium"
+                style="@style/Widget.App.CardView"
+                android:layout_marginBottom="@dimen/margin_xxlarge"
+                app:cardPreventCornerOverlap="false"
+                app:strokeWidth="@dimen/default_4dp"
+                app:strokeColor="?attr/colorSurfaceContainerHighest"
+                >
+                <androidx.core.widget.NestedScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    >
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="@dimen/padding_xxlarge"
+                        android:paddingTop="@dimen/padding_xxlarge"
+                        android:paddingBottom="@dimen/padding_xxxlarge">
+                        <TextView
+                            android:id="@+id/welcomeTextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:gravity="start"
+                            android:text="@string/account_details"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="@dimen/text_size_large"
+                            android:textStyle="bold"/>
+                        <TextView
+                            android:id="@+id/descriptionTextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:gravity="start"
+                            android:text="@string/fill_your_informations_in_order_to_continue"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="@dimen/text_size_medium" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_marginTop="@dimen/margin_large"
+                            style="?attr/textInputOutlinedDenseStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/company_name_label"
+                            android:textColorHint="?attr/colorOnSurface"
+                            app:boxBackgroundColor="?attr/colorSurfaceDim"
+                            app:boxStrokeColor="?attr/colorOnSurface"
+                            app:hintTextColor="?attr/colorOnSurface"
+                            app:startIconTint="?attr/colorOnSurface"
+                            android:enabled="false"
+                            >
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/companyNameTextInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/text_size_medium"
+                                android:enabled="false"
+                                android:inputType="textPersonName|textCapWords"
+                                />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_marginTop="@dimen/margin_large"
+                            style="?attr/textInputOutlinedDenseStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/full_name"
+                            android:textColorHint="?attr/colorOnSurface"
+                            app:boxBackgroundColor="?attr/colorSurfaceDim"
+                            app:boxStrokeColor="?attr/colorOnSurface"
+                            app:hintTextColor="?attr/colorOnSurface"
+                            app:startIconTint="?attr/colorOnSurface"
+                            app:endIconMode="clear_text"
+                            >
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/nameTextInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/text_size_medium"
+                                android:inputType="textPersonName|textCapWords"
+                                />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_marginTop="@dimen/margin_large"
+                            style="?attr/textInputOutlinedDenseStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/phone_number"
+                            android:textColorHint="?attr/colorOnSurface"
+                            app:boxBackgroundColor="?attr/colorSurfaceDim"
+                            app:boxStrokeColor="?attr/colorOnSurface"
+                            app:hintTextColor="?attr/colorOnSurface"
+                            app:startIconTint="?attr/colorOnSurface"
+                            app:endIconMode="clear_text"
+                            >
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/phoneTextInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/text_size_medium"
+                                android:inputType="phone"
+                                />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_marginTop="@dimen/margin_large"
+                            style="?attr/textInputOutlinedDenseStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/vehicle_label"
+                            android:textColorHint="?attr/colorOnSurface"
+                            app:boxBackgroundColor="?attr/colorSurfaceDim"
+                            app:boxStrokeColor="?attr/colorOnSurface"
+                            app:hintTextColor="?attr/colorOnSurface"
+                            app:startIconTint="?attr/colorOnSurface"
+                            app:endIconMode="clear_text"
+                            >
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/vehicleTextInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/text_size_medium"
+                                android:inputType="textCapWords"
+                                />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+
+                    </LinearLayout>
+                </androidx.core.widget.NestedScrollView>
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:id="@+id/bottomContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/nextButton"
+                    style="@style/Widget.Material3.Button.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="?attr/colorSurfaceInverse"
+                    android:elevation="@dimen/elevation_low"
+                    android:text="@string/create_account_label"
+                    app:iconTint="?attr/colorOnSurfaceInverse" />
+
+            </LinearLayout>
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

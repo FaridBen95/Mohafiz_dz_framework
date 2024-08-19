@@ -1,5 +1,6 @@
 package com.MohafizDZ.framework_repository;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,7 +11,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.provider.Settings;
@@ -23,10 +26,15 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.MohafizDZ.App;
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.framework_repository.datas.MConstants;
+import com.MohafizDZ.own_distributor.R;
 import com.MohafizDZ.framework_repository.Utils.FileManager;
 import com.MohafizDZ.framework_repository.Utils.IntentUtils;
 import com.MohafizDZ.framework_repository.Utils.MySharedPreferences;
@@ -85,7 +93,8 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
     private View waitingFrameLayout;
     private LowStorageBroadcastReceiver lowStorageBroadcastReceiver;
     private boolean allowStartProjectCode = false;
-    private IntentType intentType;
+    private int userResyncDelay = 15;
+    private ActivityResultLauncher<Intent> storagePermissionResultLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,10 +134,10 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
             lowVersionDialog.show();
             return;
         }
+        initResultLaunchers();
         initConfig();
         init();
         initArgs();
-        initDrawerMenu();
         data = null;
         if(toOpenFragment != null) {
             data = new Bundle();
@@ -171,10 +180,12 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
     }
 
     private void verifyUserConnection() {
+        Log.d(TAG, "verifyUserConnection");
         DataRow currentUserRow = app().getCurrentUser();
         if(app().isConnected()) {
-            boolean userSynced = new UserModel(this).syncWithSuccess(15);
-            if (currentUserRow != null && (App.TEST_MODE || !app().inNetwork() || userSynced)) {
+            int userResyncDelay = App.TEST_MODE? 30 : this.userResyncDelay;
+            boolean userSynced = new UserModel(this).syncWithSuccess(userResyncDelay);
+            if (currentUserRow != null && (!app().inNetwork() || userSynced)) {
                 openNextPage();
             }else{
                 syncUser();
@@ -189,9 +200,9 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         Log.d(TAG, "Start Syncing user");
         cancelLastSync();
         if (App.syncUsingBackgroundServices) {
-            SyncUtilsWithSyncAdapter.requestSync(this, UserModel.AUTHORITY, bundle);
+            SyncUtilsWithSyncAdapter.requestSync(this, UserModel.BASE_AUTHORITY, bundle);
         } else {
-            SyncUtilsInTheAppRun.requestSync(this, UserModel.AUTHORITY, UserModel.class, bundle);
+            SyncUtilsInTheAppRun.requestSync(this, UserModel.BASE_AUTHORITY, UserModel.class, bundle);
         }
     }
 
@@ -355,42 +366,6 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
 //        AutoStartHelper.getInstance().getAutoStartPermission(this);
 //    }
 
-        private void initDrawerMenu() {
-            drawerLayout = (DuoDrawerLayout) findViewById(R.id.drawer_layout);
-            DuoDrawerToggle drawerToggle = new DuoDrawerToggle(this, drawerLayout, toolbar,
-                    R.string.navigation_drawer_open,
-                    R.string.navigation_drawer_close);
-            ArrayList<String> menuOptions = new ArrayList<>();
-            menuOptions.add(getResources().getString(R.string.home));
-//        menuOptions.add(getResources().getString(R.string.my_profile));
-//        menuOptions.add(getResources().getString(R.string.my_orders));
-            menuOptions.add(getResources().getString(R.string.action_settings));
-            menuOptions.add(getResources().getString(R.string.about));
-            duoMenuView = findViewById(R.id.menu);
-            menuAdapter = new MMenuAdapter(menuOptions);
-            menuOptions = new ArrayList<>();
-            menuOptions.add(getResources().getString(R.string.home));
-            menuAdapter.setViewSelected(0, true);
-            menuAdapter = new MMenuAdapter(menuOptions);
-            menuAdapter.setViewSelected(0, true);
-            drawerLayout.setDrawerListener(drawerToggle);
-            drawerToggle.syncState();
-            duoMenuView.setOnMenuClickListener(this);
-        }
-
-        public MMenuAdapter getMenuAdapter() {
-            return menuAdapter;
-        }
-
-        public void setMenuAdapter(MMenuAdapter menuAdapter) {
-            this.menuAdapter = menuAdapter;
-        }
-
-        public void applyMenuAdapter(){
-            DuoMenuView duoMenuView = (DuoMenuView) findViewById(R.id.menu);
-            duoMenuView.setAdapter(getMenuAdapter());
-        }
-
         private void syncModels() {
             //todo sync necessary models
         }
@@ -406,6 +381,8 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
 
         private void initConfig() {
             checkForLowStorage();
+            //todo some of these configs should be added to the launcher activity
+            requestAppPermissions();
             if(App.syncUsingBackgroundServices) {
                 keepServicesInChineseDevices();
                 AutoStartHelper.getInstance().getAutoStartPermission(this);
@@ -419,8 +396,6 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
             }
             FirebaseMessaging.getInstance().setAutoInitEnabled(true);
             // new code
-            allowStartProjectCode = true;
-            app().createApplicationFolder();
             //previous code
         /*
         int WRITE_EXTERNAL_STORAGE_Check = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -456,6 +431,31 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
             };
         }
 
+
+        private void requestAppPermissions() {
+            requestStoragePermission();
+        }
+
+        private void requestStoragePermission(){
+            // Check if the permissions are already granted
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager()) {
+                    // Permission is granted, proceed with the operation
+                    app().createApplicationFolder();
+                    allowStartProjectCode = true;
+                } else {
+                    // Request for MANAGE_EXTERNAL_STORAGE
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                    intent.setData(Uri.parse("package:" + getPackageName()));
+                    storagePermissionResultLauncher.launch(intent);
+                }
+            } else {
+                // Request WRITE_EXTERNAL_STORAGE for older versions
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        PERMISSIONS_REQUEST_REQUIRED_PERMS);
+            }
+        }
         private void showPermissionInfoDialog() {
 //        SweetAlertDialog dialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
 //        dialog.setTitleText("Permissions");
@@ -537,11 +537,11 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
                 Bundle data = new Bundle();
                 data.putString("from", TAG);
                 if(App.syncUsingBackgroundServices) {
-                    SyncUtilsWithSyncAdapter.requestSync(this, UserModel.AUTHORITY, data);
+                    SyncUtilsWithSyncAdapter.requestSync(this, UserModel.BASE_AUTHORITY, data);
                     SyncUtilsWithSyncAdapter.requestSync(this, ConfigurationModel.AUTHORITY, data);
                     waitForFirstSync = true;
                 }else{
-                    SyncUtilsInTheAppRun.requestSync(this, UserModel.AUTHORITY, UserModel.class, data);
+                    SyncUtilsInTheAppRun.requestSync(this, UserModel.BASE_AUTHORITY, UserModel.class, data);
                     SyncUtilsInTheAppRun.requestSync(this, ConfigurationModel.AUTHORITY, ConfigurationModel.class, data);
                 }
             }
@@ -555,8 +555,6 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
             Bundle data = getIntent().getExtras();
             if(data != null){
                 toOpenFragment = data.containsKey(FRAGMENT_NAME)? data.getString(FRAGMENT_NAME) : null;
-                String intentTypeStr = data.containsKey(INTENT_TYPE_KEY)? data.getString(INTENT_TYPE_KEY) : IntentType.home.name();
-                intentType = IntentType.valueOf(intentTypeStr);
             }
         }
 
@@ -565,6 +563,18 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
 
         private void init(){
             progressDialog = MyUtil.getProgressDialog(this);
+        }
+
+        private void initResultLaunchers(){
+            storagePermissionResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()){
+                    app().createApplicationFolder();
+                    startProjectCode();
+                }else{
+                    showToast(getString(R.string.accept_permission));
+                    finish();
+                }
+            });
         }
 
         @Override
@@ -593,7 +603,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
 
         @Override
         public void onRequestPermissionsResult(int requestCode,
-        String permissions[], int[] grantResults) {
+        String[] permissions, int[] grantResults) {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             switch (requestCode) {
                 case PERMISSIONS_REQUEST_REQUIRED_PERMS: {
@@ -601,6 +611,7 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
                     allowStartProjectCode = true;
                     for (int i = 0; i < grantResults.length; i++) {
                         if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            Log.d(TAG, permissions[i] + " not granted");
                             allowStartProjectCode = false;
                             Toast.makeText(this, getString(R.string.accept_permission), Toast.LENGTH_LONG).show();
                             finish();
@@ -676,13 +687,13 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
             String from = data.containsKey("from") ? data.getString("from") : "";
             if (from != null) {
                 if (from.equals(MohafizMainActivity.TAG) && !opened) {
-                    if(model.getModelName().equals("user") || model.getModelName().equals("tag") || model.getModelName().equals("shareable_user")
+                    if(model.getModelName().equals("user")
                             || model.getModelName().equals("global_configuration")){
                         if (!syncedModels.contains(model.getModelName())) {
                             syncedModels.add(model.getModelName());
                         }
                     }
-                    if((waitForFirstSync && syncedModels.size() == 4) || (!waitForFirstSync && syncedModels.size() >= 1 && syncedModels.contains("user"))) {
+                    if((waitForFirstSync && syncedModels.size() == 2) || (!waitForFirstSync && syncedModels.size() >= 1 && syncedModels.contains("user"))) {
                         syncedModels.clear();
                         if(App.syncUsingBackgroundServices) {
                             if (waitForFirstSync) {
@@ -697,14 +708,21 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
         }
 
         private void openNextPage() {
-            boolean userSynced = new UserModel(MohafizMainActivity.this).syncWithSuccess(15);
-            if(App.TEST_MODE || !app().inNetwork() || userSynced) {
+            if(opened){
+                return;
+            }
+            Log.d(TAG, "openNextPage" + opened);
+            int userResyncDelay = App.TEST_MODE? 30 : this.userResyncDelay;
+            boolean userSynced = new UserModel(MohafizMainActivity.this).syncWithSuccess(userResyncDelay);
+            if(!app().inNetwork() || userSynced) {
                 DataRow currentUserRow = app().getCurrentUser();
                 if (currentUserRow == null ||
                         (!currentUserRow.getBoolean("is_anonymous")
-                                && (!currentUserRow.getBoolean("_is_active") || !currentUserRow.getBoolean("signed_from_mobile")))) {
+                                && (!currentUserRow.getBoolean("_is_active")))) {
+                    opened = true;
                     StartClassHelper.openSignUpActivity(this);
                 }else{
+                    opened = true;
                     StartClassHelper.openProjectMainActivity(this);
                 }
             }else{//todo maybe i need to force finish if the user isn't synced
@@ -754,14 +772,12 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
             super.onPause();
         }
 
-        public static Intent getIntent(Context context, IntentType intentType){
+        public static Intent getIntent(Context context){
             Intent intent = new Intent(context, MohafizMainActivity.class);
             Bundle data = new Bundle();
-            data.putString(INTENT_TYPE_KEY, intentType.name());
             intent.putExtras(data);
             return intent;
         }
 
-        public enum IntentType{home, marketplace, craftMen, customerService, search, qrcode, fromApp}
     }
 

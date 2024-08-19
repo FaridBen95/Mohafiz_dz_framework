@@ -100,6 +100,18 @@
                     android:src="@drawable/ic_circle_border_orange_white"
                     android:visibility="invisible" />
 
+                <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/qrCodeFab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:elevation="2dp"
+                    android:src="@drawable/ic_baseline_qr_code_scanner_24"
+                    android:visibility="invisible"
+                    app:fab_colorNormal="?attr/colorPrimaryContainer"
+                    app:fab_colorPressed="?attr/colorPrimaryContainer"
+                    app:fab_size="normal" />
+
 
             </RelativeLayout>
 

@@ -36,7 +36,7 @@ public class FirestoreSyncDownBridge implements FirestoreSyncDownAdapter.Firesto
     }
 
     private void init() {
-        firestoreSyncDownAdapter = new FirestoreSyncDownAdapter(limit, collectionName);
+        firestoreSyncDownAdapter = new FirestoreSyncDownAdapter(limit, collectionName, model.getDocumentReference());
         firestoreSyncDownAdapter.setFirestoreListener(this);
     }
 

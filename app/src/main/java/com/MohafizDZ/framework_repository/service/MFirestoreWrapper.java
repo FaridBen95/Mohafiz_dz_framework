@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.MohafizDZ.framework_repository.core.Col;
+import com.MohafizDZ.framework_repository.core.Model;
 import com.MohafizDZ.framework_repository.datas.MConstants;
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -230,14 +231,19 @@ public class MFirestoreWrapper {
         return queryBuilder.toString();
     }
 
-    public String generateBatchWriteUpdateQuery(String modelName, Map<String, Map<String, Object>> records) {
+    public String generateBatchWriteUpdateQuery(Model model, Map<String, Map<String, Object>> records) {
         String startQuery = "{\n" +
                 "  \"writes\": [\n";
         String endQuery = "  ]\n" +
                 "}";
         StringBuilder queryBuilder = new StringBuilder(startQuery);
         for(Map<String, Object> record : records.values()){
-            String path = "projects/" + MConstants.PROJECT_ID+"/databases/(default)/documents/"+ modelName+"/"+record.get(Col.SERVER_ID);
+            String collectionPath = model.getCollectionPath();
+            String path = "projects/" + MConstants.PROJECT_ID+"/databases/(default)/documents";
+            if(collectionPath != null){
+                path += model.getCollectionPath();
+            }
+            path += "/" + model.getModelName() + "/"+record.get(Col.SERVER_ID);;
             queryBuilder.append("    {\n");
             queryBuilder.append("      \"update\": {\n");
             queryBuilder.append("        \"name\": \"").append(path).append("\",\n");

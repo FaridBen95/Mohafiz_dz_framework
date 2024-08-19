@@ -29,7 +29,7 @@ import com.MohafizDZ.framework_repository.service.OrderByLine;
 import com.MohafizDZ.framework_repository.service.PagingSyncModel;
 import com.MohafizDZ.framework_repository.service.SyncModel;
 import com.MohafizDZ.framework_repository.service.SyncingDomain;
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 
 import java.util.ArrayList;
 import java.util.List;

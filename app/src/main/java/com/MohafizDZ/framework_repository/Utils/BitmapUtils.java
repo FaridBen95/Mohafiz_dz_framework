@@ -36,7 +36,9 @@ import android.net.Uri;
 import android.os.Environment;
 import android.text.TextPaint;
 import android.util.Base64;
-import com.MohafizDZ.empty_project.R;
+import android.util.Log;
+
+import com.MohafizDZ.own_distributor.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -47,6 +49,7 @@ import java.util.Locale;
 import id.zelory.compressor.Compressor;
 
 public class BitmapUtils {
+    private static final String TAG = BitmapUtils.class.getSimpleName();
     public static final int THUMBNAIL_SIZE = 500;
 
     /**
@@ -114,11 +117,13 @@ public class BitmapUtils {
      * @param base64  the base64
      * @return the bitmap attachement
      */
+    public static Bitmap getBitmapImage(String base64) {
+        return getBitmapImage(null, base64);
+    }
     public static Bitmap getBitmapImage(Context context, String base64) {
         byte[] imageAsBytes = Base64.decode(base64.getBytes(), 5);
         return BitmapFactory.decodeByteArray(imageAsBytes, 0,
                 imageAsBytes.length);
-
     }
 
     public static Bitmap getAlphabetImage(Context context, String content) {
@@ -165,7 +170,7 @@ public class BitmapUtils {
     }
 
     public static Typeface boldFont() {
-        return Typeface.create("sans-serif-condensed", 0);
+        return Typeface.create("sans-serif-condensed", Typeface.NORMAL);
     }
 
     public static File getCompressedImage(Context context, String newImage, int maxWidth, int maxHeight, int quality) {
@@ -226,6 +231,49 @@ public class BitmapUtils {
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
         return bitmap;
+    }
+
+    public static Bitmap getBitmapFromUri(Context context, Uri imageUri){
+        try {
+            // Step 1: Retrieve InputStream from the URI
+            ContentResolver contentResolver = context.getContentResolver();
+            InputStream inputStream = contentResolver.openInputStream(imageUri);
+
+            // Step 2: Create BitmapFactory.Options and decodeStream to get image dimensions
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(inputStream, null, options);
+            inputStream.close();
+
+            // Step 3: Calculate sample size
+            int targetSize = 1024; // specify your desired target size
+            int width = options.outWidth;
+            int height = options.outHeight;
+
+            int sampleSize = 1;
+            if (width > targetSize || height > targetSize) {
+                final int halfWidth = width / 2;
+                final int halfHeight = height / 2;
+                while ((halfWidth / sampleSize) >= targetSize && (halfHeight / sampleSize) >= targetSize) {
+                    sampleSize *= 2;
+                }
+            }
+
+            // Step 4: Reset InputStream and update BitmapFactory.Options with sample size
+            inputStream = contentResolver.openInputStream(imageUri);
+            options.inSampleSize = sampleSize;
+            options.inJustDecodeBounds = false;
+
+            // Step 5: Decode the input stream into a Bitmap with the desired sample size
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+            inputStream.close();
+
+            // Step 6: Decode the QR code from the Bitmap
+            return bitmap;
+        } catch (IOException e) {
+            Log.e(TAG, "Error decoding QR code from URI", e);
+            return null;
+        }
     }
 
 }

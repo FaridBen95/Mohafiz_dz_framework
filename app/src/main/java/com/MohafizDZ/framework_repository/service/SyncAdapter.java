@@ -190,14 +190,18 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                             Boolean allowDeleteInLocal, Boolean allowDeleteOnServer,
                             Boolean canSyncUp, Boolean canSyncUpRelations, Boolean allowRemoveOutOfDomain, Integer limit,
                             String likeValue, List<String> likeFields, OrderBy orderBy) {
+        Log.d(TAG, "perform sync");
         if(app.forceAutomaticDate() && !app.dateIsCorrect()){
+            Log.d(TAG, "incorrect date");
             return;
         }
         if (model.isOnline()) {
+            Log.d(TAG, "mode is online " + model.getModelName());
             authorizationToken = sharedPref.getString(MUser.AUTH_TOKEN_KEY, null);
             authorizationTokenWriteDate = sharedPref.getString(MUser.AUTH_TOKEN_WRITE_DATE_KEY, null);
             FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
             if(firebaseUser != null && (app).inNetwork() && authorizationExpired()){
+                Log.d(TAG, "authorization expired");
                 firebaseUser.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
                     @Override
                     public void onComplete(@NonNull Task<GetTokenResult> task) {
@@ -205,6 +209,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                             MySharedPreferences mySharedPreferences = new MySharedPreferences(context.getApplicationContext());
                             String lastToken = mySharedPreferences.getString(MUser.AUTH_TOKEN_KEY, "");
                             String currentToken = task.getResult().getToken();
+                            Log.d(TAG, "id token complete " + currentToken);
                             if(!lastToken.equals(currentToken)) {
                                 mySharedPreferences.putString(MUser.AUTH_TOKEN_KEY, currentToken);
                                 authorizationToken = currentToken;
@@ -246,6 +251,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                 syncingDomain = customDomain;
             }
             try {
+                Log.d(TAG, syncingDomain.getSelection());
                 canSyncDown = canSyncDown == null? model.allowSyncDown() : canSyncDown;
                 if(canSyncDown && syncingDomain != null) {
                     syncAndUpdateInLocal(syncingDomain, limit, likeValue, likeFields, orderBy);
@@ -264,6 +270,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                 }
                 canSyncUp = canSyncUp == null? model.allowSyncUp() : canSyncUp;
                 if(canSyncUp) {
+                    Log.d(TAG, "syncing up");
                     performSyncUp();
                 }
                 canSyncUpRelations = canSyncUpRelations == null? model.canSyncUpRelations() : canSyncUpRelations;
@@ -278,6 +285,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                     recordHandler.saveSyncingDate(model.getModelName(), recordHandler.savingDate);
                 }
 
+                Log.d(TAG, "on sync finished");
                 onSyncFinished();
                 model.onSyncFinished();
             } catch (Exception e) {
@@ -293,8 +301,8 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
     }
 
     private boolean authorizationExpired() {
-        Date before56Min = MyUtil.createDateObject(MyUtil.getDateBeforeMins(56), MyUtil.DEFAULT_DATE_FORMAT, false);
-        Date lastWriteDate = MyUtil.createDateObject(authorizationTokenWriteDate, MyUtil.DEFAULT_DATE_FORMAT, false);
+        Date before56Min = MyUtil.createDateObject(MyUtil.getDateBeforeMins(56), MyUtil.DEFAULT_DATE_TIME_FORMAT, false);
+        Date lastWriteDate = MyUtil.createDateObject(authorizationTokenWriteDate, MyUtil.DEFAULT_DATE_TIME_FORMAT, false);
         return authorizationToken == null || lastWriteDate == null || before56Min.compareTo(lastWriteDate) >= 0;
     }
 
@@ -333,7 +341,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                 postData = firestoreWrapper.generateReadQuery(model.getModelName(), filterObject, currentLimit, offset, likeFields, likeValue, orderBy);
             }
             MFirestoreResponse response = new MFirestoreResponse();
-            firestoreWrapper.newJSONPOSTRequest(MFirestoreWrapper.RUN_QUERY_URL, postData,
+            firestoreWrapper.newJSONPOSTRequest(generateRunQueryUrl(model), postData,
                     authorizationToken, response);
             if(response.containsError()){
                 Log.d(TAG, "Error : " + response.getError().toString());
@@ -390,7 +398,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                         String postData = firestoreWrapper.generateReadQuery(relModel.getModelName(),
                                 filterObject);
                         MFirestoreResponse response = new MFirestoreResponse();
-                        firestoreWrapper.newJSONPOSTRequest(MFirestoreWrapper.RUN_QUERY_URL, postData,
+                        firestoreWrapper.newJSONPOSTRequest(generateRunQueryUrl(model), postData,
                                 authorizationToken, response);
                         if(response.containsError()){
                             Log.d(TAG, "Error : " + response.getError().toString());
@@ -434,7 +442,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                         String postData = firestoreWrapper.generateReadQuery(relModel.getModelName(),
                                 filterObject);
                         MFirestoreResponse response = new MFirestoreResponse();
-                        firestoreWrapper.newJSONPOSTRequest(MFirestoreWrapper.RUN_QUERY_URL, postData,
+                        firestoreWrapper.newJSONPOSTRequest(generateRunQueryUrl(model), postData,
                                 authorizationToken, response);
                         if(response.containsError()){
                             Log.d(TAG, "Error : " + response.getError().toString());
@@ -468,7 +476,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
         recordHandler.reset();
         String postData = firestoreWrapper.generateReadQuery(deletionModelName, filterObject);
         MFirestoreResponse response = new MFirestoreResponse();
-        firestoreWrapper.newJSONPOSTRequest(MFirestoreWrapper.RUN_QUERY_URL, postData,
+        firestoreWrapper.newJSONPOSTRequest(generateRunQueryUrl(model), postData,
                 authorizationToken, response);
         if(response.containsError()){
             Log.d(TAG, "Error : " + response.getError().toString());
@@ -509,7 +517,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                 ids.add(row.getString(Col.SERVER_ID));
             }
         }
-        String url = MFirestoreWrapper.COMMIT_UPDATES_URL;
+        String url = generateCommitUpdateUrl(model);
         String postData = firestoreWrapper.generateBatchWriteDeleteQuery(model.getModelName(), ids);
         MFirestoreResponse response = new MFirestoreResponse();
         firestoreWrapper.newJSONBatchWriteRequest(url, postData, authorizationToken
@@ -534,7 +542,7 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
             SyncingDomain domain = new SyncingDomain();
             if(ids.size() != 0) {
                 domain = domain.addWhereInOperation(Col.SERVER_ID, ids, false);
-                String url = MFirestoreWrapper.RUN_QUERY_URL;
+                String url = generateRunQueryUrl(model);
                 for (FilterObject query : domain.getFilterObjects()) {
                     String postData = firestoreWrapper.generateReadQuery(model.getModelName(), query);
                     MFirestoreResponse response = new MFirestoreResponse();
@@ -545,13 +553,15 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                         throw new Exception("runQuery returns error " + response.getError());
                     } else {
                         toUpdateOnServerRecords = recordHandler.checkWriteDate(response.getResponse(), toUpdateOnServerRecords, writeDates);
+                        Log.d(TAG, "to update records size "+ toUpdateOnServerRecords.size());
                     }
                 }
             }
         }
         if (toUpdateOnServerRecords.size() != 0) {
-            String url = MFirestoreWrapper.COMMIT_UPDATES_URL;
-            String postData = firestoreWrapper.generateBatchWriteUpdateQuery(model.getModelName(), toUpdateOnServerRecords);
+            String url = generateCommitUpdateUrl(model);
+            String postData = firestoreWrapper.generateBatchWriteUpdateQuery(model, toUpdateOnServerRecords);
+            Log.d(TAG," post data " + postData);
             MFirestoreResponse response = new MFirestoreResponse();
             firestoreWrapper.newJSONBatchWriteRequest(url, postData, authorizationToken
                     , response);
@@ -563,9 +573,28 @@ public class SyncAdapter extends MAbstractThreadedSyncAdapter {
                 for (Map<String, Object> record : toUpdateOnServerRecords.values()) {
                     updatedServerIds.add(String.valueOf(record.get(Col.SERVER_ID)));
                 }
+                Log.d(TAG, "updated server ids size " + updatedServerIds.size());
                 recordHandler.recordsUpdatedOnServer(updatedServerIds);
             }
         }
+    }
+
+    private String generateRunQueryUrl(Model model){
+        String collectionPath = model.getCollectionPath();
+        String path = MFirestoreWrapper.RUN_QUERY_URL;
+        if(collectionPath != null){
+            path = path.replace("/:runQuery", collectionPath + "/:runQuery");
+        }
+        return path;
+    }
+
+    private String generateCommitUpdateUrl(Model model){
+//        String path = MFirestoreWrapper.COMMIT_UPDATES_URL;
+//        String collectionPath = model.getCollectionPath();
+//        if(collectionPath != null){
+//            path = path.replace(":commit", collectionPath + ":commit");
+//        }
+        return MFirestoreWrapper.COMMIT_UPDATES_URL;
     }
 
     private void syncUpRelations() {

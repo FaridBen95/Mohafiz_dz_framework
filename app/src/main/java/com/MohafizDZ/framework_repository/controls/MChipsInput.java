@@ -3,7 +3,7 @@ package com.MohafizDZ.framework_repository.controls;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 import com.pchmn.materialchips.ChipsInput;
 import com.pchmn.materialchips.views.ChipsInputEditText;
 

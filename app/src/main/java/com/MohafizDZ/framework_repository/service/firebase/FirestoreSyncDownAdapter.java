@@ -11,6 +11,7 @@ import com.MohafizDZ.framework_repository.service.FirestoreSingleton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class FirestoreSyncDownAdapter {
     private FirebaseFirestore firebaseFirestore;
     private Integer limit;
+    private final DocumentReference modelDocumentReference;
     private String collectionName;
     private FirestoreListener firestoreListener;
 
@@ -30,9 +32,10 @@ public class FirestoreSyncDownAdapter {
         this.firestoreListener = firestoreListener;
     }
 
-    public FirestoreSyncDownAdapter(Integer limit, String collectionName) {
+    public FirestoreSyncDownAdapter(Integer limit, String collectionName, DocumentReference modelDocumentReference) {
         this.limit = limit;
         this.collectionName = collectionName;
+        this.modelDocumentReference = modelDocumentReference;
         init();
     }
 
@@ -45,7 +48,8 @@ public class FirestoreSyncDownAdapter {
     }
 
     public void sync(boolean nextPage){
-        Query query = firebaseFirestore.collection(collectionName);
+        Query query = modelDocumentReference == null? firebaseFirestore.collection(collectionName):
+                modelDocumentReference.collection(collectionName);
         if(firestoreListener != null && firestoreListener.orderByWriteDate()){
             query = query.orderBy("write_date", Query.Direction.DESCENDING);
         }else if (firestoreListener != null && firestoreListener.setOrderByField() != null){

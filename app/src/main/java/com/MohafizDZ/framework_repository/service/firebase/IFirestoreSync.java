@@ -26,4 +26,10 @@ public interface IFirestoreSync {
     interface SyncBridgeListener{
         void sync(List<DataRow> rows, FirestoreSyncUpBridge.SyncListener syncListener);
     }
+
+    interface SyncDownListener{
+        void onException(Exception exception);
+
+        void onResult(List<Map<String, Object>> data);
+    }
 }

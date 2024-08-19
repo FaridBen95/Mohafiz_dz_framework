@@ -21,7 +21,7 @@ public class FirestoreSingleton {
                 firestoreSingleton = FirebaseFirestore.getInstance();
                 FirebaseFirestore.setLoggingEnabled(false);
                 FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                        .setPersistenceEnabled(false)
+//                        .setPersistenceEnabled(false)
                         .build();
                 firestoreSingleton.setFirestoreSettings(settings);
             }catch (Exception ignored){}

@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Filter;
 
 import androidx.annotation.NonNull;
 
@@ -31,6 +32,12 @@ public class KeyValueAutoComplete extends AutoCompleteTextView implements TextWa
     private CustomArrayAdapter adapter;
     private SelectionListener selectionListener;
     private boolean initialized;
+    private String lastCurrentKey;
+    private boolean filterBasedOnSelection = true;
+
+    public void setFilterBasedOnSelection(boolean filterBasedOnSelection) {
+        this.filterBasedOnSelection = filterBasedOnSelection;
+    }
 
     public KeyValueAutoComplete(Context context) {
         super(context);
@@ -79,6 +86,12 @@ public class KeyValueAutoComplete extends AutoCompleteTextView implements TextWa
         this.hasDefaultValue = hasDefaultValue;
 
         ready = true;
+
+        if(hasDefaultValue) {
+            mNamesList.add(defaultValue);
+            mKeysList.add(DEFAULT_KEY);
+        }
+
         Iterator<Map.Entry<String, String>> it = keyValMap.entrySet().iterator();
         this.keyValMap.putAll(keyValMap);
         while (it.hasNext()) {
@@ -87,16 +100,11 @@ public class KeyValueAutoComplete extends AutoCompleteTextView implements TextWa
             mKeysList.add(pairs.getKey());
             it.remove(); // avoids a ConcurrentModificationException
         }
-
-        if(hasDefaultValue) {
-            mNamesList.add(defaultValue);
-            mKeysList.add(DEFAULT_KEY);
-        }else{
+        if(!hasDefaultValue){
             defaultValue = mNamesList.get(0);
             defaultKey = mKeysList.get(0);
         }
-
-        adapter = new CustomArrayAdapter(context, mNamesList, mKeysList);
+        adapter = new CustomArrayAdapter(context, mNamesList, mKeysList, filterBasedOnSelection);
         adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         setAdapter(adapter);
     }
@@ -109,7 +117,7 @@ public class KeyValueAutoComplete extends AutoCompleteTextView implements TextWa
         if (ready) {
             return getExactValue? keyValMap.get(getCurrentKey()) : getSelectedItem();
         } else {
-            return DEFAULT_KEY;
+            return defaultValue;
         }
     }
 
@@ -148,10 +156,9 @@ public class KeyValueAutoComplete extends AutoCompleteTextView implements TextWa
         }
         final String currentKey = getCurrentKey();
         final String currentValue = getCurrentValue();
-        if(currentKey != null && !currentKey.equals(DEFAULT_KEY)){
+        if(currentKey != null && !currentKey.equals(lastCurrentKey)){
             selectionListener.onSelect(this, currentKey, currentValue, true);
-        }else{
-            selectionListener.onSelect(this, DEFAULT_KEY, defaultValue, true);
+            lastCurrentKey = currentKey;
         }
     }
 
@@ -164,21 +171,51 @@ public class KeyValueAutoComplete extends AutoCompleteTextView implements TextWa
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         String currentKey = getCurrentKey();
         String currentValue = getCurrentValue();
-        if(currentKey != null && !currentKey.equals(KeyValueAutoComplete.DEFAULT_KEY)) {
+        if(currentKey != null && !currentKey.equals(lastCurrentKey)) {
             selectionListener.onSelect(this, currentKey, currentValue, false);
-        }else{
-            selectionListener.onSelect(this, DEFAULT_KEY, defaultValue, false);
         }
     }
 
     private static class CustomArrayAdapter extends ArrayAdapter<String>{
         private final Map<String, String> valuesToKeysMap;
+        private final ArrayList<String> items;
+        private final boolean filterBasedOnSelection;
 
-        public CustomArrayAdapter(@NonNull Context context, ArrayList<String> namesList, ArrayList<String> keysList) {
+        public CustomArrayAdapter(@NonNull Context context, ArrayList<String> namesList, ArrayList<String> keysList, boolean filterBasedOnSelection) {
             super(context, android.R.layout.simple_dropdown_item_1line, namesList);
+            this.items = namesList;
+            this.filterBasedOnSelection = filterBasedOnSelection;
             valuesToKeysMap = new HashMap<>();
             for(int i = 0; i < namesList.size(); i++){
                 valuesToKeysMap.put(namesList.get(i).toLowerCase().trim(), keysList.get(i));
+            }
+        }
+
+        @NonNull
+        @Override
+        public Filter getFilter() {
+            if(filterBasedOnSelection){
+                return super.getFilter();
+            }else {
+                return new Filter() {
+                    @Override
+                    protected FilterResults performFiltering(CharSequence constraint) {
+                        FilterResults filterResults = new FilterResults();
+                        filterResults.values = items;
+                        filterResults.count = items.size();
+                        return filterResults;
+                    }
+
+                    @Override
+                    protected void publishResults(CharSequence constraint, FilterResults results) {
+                        notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public CharSequence convertResultToString(Object resultValue) {
+                        return resultValue.toString();
+                    }
+                };
             }
         }
 

@@ -20,6 +20,7 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.multidex.MultiDex;
@@ -38,7 +39,7 @@ import com.MohafizDZ.framework_repository.core.MySqlite;
 import com.MohafizDZ.framework_repository.core.SQLitesListSingleton;
 import com.MohafizDZ.framework_repository.core.Values;
 import com.MohafizDZ.framework_repository.datas.MConstants;
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 import com.MohafizDZ.project.models.UserModel;
 import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -63,7 +64,7 @@ import java.util.HashMap;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class App extends MultiDexApplication {
-    public static final boolean TEST_MODE = false;
+    public static final boolean TEST_MODE = true;
     private static final String TAG = App.class.getSimpleName();
     public static final String CATEGORY_1 = "HIGH_CATEGORY";
     public static final String CATEGORY_2 = "LOW_CATEGORY";
@@ -243,19 +244,34 @@ public class App extends MultiDexApplication {
 
     public DataRow getCurrentUser(){
         try{
-            String user_id = firebaseAuth.getCurrentUser().getUid();
+            final FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+            boolean isAnonymous = currentUser.isAnonymous();
+
+            String user_id = currentUser.getUid();
             Log.d("user_id", user_id);
             UserModel userModel = new UserModel(this);
             DataRow userRow = userModel.browse(" firebase_user_id = ? ",
                     new String[]{user_id});
-            if(userRow == null || !userRow.getBoolean("subscribed_to_fcm")){
-                subscribeToUserIdTopic(userRow);
+            if(userRow != null) {
+                if (!userRow.getBoolean("subscribed_to_fcm")) {
+                    subscribeToUserIdTopic(userRow);
+                    Values values = new Values();
+                    values.put("subscribed_to_fcm", 1);
+                    values.put("_is_updated", userRow.getBoolean("_is_updated") ? 1 : 0);
+                    userModel.update(userRow.getInteger(Col.ROWID), values);
+                }
+                userRow = userModel.getRelations(userRow);
+            }else if(isAnonymous){
                 Values values = new Values();
-                values.put("subscribed_to_fcm", 1);
-                values.put("_is_updated", userRow.getBoolean("_is_updated")? 1 : 0);
-                userModel.update(userRow.getInteger(Col.ROWID), values);
+                String name = currentUser.getDisplayName();
+                name = name == null? "" : name;
+                values.put("name", name);
+                values.put("is_anonymous", 1);
+                values.put("email", "anonymous");
+                values.put("firebase_user_id", currentUser.getUid());
+                values.put("_is_active", 0);
+                userRow = userModel.insertAndBrowse(values);
             }
-            userRow = userModel.getRelations(userRow);
             return userRow;
         }catch (Exception e){
             e.printStackTrace();
@@ -357,20 +373,25 @@ public class App extends MultiDexApplication {
     }
 
     public void createApplicationFolder() {
-        MConstants.applicationFolder = Environment.getExternalStorageDirectory().getPath() + "/MohafizDZ/"+ App.getApplicationName(this) + "/";
-        MConstants.applicationImagesFolder = Environment.getExternalStorageDirectory().getPath() + "/MohafizDZ/"+ App.getApplicationName(this) + "/";
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
-            MConstants.applicationImagesFolder= getExternalFilesDir
-                    (Environment.DIRECTORY_DCIM)+"/MohafizDZ/"+ App.getApplicationName(this);
+        String mainFolder = Environment.getExternalStorageDirectory().getPath()+  "/Documents/MohafizDZ/";
+        MConstants.applicationFolder = App.getApplicationName(this) + "/";
+        MConstants.applicationImagesFolder = App.getApplicationName(this) + "/";
+        String fullImagesFolderPath = mainFolder + MConstants.applicationImagesFolder;
+        String fullAppFolderPath = mainFolder + MConstants.applicationFolder;
+        File mainDirectory = new File(mainFolder);
+        File appDirectory = new File(fullImagesFolderPath);
+        File appImagesDirectory = new File(fullAppFolderPath);
+        if(!mainDirectory.exists()){
+            mainDirectory.mkdir();
+            appDirectory.mkdir();
+            appImagesDirectory.mkdir();
+            return;
         }
-        else
-        {
-            MConstants.applicationImagesFolder = Environment.getExternalStorageDirectory().getPath() + "/MohafizDZ/"+ App.getApplicationName(this) + "/";
+        if(!appDirectory.exists()){
+            appDirectory.mkdir();
         }
-        File directory = new File(Environment.getExternalStorageDirectory().getPath()+  "/MohafizDZ");
-        if(!directory.exists()){
-            directory.mkdir();
-            new File(MConstants.applicationFolder).mkdir();
+        if(!appImagesDirectory.exists()){
+            appImagesDirectory.mkdir();
         }
     }
 

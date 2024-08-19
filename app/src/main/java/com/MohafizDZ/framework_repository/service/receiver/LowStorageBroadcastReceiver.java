@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 
 public class LowStorageBroadcastReceiver extends BroadcastReceiver {
     public static final String TAG = LowStorageBroadcastReceiver.class.getSimpleName();

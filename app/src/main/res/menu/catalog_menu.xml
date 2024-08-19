@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="@string/empty_label"
+        app:showAsAction="ifRoom"
+        android:id="@+id/menuEmpty"
+        android:icon="@drawable/baseline_delete_24"
+        />
+    <item
+        android:title="@string/scan_label"
+        app:showAsAction="ifRoom"
+        android:id="@+id/menuScan"
+        android:icon="@drawable/ic_baseline_qr_code_scanner_24"
+        />
+    <item
+        android:title="@string/filters_label"
+        android:icon="@drawable/baseline_filter_alt_24"
+        android:id="@+id/menuFilter"
+        app:showAsAction="always"
+        />
+</menu>
+
+

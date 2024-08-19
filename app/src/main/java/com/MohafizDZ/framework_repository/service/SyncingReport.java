@@ -3,7 +3,7 @@ package com.MohafizDZ.framework_repository.service;
 import android.content.Context;
 import android.net.Uri;
 
-import com.MohafizDZ.empty_project.BuildConfig;
+import com.MohafizDZ.own_distributor.BuildConfig;
 import com.MohafizDZ.framework_repository.core.Col;
 import com.MohafizDZ.framework_repository.core.Model;
 

@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeMenuItem"
+        android:enabled="true"
+        android:icon="@drawable/home_icon_drawable"
+        android:title="@string/home"/>
+    <item
+        android:id="@+id/catalogMenuItem"
+        android:enabled="true"
+        android:icon="@drawable/store_icon_drawable"
+        android:title="@string/catalog_label"/>
+    <item
+        android:id="@+id/expensesMenuItem"
+        android:enabled="true"
+        android:icon="@drawable/baseline_monetization_on_24"
+        android:title="@string/expenses_label"/>
+    <item
+        android:id="@+id/dashboardMenuItem"
+        android:enabled="true"
+        android:icon="@drawable/baseline_dashboard_24"
+        android:title="@string/dashboard_label"/>
+</menu>

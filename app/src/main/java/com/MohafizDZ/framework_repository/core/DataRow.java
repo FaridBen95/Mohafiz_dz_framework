@@ -55,6 +55,10 @@ public class DataRow extends HashMap<String, Object> implements Parcelable{
         return model.getRelArray(this, field);
     }
 
+    public List<DataRow> getRelArrayRows(Model model, String field){
+        return model.getRelArrayRows(this, field);
+    }
+
     public List<String> getRelArray(Model model, Col col){
         return model.getRelArray(this, col);
     }

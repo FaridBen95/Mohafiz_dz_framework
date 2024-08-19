@@ -18,6 +18,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.telephony.TelephonyManager;
@@ -42,8 +43,7 @@ import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
 
-import com.MohafizDZ.empty_project.R;
-import com.MohafizDZ.framework_repository.MohafizMainActivity;
+import com.MohafizDZ.own_distributor.R;
 import com.MohafizDZ.framework_repository.core.Account.LauncherActivity;
 import com.MohafizDZ.framework_repository.core.Col;
 import com.MohafizDZ.framework_repository.core.DataRow;
@@ -87,7 +87,8 @@ import io.michaelrocks.libphonenumber.android.PhoneNumberUtil;
 
 public class MyUtil {
     public static final String DEFAULT_LANGUAGE = "not_provided";
-    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String DEFAULT_SHARE_DATE_FORMAT = "yyyy-MM-dd HH:mm";
     public static final String CUSTOM_DATE_SHOWING_FORMAT = "EEEE, dd MMMM";
 
@@ -102,7 +103,7 @@ public class MyUtil {
 
     public static String getCurrentDate(){
         SimpleDateFormat gmtFormat = new SimpleDateFormat();
-        gmtFormat.applyPattern(DEFAULT_DATE_FORMAT);
+        gmtFormat.applyPattern(DEFAULT_DATE_TIME_FORMAT);
         TimeZone gmtTime =  TimeZone.getDefault();
         gmtFormat.setTimeZone(gmtTime);
         return gmtFormat.format(new Date());
@@ -164,7 +165,7 @@ public class MyUtil {
     }
 
     public static long dateToMilliSec(String date){
-        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);
         long timeInMilliseconds = 0;
         try {
             Date mDate = sdf.parse(date);
@@ -176,7 +177,11 @@ public class MyUtil {
     }
 
     public static String milliSecToDate(long milliSec){
-        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+        return milliSecToDate(milliSec, DEFAULT_DATE_TIME_FORMAT);
+    }
+
+    public static String milliSecToDate(long milliSec, String dateFormat){
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSec);
         return sdf.format(calendar.getTime()).toString();
@@ -608,8 +613,8 @@ public class MyUtil {
         cal.setTime(today);
         cal.add(Calendar.MINUTE, mins * -1);
         Date date = cal.getTime();
-        SimpleDateFormat gmtFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT, Locale.ENGLISH);
-        gmtFormat.applyPattern(DEFAULT_DATE_FORMAT);
+        SimpleDateFormat gmtFormat = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT, Locale.ENGLISH);
+        gmtFormat.applyPattern(DEFAULT_DATE_TIME_FORMAT);
         TimeZone gmtTime = TimeZone.getDefault();
         gmtFormat.setTimeZone(gmtTime);
         return gmtFormat.format(date);
@@ -621,8 +626,8 @@ public class MyUtil {
         cal.setTime(today);
         cal.add(Calendar.HOUR, hours * -1);
         Date date = cal.getTime();
-        SimpleDateFormat gmtFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT, Locale.ENGLISH);
-        gmtFormat.applyPattern(DEFAULT_DATE_FORMAT);
+        SimpleDateFormat gmtFormat = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT, Locale.ENGLISH);
+        gmtFormat.applyPattern(DEFAULT_DATE_TIME_FORMAT);
         TimeZone gmtTime = TimeZone.getDefault();
         gmtFormat.setTimeZone(gmtTime);
         return gmtFormat.format(date);
@@ -682,7 +687,7 @@ public class MyUtil {
 
     public static String saveImage(Context mContext, Bitmap image, String fileName) {
         String savedImagePath = null;
-        File storageDir = new File(MConstants.applicationImagesFolder);
+        File storageDir = Environment.getExternalStoragePublicDirectory(MConstants.applicationImagesFolder);
         boolean success = true;
         if (!storageDir.exists()) {
             success = storageDir.mkdirs();
@@ -720,7 +725,7 @@ public class MyUtil {
 
     public static String durationFromNow(Resources resources, String dateFrom, String currentDate) {
         long currentTimeMillis = currentDate == null? System.currentTimeMillis(): convertStringDateToMillis(currentDate);
-        Date startDate = createDateObject(dateFrom, DEFAULT_DATE_FORMAT, false);
+        Date startDate = createDateObject(dateFrom, DEFAULT_DATE_TIME_FORMAT, false);
         long different = currentTimeMillis - startDate.getTime();
 
         long secondsInMilli = 1000;
@@ -815,11 +820,11 @@ public class MyUtil {
     }
 
     private static long convertStringDateToMillis(String currentDate) {
-        return createDateObject(currentDate, DEFAULT_DATE_FORMAT, false).getTime();
+        return createDateObject(currentDate, DEFAULT_DATE_TIME_FORMAT, false).getTime();
     }
 
     public static Date getDateFromStringDate(String currentDate) {
-        return createDateObject(currentDate, DEFAULT_DATE_FORMAT, false);
+        return createDateObject(currentDate, DEFAULT_DATE_TIME_FORMAT, false);
     }
 
     public static void toastIconInfo(Activity activity, String message) {
@@ -911,7 +916,7 @@ public class MyUtil {
     }
 
     public static String formatTime(Date time, Locale locale){
-        String timeFormat = DEFAULT_DATE_FORMAT;
+        String timeFormat = DEFAULT_DATE_TIME_FORMAT;
 
         SimpleDateFormat formatter;
         formatter = new SimpleDateFormat(timeFormat, locale);
@@ -1032,4 +1037,39 @@ public class MyUtil {
         BaseInputConnection inputConnection = new BaseInputConnection(editText, true);
         inputConnection.performEditorAction(EditorInfo.IME_ACTION_UNSPECIFIED);
     }
+
+    public static String getGeoHash(double latitude, double longitude) {
+        return GeoFireUtils.getGeoHashForLocation(new GeoLocation(latitude, longitude));
+    }
+
+    public static double distance(double latitude1, double longitude1, double latitude2, double longitude2) {
+        final int RADIUS_EARTH = 6371;
+
+        double dLat = getRad(latitude2 - latitude1);
+        double dLong = getRad(longitude2 - longitude1);
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(getRad(latitude1)) * Math.cos(getRad(latitude2)) * Math.sin(dLong / 2) * Math.sin(dLong / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return (RADIUS_EARTH * c) * 1000;
+    }
+
+    private static Double getRad(Double x) {
+        return x * Math.PI / 180;
+    }
+
+    public static long getTimeInMillis(String date){
+        return createDateObject(date, DEFAULT_DATE_TIME_FORMAT, false)
+                .getTime();
+    }
+
+    public static float calculateDuration(String endDate, String startDate){
+        float duration = 0;
+        try {
+            duration = (getTimeInMillis(endDate) -
+                    getTimeInMillis(startDate));
+        }catch (Exception ignored){}
+        return duration;
+    }
+
+
 }

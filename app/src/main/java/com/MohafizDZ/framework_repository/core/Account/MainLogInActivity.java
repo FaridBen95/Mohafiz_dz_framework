@@ -22,7 +22,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
-import com.MohafizDZ.empty_project.R;
+import com.MohafizDZ.own_distributor.R;
 import com.MohafizDZ.framework_repository.Utils.MyUtil;
 import com.MohafizDZ.framework_repository.core.Account.login_helper_dir.ILogIn;
 import com.MohafizDZ.framework_repository.core.Account.login_helper_dir.LogInHelper;
@@ -121,7 +121,7 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
 
     @Override
     public void setTitleBar(ActionBar actionBar) {
-        setTitle(null);
+        setToolbarTitle(null);
         actionBar.setTitle(null);
     }
 
@@ -133,6 +133,7 @@ public class MainLogInActivity extends MyAppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         int id = v.getId();
+        MyUtil.preventDoubleClick(v);
         if (id == R.id.logInButton) {
             authenticate();
         }else if (id == R.id.googleLoginButton) {

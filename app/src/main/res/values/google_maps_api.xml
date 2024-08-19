@@ -11,7 +11,5 @@
     Note: This resource is used for the debug build target. Update this file if you just want to run
     the demo app.
     -->
-    <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">
-        AIzaSyAOawYg4dWhQkVlr0fIuBAEo1SdgfkTYR0
-    </string>
+    <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">AIzaSyCZ9hWi6z7_AFHsoWPQUcubDM1ZsLd9yvQ</string>
 </resources>

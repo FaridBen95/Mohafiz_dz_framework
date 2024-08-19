@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accountType="com.mohafizDZ.empty_project.auth"
-    android:contentAuthority="com.MohafizDZ.empty_project.global_configuration_provider"
+    android:accountType="com.mohafizDZ.own_distributor.auth"
+    android:contentAuthority="com.MohafizDZ.own_distributor.global_configuration_provider"
     android:supportsUploading="true"
     android:userVisible="true"
     android:allowParallelSyncs="false"

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "749007453941",
+    "project_id": "own-distributor",
+    "storage_bucket": "own-distributor.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:749007453941:android:d0ca1651774a22d1fb4fbc",
+        "android_client_info": {
+          "package_name": "com.MohafizDZ.own_distributor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "749007453941-n285ng59ot993e8ujfj9rfuib48b25gu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFi05XeEp6jqi_1nBjPlI46C6pInUfAZQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "749007453941-n285ng59ot993e8ujfj9rfuib48b25gu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
