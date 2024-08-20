@@ -684,9 +684,11 @@ public class MohafizMainActivity extends MyAppCompatActivity implements DuoMenuV
 
         @Override
         public void onSyncFinish(Bundle data, Model model) {
+            Log.d(TAG, "onsync finished1 " + model.getModelName());
             String from = data.containsKey("from") ? data.getString("from") : "";
             if (from != null) {
                 if (from.equals(MohafizMainActivity.TAG) && !opened) {
+                    Log.d(TAG, "onsync finished " + model.getModelName());
                     if(model.getModelName().equals("user")
                             || model.getModelName().equals("global_configuration")){
                         if (!syncedModels.contains(model.getModelName())) {

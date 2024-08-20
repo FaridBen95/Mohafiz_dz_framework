@@ -54,6 +54,7 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
     private final DataRow currentUserRow;
     private final Models models;
     private int refreshingCount;
+    private boolean syncInProgress = false;
 
     public DetailsPresenterImpl(IDetailsPresenter.View view, Context context, DataRow currentUserRow) {
         this.view = view;
@@ -64,6 +65,7 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
 
     @Override
     public void onViewCreated() {
+        syncInProgress = false;
         requestSyncCompanyUser();
         requestSyncDistributor();
         requestSyncPlannerModel();
@@ -75,6 +77,9 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
         requestSyncDown(models.expenseSubjectModel);
         requestSyncDown(models.denominationModel);
         requestSyncDown(models.visitNoActionCategoryModel);
+        if(!syncInProgress){
+            view.prepareView();
+        }
         if(isAdmin()){
             DataRow plannerRow = models.plannerModel.getCurrentPlanner(currentUserRow);
             if(!plannerRow.getBoolean("synced")){
@@ -134,12 +139,13 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
     }
 
     private void requestSyncDistributor() {
-        //todo switch to firebase functions
-        onSyncStateChanged(isRefreshing(true));
         final String key = models.distributorModel.getModelName() + "_down_" + SYNC_KEY_SUFFIX;
         if(hasSynced(key)){
             return;
         }
+        syncInProgress = true;
+        //todo switch to firebase functions
+        onSyncStateChanged(isRefreshing(true));
         models.distributorModel.syncDistributor(currentUserRow.getString(Col.SERVER_ID),
                 new IFirestoreSync.SyncDownListener() {
             @Override
@@ -164,6 +170,7 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
         if(hasSynced(key)){
             return;
         }
+        syncInProgress = true;
         onSyncStateChanged(isRefreshing(true));
         models.companyUserModel.syncUser(currentUserRow.getString(Col.SERVER_ID),
                 new IFirestoreSync.SyncDownListener() {
@@ -189,6 +196,7 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
         if(hasSynced(key)){
             return;
         }
+        syncInProgress = true;
         final FirestoreSyncDownBridge firestoreSyncDownBridge = new FirestoreSyncDownBridge(models.plannerModel, null, new FirestoreSyncDownBridge.SyncListener() {
             @Override
             public void onSyncFinished(List<DataRow> records) {
@@ -233,6 +241,7 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
         if(syncWithSuccess(key, REGION_SYNC_DOWN_DELAY)){
             return;
         }
+        syncInProgress = true;
         final FirestoreSyncDownBridge firestoreSyncDownBridge = new FirestoreSyncDownBridge(models.regionModel, null, new FirestoreSyncDownBridge.SyncListener() {
             @Override
             public void onSyncFinished(List<DataRow> records) {
@@ -312,6 +321,7 @@ public class DetailsPresenterImpl implements IDetailsPresenter.Presenter, SyncMo
         if(syncWithSuccess(key, DEFAULT_SYNC_DOWN_DELAY)){
             return;
         }
+        syncInProgress = true;
         final FirestoreSyncDownBridge firestoreSyncDownBridge = new FirestoreSyncDownBridge(model, null, new FirestoreSyncDownBridge.SyncListener() {
             @Override
             public void onSyncFinished(List<DataRow> records) {

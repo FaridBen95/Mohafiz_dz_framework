@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -331,9 +332,10 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private ISyncFinishReceiver syncFinishReceiver = new ISyncFinishReceiver() {
+    private final ISyncFinishReceiver syncFinishReceiver = new ISyncFinishReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReciver sync finished");
             Bundle data = intent.getExtras();
             if(data != null){
                 String modelClassName = data.getString(ISyncFinishReceiver.MODEL_KEY);
@@ -408,9 +410,16 @@ public abstract class MyAppCompatActivity extends AppCompatActivity implements A
         super.onResume();
         try {
             //todo check these
-            registerReceiver(onlineDateReceiver, new IntentFilter(IOnlineDateReceiver.ONLINE_DATE_STARTED), RECEIVER_NOT_EXPORTED);
-            getApplicationContext().registerReceiver(syncStartReceiver, new IntentFilter(ISyncStartReceiver.SYNC_START), RECEIVER_NOT_EXPORTED);
-            getApplicationContext().registerReceiver(syncFinishReceiver, new IntentFilter(ISyncFinishReceiver.SYNC_FINISH), RECEIVER_NOT_EXPORTED);
+            IntentFilter intentFilter = new IntentFilter(ISyncFinishReceiver.SYNC_FINISH);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getApplicationContext().registerReceiver(syncStartReceiver, new IntentFilter(IOnlineDateReceiver.ONLINE_DATE_STARTED), RECEIVER_EXPORTED);
+                getApplicationContext().registerReceiver(syncStartReceiver, new IntentFilter(ISyncStartReceiver.SYNC_START), RECEIVER_EXPORTED);
+                getApplicationContext().registerReceiver(syncFinishReceiver, intentFilter, RECEIVER_EXPORTED);
+            } else {
+                getApplicationContext().registerReceiver(syncStartReceiver, new IntentFilter(IOnlineDateReceiver.ONLINE_DATE_STARTED));
+                getApplicationContext().registerReceiver(syncStartReceiver, new IntentFilter(ISyncStartReceiver.SYNC_START));
+                getApplicationContext().registerReceiver(syncFinishReceiver, intentFilter);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
