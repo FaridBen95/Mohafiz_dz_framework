@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Own Distributor</string>
+    <string name="app_name">D ElGuide</string>
     <string name="accept_permission">Please accept the permission to start the application</string>
     <string name="facebook_app_id" translatable="false">257843415722498</string>
     <string name="fb_login_protocol_scheme" translatable="false">fb257843415722498</string>
@@ -16,7 +16,7 @@
     <string name="default_notification_channel_id" translatable="false">0</string>
     <string name="you_need_internet_connection">You need an internet connection</string>
     <string name="try_again">Please try again</string>
-    <string name="app_title" translatable="false">Mohafiz dz Own Distributor</string>
+    <string name="app_title" translatable="false">@string/app_name</string>
     <string name="phone_number">Phone</string>
     <string name="reset_code_sent">Reset password code sent to your email</string>
     <string name="error_confirming_phone_code">An error while confirming phone code</string>

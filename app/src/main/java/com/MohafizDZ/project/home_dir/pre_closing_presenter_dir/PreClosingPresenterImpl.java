@@ -27,7 +27,6 @@ public class PreClosingPresenterImpl implements IPreClosingPresenter.Presenter{
     @Override
     public void onViewCreated() {
         initData();
-        view.toggleCashBox(tourRow != null && tourRow.getBoolean("use_cash_box"));
         onRefresh();
     }
 
@@ -43,6 +42,7 @@ public class PreClosingPresenterImpl implements IPreClosingPresenter.Presenter{
         view.checkCashBox(tourRow != null && tourRow.getBoolean("cash_box_validated"));
         view.checkSales(tourRow != null && tourRow.getBoolean("sales_validated"));
         view.checkInventory(tourRow != null && tourRow.getBoolean("inventory_validated"));
+        view.toggleCashBox(tourRow != null && tourRow.getBoolean("use_cash_box"));
     }
 
     @Override
